@@ -1,0 +1,162 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = false;
+}
+
+PARSER_BEGIN(Parser)
+package ParserPackage;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class Parser
+{
+  public static void main(String args []) throws ParseException, IOException
+  {
+    final String STRUCTURE = "Enter an expression like \"(S1) (d | d:D) c.operation (S2);\" :\n";
+    BufferedReader objReader = new BufferedReader(new FileReader("simpleMarketPlace.txt"));
+    Parser parser = new Parser(objReader);
+    Automaton a = new Automaton();
+    System.out.print(STRUCTURE);
+    boolean endOfFile = false;
+    while (!endOfFile)
+    {
+      try
+      {
+        switch (parser.one_line(a))
+        {
+          case 0 : 
+          break;
+          case 1 : 
+          endOfFile = true;
+          break;
+          default : 
+          break;
+        }
+      }
+      catch (Exception e)
+      {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        break;
+      }
+      catch (Error e)
+      {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+    a.printAll();
+  }
+}
+
+PARSER_END(Parser)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN :
+{
+  < #DIGIT : [ "0"-"9" ] >
+| < #LETTER : [ "a"-"z", "A"-"Z" ] >
+| < STRING : (< LETTER >)+ >
+| < EMPTYSTATE : "(_)" >
+| < STATE :
+    "("
+    (
+      < LETTER > (< DIGIT >)*
+    )
+    ")" >
+| < START : "starts(" < STRING > ")" >
+| < METHOD : < STRING > "()" >
+| < CONTRACTOPERATION : < STRING > "." < METHOD > >
+}
+
+int one_line(Automaton a) :
+{}
+{
+  action(a) ";"
+  {
+    return 0;
+  }
+| "EOF;"
+  {
+    return 1;
+  }
+}
+
+void action(Automaton a) :
+{
+  Token iState;
+  Token eState;
+  Token method;
+}
+{
+  < EMPTYSTATE > participant(a) method = < START > eState = < STATE >
+  {
+    a.addState(eState.image);
+    a.setInitialState(eState.image);
+    a.addContract(method.image);
+  }
+| iState = < STATE > participantAll(a) actionChoice(a)
+  {
+    a.addState(iState.image);
+  }
+}
+
+void actionChoice(Automaton a) :
+{
+  Token op;
+  Token state;
+}
+{
+  op = < CONTRACTOPERATION > state = < STATE >
+  {
+    a.addState(state.image);
+    a.addOperation(op.image);
+  }
+| op = < METHOD > state = < STATE >
+  {
+    a.addState(state.image);
+    a.addInternalOperations(op.image);
+  }
+}
+
+void participant(Automaton a) :
+{
+  Token par;
+  Token role = null;
+}
+{
+  par = < STRING > (":" role = < STRING >)?
+  {
+    if (role != null)
+    {
+      a.addParticipant(par.image, role.image);
+      a.addRole(role.image);
+    }
+  }
+}
+
+void participantAll(Automaton a) :
+{
+  Token fPar;
+  Token sPar;
+}
+{
+  // needs change
+  // possible input (d:D | p:P)
+  "(" participant(a) "|" participant(a) ")"
+| participant(a)
+  {
+  }
+}
