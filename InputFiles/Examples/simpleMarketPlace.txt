@@ -1,0 +1,14 @@
+(_) o:O starts(c) (S0);
+(S0) b:B c.makeOffer() (S1);
+(S0) o c.halt() (S5);
+(S1) o c.reject() (S3);
+(S1) o c.accept() (S2);
+(S2) b c.halt() (S5);
+(S2) b c-leave() (S5);
+(S3) b c-leave() (S5);
+(S3) o x.halt() (S5);
+(S3) b c-stay() (S3);
+(S4) b c-leave() (S5);
+(S4) (b|b:B) c.makeOffer() (S1);
+ENDSTATES - c - {(S5)};
+EOF;
