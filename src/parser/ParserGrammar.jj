@@ -129,7 +129,7 @@ void normalAction(Automaton a):
   String part;
 }
 {
-  iState = < STATE >  part = participantChoice(a) contract = <STRING> actionChoice(a,contract,iState)
+  iState = < STATE >  part = participantChoice(a) contract = <STRING> actionChoice(a, contract, part, iState)
   {
     Contract c = a.getContractById(contract.image);
 	if(c == null)
@@ -140,7 +140,8 @@ void normalAction(Automaton a):
   }
 }
 
-void actionChoice(Automaton a, Token cId, Token iState) :
+void actionChoice(Automaton a, Token cId, 
+  String part, Token iState) :
 {
   Token op;
   Token state;
@@ -158,6 +159,7 @@ void actionChoice(Automaton a, Token cId, Token iState) :
     c.addState(state.image);
     g = a.getGraph();
     g.addEdge(iState.image, state.image);
+    a.addTransitions(new Transition(iState.image, state.image, op.image, part));
   }
 | op = < INTERNALOPERATIONS > state = < STATE >
   {
@@ -169,6 +171,7 @@ void actionChoice(Automaton a, Token cId, Token iState) :
     c.addState(state.image);
     g = a.getGraph();
     g.addEdge(iState.image, state.image);
+    a.addTransitions(new Transition(iState.image, state.image, op.image, part));
   }
 }
 
@@ -254,6 +257,8 @@ void deployAction(Automaton a):
     c.addParticipant(par.image);
     c.addRegisteredParticipant(par.image, role.image);
     c.addRole(role.image);
+    
+    a.addTransitions(new Transition("_", eState.image, method.image, par.image));
   }
 }
 

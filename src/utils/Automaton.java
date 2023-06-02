@@ -8,6 +8,7 @@ public class Automaton {
 	private Set<String> contractsRegistered = new HashSet<String>();
 	private Hashtable<String, Contract> contracts = new Hashtable<String, Contract>();
 	
+	private List<Transition> transitions = new ArrayList<Transition>();
 	private Graph graph;
 	
 	public Automaton() {
@@ -51,5 +52,17 @@ public class Automaton {
 
 	public void setGraph(Graph graph) {
 		this.graph = graph;
+	}
+
+	public List<Transition> getTransitions() {
+		return transitions;
+	}
+
+	public void setTransitions(List<Transition> transitions) {
+		this.transitions = transitions;
+	}
+
+	public void addTransitions(Transition transition) {
+		this.transitions.add(transition);
 	}
 }
