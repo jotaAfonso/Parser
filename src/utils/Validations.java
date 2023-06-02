@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 public class Validations {
 
 	private boolean validationFlag;
+	private Graph graph;
 
 	private static final String ERROR = "ERROR";
 	private static final String ERROR_CONTRACT = ERROR + " - CONTRACT";
@@ -28,10 +29,11 @@ public class Validations {
 	}
 
 	public void validateParsedInput(Automaton a) {
-		this.checkValidaityOfContract(a);
+		this.checkValidaityOfContracts(a);
 		for (Contract c : a.getContractsSet()) {
 			this.checkValidityOfParticipants(c);
 			this.checkEndStates(c);
+			this.checkValidityOfStates(c, a.getGraph());
 		}
 
 		if (this.getFlag())
@@ -52,7 +54,7 @@ public class Validations {
 		UtilsParser.printLoop("Internal operations:", c.getInternalOperationsSet());
 	}
 
-	public void checkValidaityOfContract(Automaton a) {
+	public void checkValidaityOfContracts(Automaton a) {
 		Set<String> regContractSet = a.getRegisteredContractsSet();
 		if (a.getContractsIdSet().containsAll(regContractSet)) {
 			Set<String> result = new HashSet<String>(regContractSet);
@@ -105,50 +107,76 @@ public class Validations {
 		}
 	}
 
-	public static Graph calculateShortestPathFromSource(Graph graph, Node source) {
-		source.setDistance(0);
+	private void checkValidityOfStates(Contract c, Graph g) {
+		if (this.getFlag()) {
+			String initS = c.getInitialState();
+			List<String> endS = UtilsParser.setToList(c.getEndStatesSet());
 
-		Set<Node> settledNodes = new HashSet<Node>();
-		Set<Node> unsettledNodes = new HashSet<Node>();
-
-		unsettledNodes.add(source);
-
-		while (unsettledNodes.size() != 0) {
-			Node currentNode = getLowestDistanceNode(unsettledNodes);
-			unsettledNodes.remove(currentNode);
-			for (Entry<Node, Integer> adjacencyPair : currentNode.getAdjacentNodes().entrySet()) {
-				Node adjacentNode = adjacencyPair.getKey();
-				Integer edgeWeight = adjacencyPair.getValue();
-				if (!settledNodes.contains(adjacentNode)) {
-					calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
-					unsettledNodes.add(adjacentNode);
+			for (String s : c.getStatesSet()) {
+				if (!s.equals(initS) && !endS.contains(s)) {
+					boolean t1 = checkPath(g, s, endS);
+					boolean t2 = checkIfPathExists(g, initS, s);
+				} else if(endS.contains(s)) {
+					boolean t2 = checkIfPathExists(g, initS, s);
+				} else {
+					boolean t1 = checkPath(g, s, endS);
 				}
 			}
-			settledNodes.add(currentNode);
 		}
+	}
+
+	private boolean checkPath(Graph graph, String state, List<String> endS) {
+		for (String e : endS) {
+			if (!checkIfPathExists(graph, state, e)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean checkIfPathExists(Graph graph, String start, String end) {
+		LinkedList<String> visited = new LinkedList<String>();
+		visited.add(start);
+		boolean flag = false;
+		boolean result = breadthFirst(graph, visited, start, end, flag);
+		if (!result) {
+			System.out.println("No path Exists between " + start + " and " + end);
+		}
+		return result;
+	}
+
+	private boolean breadthFirst(Graph graph, LinkedList<String> visited, String start, String end, boolean flag) {
+		LinkedList<String> nodes = graph.adjacentNodes(visited.getLast());
+
+		for (String node : nodes) {
+			if (visited.contains(node)) {
+				continue;
+			}
+			if (node.equals(end)) {
+				visited.add(node);
+				flag = true;
+				visited.removeLast();
+				break;
+			}
+		}
+
+		for (String node : nodes) {
+			if (visited.contains(node) || node.equals(end)) {
+				continue;
+			}
+			visited.addLast(node);
+			flag = breadthFirst(graph, visited, start, end, flag);
+			visited.removeLast();
+		}
+
+		return flag;
+	}
+
+	public Graph getGraph() {
 		return graph;
 	}
 
-	private static Node getLowestDistanceNode(Set<Node> unsettledNodes) {
-		Node lowestDistanceNode = null;
-		int lowestDistance = Integer.MAX_VALUE;
-		for (Node node : unsettledNodes) {
-			int nodeDistance = node.getDistance();
-			if (nodeDistance < lowestDistance) {
-				lowestDistance = nodeDistance;
-				lowestDistanceNode = node;
-			}
-		}
-		return lowestDistanceNode;
-	}
-
-	private static void calculateMinimumDistance(Node evaluationNode, Integer edgeWeigh, Node sourceNode) {
-		Integer sourceDistance = sourceNode.getDistance();
-		if (sourceDistance + edgeWeigh < evaluationNode.getDistance()) {
-			evaluationNode.setDistance(sourceDistance + edgeWeigh);
-			LinkedList<Node> shortestPath = new LinkedList<Node>(sourceNode.getShortestPath());
-			shortestPath.add(sourceNode);
-			evaluationNode.setShortestPath(shortestPath);
-		}
+	public void setGraph(Graph graph) {
+		this.graph = graph;
 	}
 }

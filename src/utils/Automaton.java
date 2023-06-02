@@ -8,7 +8,10 @@ public class Automaton {
 	private Set<String> contractsRegistered = new HashSet<String>();
 	private Hashtable<String, Contract> contracts = new Hashtable<String, Contract>();
 	
+	private Graph graph;
+	
 	public Automaton() {
+		setGraph(new Graph());
 	}
 
 	/** adds a registered contract to the automaton, used for checking */
@@ -42,8 +45,11 @@ public class Automaton {
 		return this.contracts.keySet();
 	}
 
-//	public List<String> getOperations() {
-//		return this.contracts.values().stream().map(x -> x.getOperationsSet()).flatMap(Collection::stream)
-//				.collect(Collectors.toList());
-//	}
+	public Graph getGraph() {
+		return graph;
+	}
+
+	public void setGraph(Graph graph) {
+		this.graph = graph;
+	}
 }

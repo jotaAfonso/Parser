@@ -6,8 +6,8 @@
 (S2) b c.halt() (S5);
 (S2) b c-leave() (S5);
 (S3) b c-leave() (S5);
-(S3) o x.halt() (S5);
-(S3) b c-stay() (S3);
+(S3) o c.halt() (S5);
+(S3) b c-stay() (S4);
 (S4) b c-leave() (S5);
 (S4) (b|b:B) c.makeOffer() (S1);
 ENDSTATES - c - {(S5)};

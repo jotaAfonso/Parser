@@ -2,7 +2,6 @@
 package parser;
 import java.io.*;
 import java.util.*;
-
 import utils.*;
 
 /** Token Manager. */

@@ -7,10 +7,10 @@ options
 }
 
 PARSER_BEGIN(Parser)
-package parserPackage;
+package parser;
 import java.io.*;
 import java.util.*;
-import UtilsPackage.*;
+import utils.*;
 
 public class Parser
 {
@@ -129,7 +129,7 @@ void normalAction(Automaton a):
   String part;
 }
 {
-  iState = < STATE >  part = participantChoice(a) contract = <STRING> actionChoice(a,contract)
+  iState = < STATE >  part = participantChoice(a) contract = <STRING> actionChoice(a,contract,iState)
   {
     Contract c = a.getContractById(contract.image);
 	if(c == null)
@@ -140,11 +140,12 @@ void normalAction(Automaton a):
   }
 }
 
-void actionChoice(Automaton a, Token cId) :
+void actionChoice(Automaton a, Token cId, Token iState) :
 {
   Token op;
   Token state;
   Contract c = null;
+  Graph g = null;
 }
 {
   op = < CONTRACTOPERATION > state = < STATE >
@@ -155,6 +156,8 @@ void actionChoice(Automaton a, Token cId) :
     c = a.getContractById(cId.image);
     c.addOperation(op.image);
     c.addState(state.image);
+    g = a.getGraph();
+    g.addEdge(iState.image, state.image);
   }
 | op = < INTERNALOPERATIONS > state = < STATE >
   {
@@ -164,6 +167,8 @@ void actionChoice(Automaton a, Token cId) :
     c = a.getContractById(cId.image);
     c.addInternalOperation(op.image);
     c.addState(state.image);
+    g = a.getGraph();
+    g.addEdge(iState.image, state.image);
   }
 }
 
