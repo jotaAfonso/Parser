@@ -1,0 +1,97 @@
+{
+  "id" : "c",
+  "initialState" : "S0",
+  "states" : [ "S3", "S4", "S5", "S0", "S1", "S2" ],
+  "endStates" : [ "S5" ],
+  "operations" : [ {
+    "fromState" : "(S1)",
+    "toState" : "(S2)",
+    "operation" : ".accept()",
+    "participant" : "o",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S3)",
+    "toState" : "(S5)",
+    "operation" : ".halt()",
+    "participant" : "o",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(_)",
+    "toState" : "(S0)",
+    "operation" : "starts(c)",
+    "participant" : "o",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S0)",
+    "toState" : "(S5)",
+    "operation" : ".halt()",
+    "participant" : "o",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S0)",
+    "toState" : "(S1)",
+    "operation" : ".makeOffer()",
+    "participant" : "b:B",
+    "newParticipant" : true,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S2)",
+    "toState" : "(S5)",
+    "operation" : ".halt()",
+    "participant" : "b",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S1)",
+    "toState" : "(S3)",
+    "operation" : ".reject()",
+    "participant" : "o",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S4)",
+    "toState" : "(S1)",
+    "operation" : ".makeOffer()",
+    "participant" : "b|b:B",
+    "newParticipant" : true,
+    "bothParticipant" : true
+  } ],
+  "internalOperations" : [ {
+    "fromState" : "(S2)",
+    "toState" : "(S5)",
+    "operation" : "-leave()",
+    "participant" : "b",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S4)",
+    "toState" : "(S5)",
+    "operation" : "-leave()",
+    "participant" : "b",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S3)",
+    "toState" : "(S4)",
+    "operation" : "-stay()",
+    "participant" : "b",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  }, {
+    "fromState" : "(S3)",
+    "toState" : "(S5)",
+    "operation" : "-leave()",
+    "participant" : "b",
+    "newParticipant" : false,
+    "bothParticipant" : false
+  } ],
+  "roles" : [ "B", "O" ],
+  "registeredParticipants" : {
+    "b" : "B",
+    "o" : "O"
+  }
+}

@@ -1,0 +1,13 @@
+(_) o:O starts(c) (S0);
+(S0) b:B c.makeOffer() (S1);
+(S0) o c.halt() (S5);
+(S1) o c.reject() (S3);
+(S1) o c.accept() (S2);
+(S2) o c.halt() (S5);
+(S2) e leave() (S5);
+(S3) t leave() (S5);
+(S3) o c.halt() (S5);
+(S3) b stay() (S4);
+(S4) b leave() (S5);
+(S4) (b|b:B) c.makeOffer() (S1);
+EOF;
