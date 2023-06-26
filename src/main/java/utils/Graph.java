@@ -1,44 +1,46 @@
 package utils;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 public class Graph {
 
-	private Map<String, LinkedHashSet<String>> map = new HashMap<String, LinkedHashSet<String>>();
+	//private Map<String, LinkedHashSet<String>> map = new HashMap<String, LinkedHashSet<String>>();
+	private Map<String, HashMap<String, String>> map = new HashMap<String, HashMap<String, String>>();
 
-	public void addEdge(String node1, String node2) {
+	public void addEdge(String node1, String node2, String part) {
 		node1 = UtilsParser.removeParenthesisFromString(node1);
 		node2 = UtilsParser.removeParenthesisFromString(node2);
-		LinkedHashSet<String> adjacent = map.get(node1);
+		HashMap<String, String> adjacent = map.get(node1);
 		if (adjacent == null) {
-			adjacent = new LinkedHashSet<String>();
+			adjacent = new HashMap<String, String>();
 			map.put(node1, adjacent);
 		}
-		adjacent.add(node2);
-	}
-
-	public void addTwoWayVertex(String node1, String node2) {
-		addEdge(node1, node2);
-		addEdge(node2, node1);
+		adjacent.put(node2, part);
 	}
 
 	public boolean isConnected(String node1, String node2) {
-		Set<String> adjacent = map.get(node1);
+		HashMap<String, String> adjacent = map.get(node1);
 		if (adjacent == null) {
 			return false;
 		}
-		return adjacent.contains(node2);
+		return adjacent.containsKey(node2);
 	}
 
 	public LinkedList<String> adjacentNodes(String last) {
-		LinkedHashSet<String> adjacent = map.get(last);
+		HashMap<String, String> adjacent = map.get(last);
 		if (adjacent == null) {
 			return new LinkedList<String>();
 		}
-		return new LinkedList<String>(adjacent);
+		return new LinkedList<String>(adjacent.keySet());
+	}
+
+	public HashMap<String, String> adjacentNodesPart(String last) {
+		HashMap<String, String> adjacent = map.get(last);
+		if (adjacent == null) {
+			return new HashMap<String, String>();
+		}
+		return adjacent;
 	}
 }

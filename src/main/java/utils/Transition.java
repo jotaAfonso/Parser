@@ -12,8 +12,8 @@ public class Transition {
 	private boolean bothParticipant;
 
 	public Transition(String from, String to, String op, String part) {
-		this.fromState = from;
-		this.toState = to;
+		this.fromState = UtilsParser.removeParenthesisFromString(from);
+		this.toState = UtilsParser.removeParenthesisFromString(to);
 		this.operation = op;
 		setupPart(part);
 	}

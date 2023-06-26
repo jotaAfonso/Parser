@@ -19,13 +19,13 @@ public class Parser
     // final String STRUCTURE = "Enter an expression like \"(S1) (d | d:D) c.operation (S2);\" :\n";
 	// for read me file
 
-    final String FILE = "t2.txt";
+    final String FILE = "t4.txt";
 
-    final String PATH_EXAMPLES = "InputFiles/Examples/simpleMarketPlace.txt";
+    final String PATH_EXAMPLES = "inputFiles/Examples/simpleMarketPlace.txt";
 
-    final String PATH_SUCCESS = "InputFiles/SuccessInput" + FILE;
+    final String PATH_SUCCESS = "inputFiles/successInput" + FILE;
 
-    final String PATH_ERROR = "InputFiles/ErrorInput/" + FILE;
+    final String PATH_ERROR = "inputFiles/errorInput/" + FILE;
     BufferedReader objReader = new BufferedReader(new FileReader(PATH_EXAMPLES));
     Parser parser = new Parser(objReader);
     Data d = new Data();
@@ -159,7 +159,7 @@ void actionChoice(Data d, Token cId,
     a = d.getContractById(cId.image);
     a.addState(state.image);
     g = d.getGraph();
-    g.addEdge(iState.image, state.image);
+    g.addEdge(iState.image, state.image, part);
 
     t =new Transition(iState.image, state.image, op.image, part); 
     a.addOperation(t);
@@ -173,7 +173,7 @@ void actionChoice(Data d, Token cId,
     a = d.getContractById(cId.image);
     a.addState(state.image);
     g = d.getGraph();
-    g.addEdge(iState.image, state.image);
+    g.addEdge(iState.image, state.image, part);
 
     t =new Transition(iState.image, state.image, op.image, part); 
     a.addInternalOperation(t);
@@ -262,10 +262,10 @@ void deployAction(Data d):
     a.setInitialState(eState.image);
 
     a.addParticipant(par.image);
-    a.addRegisteredParticipant(par.image, role.image);
+    a.addRoleParticipant(role.image, par.image);
     a.addRole(role.image);
 
-    t = new Transition("(_)", eState.image, method.image, par.image); 
+    t = new Transition("(_)", eState.image, method.image, par.image  + ":" + role.image); 
     a.addOperation(t);
     d.addTransitions(t);
   }

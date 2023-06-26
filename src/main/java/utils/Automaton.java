@@ -32,9 +32,10 @@ public class Automaton {
 	private Set<String> roles = new HashSet<String>();
 	// TODO: change so that a participant can have more roles
 	private Set<String> participants = new HashSet<String>();
-	@JsonProperty("registeredParticipants")
-	private Hashtable<String, String> registeredParticipants = new Hashtable<String, String>();
 
+	@JsonProperty("roleParticipants")
+	private List<Association> roleParticipant = new ArrayList<Association>();
+	
 	public Automaton(String id) {
 		this.id = id;
 	}
@@ -130,11 +131,6 @@ public class Automaton {
 		return this.participants;
 	}
 
-	/** registers a participant in the contract */
-	public void addRegisteredParticipant(String participant, String role) {
-		this.registeredParticipants.put(participant, role);
-	}
-
 	public void addParticipantChoice(String part) {
 		String partLocal = UtilsParser.removeParenthesisFromString(part);
 		String[] elements = partLocal.split("[|]");
@@ -142,13 +138,13 @@ public class Automaton {
 			// TODO: method to avoid duplication
 			if (elements[0].contains(":")) {
 				String[] newPart = elements[0].split(":");
-				this.addRegisteredParticipant(newPart[0], newPart[1]);
+				addRoleParticipant(newPart[1], newPart[0]);
 				this.addParticipant(elements[1]);
 				this.addParticipant(newPart[0]);
 				this.addRole(newPart[1]);
 			} else {
 				String[] newPart = elements[1].split(":");
-				this.addRegisteredParticipant(newPart[0], newPart[1]);
+				addRoleParticipant(newPart[1], newPart[0]);
 				this.addParticipant(elements[0]);
 				this.addParticipant(newPart[0]);
 				this.addRole(newPart[1]);
@@ -156,7 +152,7 @@ public class Automaton {
 		} else {
 			if (elements[0].contains(":")) {
 				String[] newPart = elements[0].split("[:]");
-				this.addRegisteredParticipant(newPart[0], newPart[1]);
+				addRoleParticipant(newPart[1], newPart[0]);
 				this.addParticipant(newPart[0]);
 				this.addRole(newPart[1]);
 			} else {
@@ -165,9 +161,39 @@ public class Automaton {
 		}
 	}
 
+	// TODO: There has got to be a better way than this
+	private boolean getRoleParticipantExistsRole(String role) {
+		return this.roleParticipant.stream().filter(x -> x.getRoleId().equals(role)).count() == 1;
+	}
+	
 	@JsonIgnore
-	/** returns the set of participants registered in the contract */
+	public List<Association> getRoleParticipant() {
+		return roleParticipant;
+	}
+
+	public void addRoleParticipant(String role, String part) {
+		if(getRoleParticipantExistsRole(role)) {
+			this.roleParticipant.stream().filter(x -> x.getRoleId().equals(role)).findFirst().get().getParticipants().add(part);
+		} else {
+			Association assoc = new Association();
+			assoc.setRoleId(role);
+			Set<String> partL = new HashSet<String>();
+			partL.add(part);
+			assoc.setParticipants(partL);
+			this.roleParticipant.add(assoc);
+		}
+	}
+
+	public void setRoleParticipant(List<Association> roleParticipant) {
+		this.roleParticipant = roleParticipant;
+	}
+
+	@JsonIgnore
 	public Set<String> getRegisteredParticipantsSet() {
-		return this.registeredParticipants.keySet();
+		Set<String> result = new HashSet<String>();
+		for(String r : this.getRolesSet()) {
+			result.addAll(this.getRoleParticipant().stream().filter(x -> x.getRoleId().equals(r)).findFirst().get().getParticipants());
+		}
+		return result;
 	}
 }
