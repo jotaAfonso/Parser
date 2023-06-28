@@ -41,12 +41,18 @@ public class Validations {
 		return this.foundRegistryOfRoleFlag;
 	}
 
-	public void validateParsedInput(Data d) throws IOException {
+	public void validateParsedInput(Data d, String outputFile) throws IOException {
+		// checks if contract was deployed
 		this.checkValidaityOfContracts(d);
 		for (Automaton c : d.getAutomataSet()) {
-			this.checkValidityOfParticipants(c);
+			// checks if the end states exist in the transitions
 			this.checkEndStates(c);
+			// checks if a state has a path a valid path from the initial state
+			// and also checks if it has a valid path to at least one end state
 			this.checkValidityOfStates(c, d.getGraph());
+			// checks if all participants are registered
+			this.checkValidityOfParticipants(c);
+			// checks if a participant was previously registered
 			checkRegistrationOfParticipants(c, d.getGraph());
 		}
 
@@ -54,24 +60,14 @@ public class Validations {
 			for (Automaton c : d.getAutomataSet()) {
 				// printAll(c);
 				ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-				mapper.writeValue(Paths.get("global_type.json").toFile(), c);
+				mapper.writeValue(Paths.get(outputFile.concat(".json")).toFile(), c);
 			}
 
 	}
 
-	public void printAll(Automaton a) {
-		System.out.printf("Contract %s\n", a.getId());
-		System.out.println("Init state:");
-		System.out.println(a.getInitialState() + "\n");
-
-		UtilsParser.printLoop("States:", a.getStatesSet());
-		UtilsParser.printLoop("End States:", a.getEndStatesSet());
-		UtilsParser.printLoop("Roles:", a.getRolesSet());
-		//UtilsParser.printLoop("Participants:", a.getRegisteredParticipantsSet());
-		//UtilsParser.printLoop("Operations:", a.getOperationsSet());
-		//UtilsParser.printLoop("Internal operations:", a.getInternalOperationsSet());
-	}
-
+	/*
+	 * checks if a contract
+	 * */
 	public void checkValidaityOfContracts(Data d) {
 		Set<String> regContractSet = d.getRegisteredContractsSet();
 		if (d.getAutomataIdSet().containsAll(regContractSet)) {

@@ -5,52 +5,60 @@ import java.util.*;
 import utils.*;
 
 public class Parser implements ParserConstants {
+  private static final String ERROR_NO_INPUT_FILE = "Requires input file path.";
+
+  private static final String POSSIBLE_ARGS = "Arguments available - <input_file_path> <output_file_name>";
+
   public static void main(String args []) throws ParseException, IOException
   {
-    // final String STRUCTURE = "Enter an expression like \"(S1) (d | d:D) c.operation (S2);\" :\n";
-        // for read me file
-
-    final String FILE = "t4.txt";
-
-    final String PATH_EXAMPLES = "inputFiles/Examples/simpleMarketPlace.txt";
-
-    final String PATH_SUCCESS = "inputFiles/successInput" + FILE;
-
-    final String PATH_ERROR = "inputFiles/errorInput/" + FILE;
-    BufferedReader objReader = new BufferedReader(new FileReader(PATH_EXAMPLES));
-    Parser parser = new Parser(objReader);
-    Data d = new Data();
-    Validations valid = new Validations();
-    boolean endOfFile = false;
-    while (!endOfFile)
+    if (args.length == 0)
     {
-      try
+      System.out.printf("%s\u005cn", POSSIBLE_ARGS);
+      System.err.printf("%s\u005cn", ERROR_NO_INPUT_FILE);
+    }
+    else
+    {
+      // final String STRUCTURE = "Enter an expression like \"(S1) (d | d:D) c.operation (S2);\" :\n";
+      String inputFilePath = args [0];
+      String outputFilePath = "global_type";
+      if (args.length > 1)
+      outputFilePath = args [1];
+      System.out.print(inputFilePath);
+      BufferedReader objReader = new BufferedReader(new FileReader(inputFilePath));
+      Parser parser = new Parser(objReader);
+      Data d = new Data();
+      Validations valid = new Validations();
+      boolean endOfFile = false;
+      while (!endOfFile)
       {
-        switch (parser.one_line(d))
+        try
         {
-          case 0 :
+          switch (parser.one_line(d))
+          {
+            case 0 :
+            break;
+            case 1 :
+            endOfFile = true;
+            break;
+            default :
+            break;
+          }
+        }
+        catch (Exception e)
+        {
+          System.out.println("NOK.");
+          System.out.println(e.getMessage());
           break;
-          case 1 :
-          endOfFile = true;
-          break;
-          default :
+        }
+        catch (Error e)
+        {
+          System.out.println("Oops.");
+          System.out.println(e.getMessage());
           break;
         }
       }
-      catch (Exception e)
-      {
-        System.out.println("NOK.");
-        System.out.println(e.getMessage());
-        break;
-      }
-      catch (Error e)
-      {
-        System.out.println("Oops.");
-        System.out.println(e.getMessage());
-        break;
-      }
+      valid.validateParsedInput(d, outputFilePath);
     }
-    valid.validateParsedInput(d);
   }
 
   final public int one_line(Data d) throws ParseException {
@@ -144,15 +152,15 @@ public class Parser implements ParserConstants {
     contract = jj_consume_token(STRING);
     actionChoice(d, contract, part, iState);
     Automaton a = d.getContractById(contract.image);
-        if(a == null)
-        d.addContract(contract.image);
+    if (a == null)
+    d.addContract(contract.image);
     a = d.getContractById(contract.image);
     a.addState(iState.image);
     a.addParticipantChoice(part);
   }
 
   final public void actionChoice(Data d, Token cId,
-  String part, Token iState) throws ParseException {
+String part, Token iState) throws ParseException {
   Token op;
   Token state;
   Automaton a = null;
@@ -163,14 +171,13 @@ public class Parser implements ParserConstants {
       op = jj_consume_token(CONTRACTOPERATION);
       state = jj_consume_token(STATE);
     a = d.getContractById(cId.image);
-    if(a == null)
-        d.addContract(cId.image);
+    if (a == null)
+    d.addContract(cId.image);
     a = d.getContractById(cId.image);
     a.addState(state.image);
     g = d.getGraph();
     g.addEdge(iState.image, state.image, part);
-
-    t =new Transition(iState.image, state.image, op.image, part);
+    t = new Transition(iState.image, state.image, op.image, part);
     a.addOperation(t);
     d.addTransitions(t);
       break;
@@ -178,14 +185,13 @@ public class Parser implements ParserConstants {
       op = jj_consume_token(INTERNALOPERATIONS);
       state = jj_consume_token(STATE);
     a = d.getContractById(cId.image);
-    if(a == null)
-        d.addContract(cId.image);
+    if (a == null)
+    d.addContract(cId.image);
     a = d.getContractById(cId.image);
     a.addState(state.image);
     g = d.getGraph();
     g.addEdge(iState.image, state.image, part);
-
-    t =new Transition(iState.image, state.image, op.image, part);
+    t = new Transition(iState.image, state.image, op.image, part);
     a.addInternalOperation(t);
     d.addTransitions(t);
       break;
@@ -269,8 +275,8 @@ public class Parser implements ParserConstants {
       ;
     }
     String result = par.image;
-    if(role != null)
-      result = result + ":" + role;
+    if (role != null)
+    result = result + ":" + role;
     {if (true) return result;}
     throw new Error("Missing return statement in function");
   }
@@ -288,18 +294,16 @@ public class Parser implements ParserConstants {
     method = jj_consume_token(START);
     eState = jj_consume_token(STATE);
     Automaton a = d.getContractById(method.image);
-    if(a == null)
-        d.addContract(method.image);
+    if (a == null)
+    d.addContract(method.image);
     a = d.getContractById(method.image);
     d.addRegisteredContract(method.image);
     a.addState(eState.image);
     a.setInitialState(eState.image);
-
     a.addParticipant(par.image);
     a.addRoleParticipant(role.image, par.image);
     a.addRole(role.image);
-
-    t = new Transition("(_)", eState.image, method.image, par.image  + ":" + role.image);
+    t = new Transition("(_)", eState.image, method.image, par.image + ":" + role.image);
     a.addOperation(t);
     d.addTransitions(t);
   }
@@ -331,7 +335,7 @@ public class Parser implements ParserConstants {
     jj_consume_token(26);
     String cId = UtilsParser.getContractIdFromMethod(cID.image);
     Automaton a = d.getContractById(cId);
-        a.addEndState(iState.image);
+    a.addEndState(iState.image);
     a.addEndStates(stateList);
   }
 
