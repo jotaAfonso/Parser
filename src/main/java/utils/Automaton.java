@@ -8,8 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "id", "initialState", "states", "endStates", "operations",
-	"internalOperations", "roles", "registeredParticipants" })
+@JsonPropertyOrder({ "id", "initialState", "states", "endStates", "operations", "internalOperations", "roles",
+		"registeredParticipants" })
 @JsonIgnoreProperties(value = { "participants" })
 public class Automaton {
 
@@ -35,7 +35,7 @@ public class Automaton {
 
 	@JsonProperty("roleParticipants")
 	private List<Association> roleParticipant = new ArrayList<Association>();
-	
+
 	public Automaton(String id) {
 		this.id = id;
 	}
@@ -108,7 +108,6 @@ public class Automaton {
 		return this.internalOperations;
 	}
 
-	// TODO: put it private and call it when new participants is called
 	/** registers a role in the contract */
 	public void addRole(String roleLabel) {
 		this.roles.add(roleLabel);
@@ -135,46 +134,43 @@ public class Automaton {
 		String partLocal = UtilsParser.removeParenthesisFromString(part);
 		String[] elements = partLocal.split("[|]");
 		if (elements.length == 2) {
-			// TODO: method to avoid duplication
 			if (elements[0].contains(":")) {
-				String[] newPart = elements[0].split(":");
-				addRoleParticipant(newPart[1], newPart[0]);
+				this.setupParticipantChoice(elements[0]);
 				this.addParticipant(elements[1]);
-				this.addParticipant(newPart[0]);
-				this.addRole(newPart[1]);
 			} else {
-				String[] newPart = elements[1].split(":");
-				addRoleParticipant(newPart[1], newPart[0]);
+				this.setupParticipantChoice(elements[1]);
 				this.addParticipant(elements[0]);
-				this.addParticipant(newPart[0]);
-				this.addRole(newPart[1]);
 			}
 		} else {
-			if (elements[0].contains(":")) {
-				String[] newPart = elements[0].split("[:]");
-				addRoleParticipant(newPart[1], newPart[0]);
-				this.addParticipant(newPart[0]);
-				this.addRole(newPart[1]);
-			} else {
+			if (elements[0].contains(":"))
+				this.setupParticipantChoice(elements[0]);
+			else
 				this.addParticipant(elements[0]);
-			}
 		}
+	}
+
+	private void setupParticipantChoice(String element) {
+		String[] partRole = element.split("[:]");
+		addRoleParticipant(partRole[1], partRole[0]);
+		this.addParticipant(partRole[0]);
+		this.addRole(partRole[1]);
 	}
 
 	// TODO: There has got to be a better way than this
 	private boolean getRoleParticipantExistsRole(String role) {
 		return this.roleParticipant.stream().filter(x -> x.getRoleId().equals(role)).count() == 1;
 	}
-	
+
 	@JsonIgnore
 	public List<Association> getRoleParticipant() {
 		return roleParticipant;
 	}
 
 	public void addRoleParticipant(String role, String part) {
-		if(getRoleParticipantExistsRole(role)) {
-			this.roleParticipant.stream().filter(x -> x.getRoleId().equals(role)).findFirst().get().getParticipants().add(part);
-		} else {
+		if (getRoleParticipantExistsRole(role))
+			this.roleParticipant.stream().filter(x -> x.getRoleId().equals(role)).findFirst().get().getParticipants()
+					.add(part);
+		else {
 			Association assoc = new Association();
 			assoc.setRoleId(role);
 			Set<String> partL = new HashSet<String>();
@@ -191,9 +187,9 @@ public class Automaton {
 	@JsonIgnore
 	public Set<String> getRegisteredParticipantsSet() {
 		Set<String> result = new HashSet<String>();
-		for(String r : this.getRolesSet()) {
-			result.addAll(this.getRoleParticipant().stream().filter(x -> x.getRoleId().equals(r)).findFirst().get().getParticipants());
-		}
+		for (String r : this.getRolesSet())
+			result.addAll(this.getRoleParticipant().stream().filter(x -> x.getRoleId().equals(r)).findFirst().get()
+					.getParticipants());
 		return result;
 	}
 }

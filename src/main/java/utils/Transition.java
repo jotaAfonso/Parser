@@ -21,16 +21,28 @@ public class Transition {
 	private void setupPart(String part) {
 		String partLocal = UtilsParser.removeParenthesisFromString(part);
 		String[] elements = partLocal.split("[|]");
+
 		// both old and new
 		if (elements.length == 2) {
+			if (elements[0].contains(":"))
+				removeRoleFromPart(elements[0]);
+			else if (elements[1].contains(":"))
+				removeRoleFromPart(elements[1]);
 			this.newParticipant = true;
 			this.bothParticipant = true;
 		} else {
-			if (elements[0].contains(":")) 
+			// new
+			if (elements[0].contains(":")) {
+				removeRoleFromPart(elements[0]);
 				this.newParticipant = true;
-		}	
+			} else
+				this.setParticipant(part);
+		}
+	}
 
-		this.participant = part;
+	private void removeRoleFromPart(String partRole) {
+		String part = partRole.split("[:]")[0];
+		this.setParticipant(part);
 	}
 
 	public void setFromState(String state) {
