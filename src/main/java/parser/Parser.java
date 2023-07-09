@@ -3,6 +3,7 @@ package parser;
 import java.io.*;
 import java.util.*;
 import utils.*;
+import visual.FSMGraphGenerator;
 
 public class Parser implements ParserConstants {
   private static final String ERROR_NO_INPUT_FILE = "Requires input file path.";
@@ -58,6 +59,7 @@ public class Parser implements ParserConstants {
         }
       }
       valid.validateParsedInput(d, outputFilePath);
+      FSMGraphGenerator.generateGraph("");
     }
   }
 
