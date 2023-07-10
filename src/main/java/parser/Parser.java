@@ -115,7 +115,7 @@ public class Parser implements ParserConstants {
                 String internalS = "I" + checks.getCounter();
                 t.setToS(internalS);
                 Transition okT = new Transition(".",internalS, eS.image, "OK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
-                        Transition nokT = new Transition(".",internalS, eS.image, "NOK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
+                        Transition nokT = new Transition(".",internalS, iS.image, "NOK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
                         a.addTransition(okT);
                         a.addTransition(nokT);
                         a.getStates().add(internalS);
