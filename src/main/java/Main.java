@@ -1,4 +1,4 @@
-package compiler;
+
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,10 +9,10 @@ import static utils.Constants.*;
 
 import parser.Parser;
 import data.Automaton;
-import validations.Graph;
+import exceptions.CustomException;
 import validations.ValidationChecks;
 
-public class Compiler {
+public class Main {
 
 	private static boolean testFlag = true;
 	
@@ -44,12 +44,11 @@ public class Compiler {
 			
 			Hashtable<String, Automaton> auto = new Hashtable<String, Automaton>();
 			
-			Graph g = new Graph();
 			ValidationChecks checks = new ValidationChecks();		
 			
 			while (!endOfFile) {
 				try {
-					switch (parser.Start(auto, g, checks)) {
+					switch (parser.Start(auto, checks)) {
 					case 0:
 						break;
 					case 1:
@@ -68,12 +67,12 @@ public class Compiler {
 					break;
 				}
 			}
-			
-			checks.setGraph(g);
 			checks.validate(auto, outputf);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
+		} catch (CustomException e) {
+			e.printStackTrace();
 		}
 	}
 }

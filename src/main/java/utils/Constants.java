@@ -52,9 +52,11 @@ public class Constants {
 	//	VALIDATIONS
 	private static final String ERROR = "ERROR";
 	public static final String ERROR_CONTRACT = ERROR + " - CONTRACT";
-	public static final String ERROR_CONTRACT_MESSAGE = "Contract %s is not deployed.\n";
+	public static final String ERROR_CONTRACT_MESSAGE = "Contract %s1 is not deployed.\n";
 	public static final String ERROR_ENDSTATES = ERROR + " - ENDSTATES";
 	public static final String ERROR_ENDSTATES_MESSAGE = "End state %s is not a used state.\n";
 	public static final String ERROR_PARTICIPANT = ERROR + " - PARTICIPANT";
 	public static final String ERROR_PARTICIPANT_MESSAGE = "Participant %s is not registered.\n";
+	public static final String PARTICIPANT_ALREADY_REGISTERED = "Participant %s1 is already registered.\n";
+	
 }

@@ -18,6 +18,10 @@ public class CommonUtils {
 		return result.replace(REPLACE_2, op2);
 	}
 	
+	public static String replaceInExceptionOne(String main, String op1) {
+		return main.replace(REPLACE_1, op1);
+	}
+	
 	public static List<String> setToList(Set<String> setValue) {
 		return setValue.stream().collect(Collectors.toList());
 	}

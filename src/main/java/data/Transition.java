@@ -47,6 +47,23 @@ public class Transition {
 		this.preCondition = "";
 		this.postCondition = "";
 	}
+
+	public Transition(String type, String f, String t, String l, Set<AssociationRP> nP, Set<AssociationRP> eP,
+			String i, String preC,String postC, boolean e) {
+		this.type = type;
+		
+		this.fromS = f;
+		this.toS = t;
+		this.actionLabel = l;
+		
+		this.newParts = nP;
+		this.existantParts = eP;
+		
+		this.input = i;
+		this.preCondition = preC;
+		this.postCondition = postC;
+		this.externalCall = e;
+	}
 	
 	@JsonIgnore
 	public String getId() {

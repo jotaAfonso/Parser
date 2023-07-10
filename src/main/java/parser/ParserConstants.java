@@ -23,17 +23,21 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int RPAR = 9;
   /** RegularExpression Id. */
-  int NORMALCALL = 10;
+  int LCURLB = 10;
   /** RegularExpression Id. */
-  int EXTERNALCALL = 11;
+  int RCURLB = 11;
   /** RegularExpression Id. */
-  int MOREPART = 12;
+  int NORMALCALL = 12;
   /** RegularExpression Id. */
-  int STRING = 13;
+  int EXTERNALCALL = 13;
   /** RegularExpression Id. */
-  int STARTLABEL = 14;
+  int MOREPART = 14;
   /** RegularExpression Id. */
-  int OPERATIONTYPE = 15;
+  int STARTLABEL = 15;
+  /** RegularExpression Id. */
+  int OPERATIONTYPE = 16;
+  /** RegularExpression Id. */
+  int STRING = 17;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -50,12 +54,14 @@ public interface ParserConstants {
     "<NUMBER>",
     "\"(\"",
     "\")\"",
+    "\"{\"",
+    "\"}\"",
     "\">\"",
     "\"<\"",
     "\"|\"",
-    "<STRING>",
-    "\"starts(\"",
+    "\"starts\"",
     "<OPERATIONTYPE>",
+    "<STRING>",
   };
 
 }

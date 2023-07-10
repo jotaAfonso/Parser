@@ -9,14 +9,14 @@ import exceptions.CustomException;
 
 public class Parser implements ParserConstants {
 
-  final public int Start(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) throws ParseException, CustomException {
+  final public int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case UNDERSCORE:
-      DeployTransition(auto, g, checks);
+      DeployTransition(auto, checks);
                 {if (true) return 0;}
       break;
     case STRING:
-      NormalTransition(auto, g);
+      NormalTransition(auto, checks);
                 {if (true) return 0;}
       break;
     case 0:
@@ -31,17 +31,16 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void DeployTransition(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) throws ParseException, CustomException {
+  final public void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException {
         Token iS;
         Token eS;
         String p;
         Transition t;
         Token isES = null;
-        Boolean eC = false;
         Boolean rES = false;
     iS = jj_consume_token(UNDERSCORE);
-    p = ParticipantExtra();
-    eC = ExternalCall();
+    p = ParticipantExtra(checks);
+    jj_consume_token(NORMALCALL);
     t = DeployAction(auto);
     eS = jj_consume_token(STRING);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -63,7 +62,7 @@ public class Parser implements ParserConstants {
                 rES = true;
         t.setToS(eS.image);
         t.addParticipant(p);
-        t.setExternalCall(eC);
+        t.setExternalCall(false);
 
                 // automaton
                 a.addBothStates(iS.image, eS.image, rES);
@@ -71,13 +70,12 @@ public class Parser implements ParserConstants {
         a.addRoleParticipant(p);
 
         // graph
-        g.addEdge(iS.image, eS.image, p);
-
+        checks.getGraph().addEdge(iS.image, eS.image, p);
         // checks
         checks.getContractsRegistered().add(t.getId());
   }
 
-  final public void NormalTransition(Hashtable<String, Automaton> auto, Graph g) throws ParseException, CustomException {
+  final public void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException {
         Token iS;
         Token eS;
         String p;
@@ -86,7 +84,7 @@ public class Parser implements ParserConstants {
         Boolean eC = false;
         Boolean rES = false;
     iS = jj_consume_token(STRING);
-    p = ParticipantExtra();
+    p = ParticipantExtra(checks);
     eC = ExternalCall();
     t = NormalAction(auto);
     eS = jj_consume_token(STRING);
@@ -111,13 +109,26 @@ public class Parser implements ParserConstants {
         t.addParticipant(p);
         t.setExternalCall(eC);
 
+        // external call
+        if(eC)
+        {
+                String internalS = "I" + checks.getCounter();
+                t.setToS(internalS);
+                Transition okT = new Transition(".",internalS, eS.image, "OK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
+                        Transition nokT = new Transition(".",internalS, eS.image, "NOK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
+                        a.addTransition(okT);
+                        a.addTransition(nokT);
+                        a.getStates().add(internalS);
+                checks.setCounter(checks.getCounter() + 1);
+                }
+
                 // automaton
                 a.addBothStates(iS.image, eS.image, rES);
         a.addTransition(t);
         a.addRoleParticipant(p);
 
                 // graph
-        g.addEdge(iS.image, eS.image, p);
+        checks.getGraph().addEdge(iS.image, eS.image, p);
   }
 
   final public boolean ExternalCall() throws ParseException {
@@ -138,7 +149,7 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public String Participant() throws ParseException {
+  final public String Participant(ValidationChecks checks) throws ParseException, CustomException {
         Token p1;
         Token p2 = null;
         Token p3 = null;
@@ -153,18 +164,24 @@ public class Parser implements ParserConstants {
       ;
     }
                 if(p2 == null)
+                {
+                        checks.getParticipantsAll().add(p1.image);
                         {if (true) return p1.image;}
+                }
                 else
+                {
+                        checks.addParticipantsRegistered(p1.image);
                         {if (true) return p1.image.concat(p2.image).concat(p3.image);}
+                }
     throw new Error("Missing return statement in function");
   }
 
-  final public String ParticipantExtra() throws ParseException {
+  final public String ParticipantExtra(ValidationChecks checks) throws ParseException, CustomException {
         String p1;
         String p2;
         Token join;
         Set < String > parts = new HashSet < String > ();
-    p1 = Participant();
+    p1 = Participant(checks);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -176,8 +193,8 @@ public class Parser implements ParserConstants {
         break label_1;
       }
       join = jj_consume_token(MOREPART);
-      p2 = Participant();
-                                                                   parts.add(join.image.concat(p2));
+      p2 = Participant(checks);
+                                                                               parts.add(join.image.concat(p2));
     }
                 String concat = String.join("", parts);
                 {if (true) return p1.concat(concat);}
@@ -187,6 +204,7 @@ public class Parser implements ParserConstants {
   final public Transition DeployAction(Hashtable<String, Automaton> auto) throws ParseException {
         Token c;
     jj_consume_token(STARTLABEL);
+    jj_consume_token(LPAR);
     c = jj_consume_token(STRING);
     jj_consume_token(RPAR);
                 {if (true) return new Transition(c.image, "starts", ".");}
@@ -221,7 +239,7 @@ public class Parser implements ParserConstants {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x2011,0x20,0x20,0xc00,0x40,0x1000,};
+      jj_la1_0 = new int[] {0x20011,0x20,0x20,0x3000,0x40,0x4000,};
    }
 
   /** Constructor with InputStream. */
@@ -338,7 +356,7 @@ public class Parser implements ParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[16];
+    boolean[] la1tokens = new boolean[18];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -352,7 +370,7 @@ public class Parser implements ParserConstants {
         }
       }
     }
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 18; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

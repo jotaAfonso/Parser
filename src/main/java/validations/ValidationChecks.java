@@ -2,11 +2,8 @@ package validations;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import static utils.Constants.*;
@@ -19,19 +16,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import data.Automaton;
-import utils.ValidationUtils;
+import exceptions.CustomException;
+import utils.CommonUtils;
 
 public class ValidationChecks {
 
 	private Graph graph;
-	private boolean validFlag;
-	
+	private int counter = 0;
+
+	private Set<String> participantsAll = new HashSet<String>();
+	private Set<String> participantsRegistered = new HashSet<String>();
 	private Set<String> contractsRegistered = new HashSet<String>();
 	
 	private FSMGraphGenerator visuals;
 	
 	public ValidationChecks() {
-		validFlag = true;
+		this.graph = new Graph();
 		this.setVisuals(new FSMGraphGenerator());
 	}
 
@@ -42,14 +42,6 @@ public class ValidationChecks {
 	public void setGraph(Graph graph) {
 		this.graph = graph;
 	}
-	
-	public boolean isValidFlag() {
-		return validFlag;
-	}
-
-	public void setValidFlag(boolean validFlag) {
-		this.validFlag = validFlag;
-	}
 
 	public FSMGraphGenerator getVisuals() {
 		return visuals;
@@ -59,27 +51,24 @@ public class ValidationChecks {
 		this.visuals = visuals;
 	}
 
-	public void validate(Hashtable<String, Automaton> auto, String outputF) {
+	// TODO: confirm for all contracts not just one
+	public void validate(Hashtable<String, Automaton> auto, String outputF) throws CustomException {
 		this.checkIfContractsWereStarted(auto.keySet());
-//		for (Automaton c : d.getAutomataSet()) {
-//			// checks if the end states exist in the transitions
-//			this.checkEndStates(c);
+		for (Automaton a : auto.values()) {
 //			// checks if a state has a path a valid path from the initial state
 //			// and also checks if it has a valid path to at least one end state
-//			this.checkValidityOfStates(c, d.getGraph());
+//			this.checkValidityOfStates(a, this.getGraph());
 //			// checks if all participants are registered
-//			this.checkValidityOfParticipants(c);
+			this.checkValidityOfParticipants(a);
 //			// checks if a participant was previously registered
-//			checkRegistrationOfParticipants(c, d.getGraph());
-//		}
-		
-		
-		if (this.isValidFlag()) {
-			toFileAndImage(auto, outputF);
+//			this.checkRegistrationOfParticipants(a, this.getGraph());
 		}
+		
+		toFileAndImage(auto, outputF);
+		
 	}
 
-	public void checkIfContractsWereStarted(Set<String> autoIds) {
+	public void checkIfContractsWereStarted(Set<String> autoIds) throws CustomException {
 		Set<String> regContractSet = this.getContractsRegistered();
 		if (autoIds.containsAll(regContractSet)) {
 			Set<String> result = new HashSet<String>(regContractSet);
@@ -89,8 +78,10 @@ public class ValidationChecks {
 				}
 			}
 			if (!result.isEmpty()) {
-				ValidationUtils.printError(ERROR_CONTRACT, ERROR_CONTRACT_MESSAGE, ValidationUtils.setToList(result));
-				this.setValidFlag(false);
+				String msg = ERROR_CONTRACT.concat(" - ").concat(ERROR_CONTRACT_MESSAGE);
+				List<String> rL = CommonUtils.setToList(result);
+				msg = CommonUtils.replaceInExceptionOne(msg, rL.get(0));
+				throw new CustomException(msg);
 			}
 		}
 	}
@@ -112,101 +103,87 @@ public class ValidationChecks {
 		}	
 	}
 
-	public Set<String> getContractsRegistered() {
-		return contractsRegistered;
+	public Set<String> getParticipantsRegistered() {
+		return participantsRegistered;
 	}
 
-	public void setContractsRegistered(Set<String> contractsRegistered) {
-		this.contractsRegistered = contractsRegistered;
+	public void setParticipantsRegistered(Set<String> contractsRegistered) {
+		this.participantsRegistered = contractsRegistered;
+	}
+
+	public void addParticipantsRegistered(String p) throws CustomException {
+		if(this.getParticipantsRegistered().contains(p))
+			throw new CustomException(CommonUtils.replaceInExceptionOne(PARTICIPANT_ALREADY_REGISTERED, p));
+		else
+			this.getParticipantsRegistered().add(p);
 	}
 	
-//	public void checkValidityOfParticipants(Automaton a) {
-//		if (this.getFlag()) {
-//			Set<String> regPartSet = a.getRegisteredParticipantsSet();
-//			if (a.getParticipantsSet().containsAll(regPartSet)) {
-//				Set<String> result = new HashSet<String>(regPartSet);
-//				for (String part : a.getParticipantsSet()) {
-//					if (!result.add(part)) {
-//						result.remove(part);
-//					}
-//				}
+	public void checkValidityOfParticipants(Automaton a) throws CustomException {		
+		Set<String> regPartSet = this.getParticipantsRegistered();
+		if (this.getParticipantsAll().containsAll(regPartSet)) {
+			Set<String> result = new HashSet<String>(regPartSet);
+			for (String part : this.getParticipantsAll()) {
+				if (!result.add(part)) {
+					result.remove(part);
+				}
+			}
+
+			if (!result.isEmpty()) {
+				String msg = ERROR_PARTICIPANT.concat(" - ").concat(ERROR_PARTICIPANT_MESSAGE);
+				List<String> rL = CommonUtils.setToList(result);
+				msg = CommonUtils.replaceInExceptionOne(msg, rL.get(0));
+				throw new CustomException(msg);
+			}
+		}
+	}
 //
-//				if (!result.isEmpty()) {
-//					UtilsParser.printError(ERROR_PARTICIPANT, ERROR_PARTICIPANT_MESSAGE, UtilsParser.setToList(result));
-//					this.setFlag(false);
-//				}
-//			}
-//		}
+//	private void checkValidityOfStates(Automaton a, Graph g) throws CustomException {		
+//		String initS = a.getInitialS();
+//		List<String> endS = CommonUtils.setToList(a.getEndS());
+//
+////		for (String s : a.getStates()) {
+////			if (!s.equals(initS) && !endS.contains(s)) {
+////				checkPath(g, s, endS);
+////				checkIfPathExists(g, initS, s);
+////			} else if (endS.contains(s)) 
+////				checkIfPathExists(g, initS, s);
+////			else
+////				checkPath(g, s, endS);
+////		}
 //	}
-//
-//	public void checkEndStates(Automaton a) {
-//		if (this.getFlag()) {
-//			if (!a.getStatesSet().containsAll(a.getEndStatesSet())) {
-//				List<String> result = new ArrayList<String>();
-//				for (String state : a.getEndStatesSet()) {
-//					if (!a.getStatesSet().contains(state)) {
-//						result.add(state);
-//					}
-//				}
-//
-//				if (!result.isEmpty()) {
-//					UtilsParser.printError(ERROR_ENDSTATES, ERROR_ENDSTATES_MESSAGE, result);
-//					this.setFlag(false);
-//				}
-//			}
-//		}
-//	}
-//
-//	private void checkValidityOfStates(Automaton a, Graph g) {
-//		if (this.getFlag()) {
-//			String initS = a.getInitialState();
-//			List<String> endS = UtilsParser.setToList(a.getEndStatesSet());
-//
-//			for (String s : a.getStatesSet()) {
-//				if (!s.equals(initS) && !endS.contains(s)) {
-//					this.validationFlag = checkPath(g, s, endS);
-//					this.validationFlag = checkIfPathExists(g, initS, s);
-//				} else if (endS.contains(s)) {
-//					this.validationFlag = checkIfPathExists(g, initS, s);
-//				} else {
-//					this.validationFlag = checkPath(g, s, endS);
-//				}
-//			}
-//		}
-//	}
-//
+
 //	private void checkRegistrationOfParticipants(Automaton a, Graph g) {
-//		if (this.getFlag()) {
-//			String initS = a.getInitialState();
-//			List<String> endS = UtilsParser.setToList(a.getEndStatesSet());
+//		String initS = a.getInitialS();
+//		List<String> endS = CommonUtils.setToList(a.getEndS());
 //
-//			for (Transition op : a.getOperationsSet()) {
-//				if (!endS.contains(op.getFromState()) && !op.getParticipant().contains(":")) {
-//					checkIfPathStatePartExists(a, g, initS, op.getToState(), op.getParticipant());
-//				}
+//		for (Transition op : a.getTransitions()) {
+//			if (!endS.contains(op.getFromS())) {
+//				for(AssociationRP nP : op.getNewParts())
+//					for(String p : nP.getParticipants())
+//						checkIfPathStatePartExists(a, g, initS, op.getToS(), p);
 //			}
 //		}
 //	}
 //
-//	private boolean checkPath(Graph graph, String state, List<String> endS) {
+//	private void checkPath(Graph graph, String state, List<String> endS) throws CustomException {
 //		for (String e : endS) {
 //			if (!checkIfPathExists(graph, state, e)) {
-//				return false;
+//				throw new CustomException("");
 //			}
 //		}
-//		return true;
 //	}
-//
-//	private boolean checkIfPathStatePartExists(Automaton a, Graph graph, String start, String end, String part) {
+
+	//	private void checkIfPathStatePartExists(Automaton a, Graph graph, String start, String end, String part) {
 //		LinkedList<String> visited = new LinkedList<String>();
 //		visited.add(start);
 //		boolean result = false;
-//		Transition starter = a.getOperationsSet().stream().filter(x -> x.getFromState().equals("_")).findAny().get();
-//		if (!starter.getParticipant().split("[:]")[0].equals(part))
-//			result = breadthFirstParticipant(graph, visited, start, end, part, false);
-//		return result;
+//		Transition starter = a.getTransitions().stream().filter(x -> x.getFromS().equals("_")).findAny().get();
+//		for(AssociationRP nP : starter.getNewParts()) {}
+////			if()
+////			if (!nP.split("[:]")[0].equals(part))
+////			//	result = breadthFirstParticipant(graph, visited, start, end, part, false);
 //	}
-//
+
 //	private boolean checkIfPathExists(Graph graph, String start, String end) {
 //		LinkedList<String> visited = new LinkedList<String>();
 //		visited.add(start);
@@ -284,4 +261,28 @@ public class ValidationChecks {
 //
 //		return flag;
 //	}
+
+	public Set<String> getContractsRegistered() {
+		return contractsRegistered;
+	}
+
+	public void setContractsRegistered(Set<String> contractsRegistered) {
+		this.contractsRegistered = contractsRegistered;
+	}
+
+	public Set<String> getParticipantsAll() {
+		return participantsAll;
+	}
+	
+	public void setParticipantsAll(Set<String> participantsAll) {
+		this.participantsAll = participantsAll;
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
 }

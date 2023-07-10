@@ -43,28 +43,32 @@ TOKEN :
   	|
   	< RPAR : ")" >
   	|
+  	< LCURLB : "{" >
+  	|
+  	< RCURLB : "}" >
+  	|
   	< NORMALCALL : ">" >
   	|
   	< EXTERNALCALL : "<" >
  	|
- 	< MOREPART : "|" > 
-  	|
-	< STRING : (["A"-"Z","a"-"z"])+(["A"-"Z","a"-"z","0"-"9"])* >
+ 	< MOREPART : "|" >
 	|
-	< STARTLABEL : "starts(" >
+	< STARTLABEL : "starts" >
 	|
 	< OPERATIONTYPE : ("-" | ".") >
+	|
+	< STRING : (["A"-"Z","a"-"z"])+(["A"-"Z","a"-"z","0"-"9"])* >
 }
 
-int Start(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) throws CustomException:
+int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException:
 {}
 {
-  	DeployTransition(auto, g, checks)
+  	DeployTransition(auto, checks)
 	{
 	  	return 0;
 	}
  	| 
- 	NormalTransition(auto, g)
+ 	NormalTransition(auto, checks)
 	{
    	 	return 0;
    	}
@@ -75,18 +79,17 @@ int Start(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) t
    	}
 }
 
-void DeployTransition(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) throws CustomException:
+void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException:
 {
   	Token iS;
  	Token eS;
  	String p;
  	Transition t;
  	Token isES = null;
- 	Boolean eC = false;
  	Boolean rES = false;
 }
 {
-  	iS = < UNDERSCORE >	p = ParticipantExtra() eC = ExternalCall() t = DeployAction(auto) eS = < STRING > (isES = < PLUS >)?
+  	iS = < UNDERSCORE > p = ParticipantExtra(checks) <NORMALCALL> t = DeployAction(auto) eS = < STRING > (isES = < PLUS >)?
 	{
 	 	Automaton a = auto.get(t.getId());
 	 	if (a == null) 
@@ -99,7 +102,7 @@ void DeployTransition(Hashtable<String, Automaton> auto, Graph g, ValidationChec
     		rES = true;
     	t.setToS(eS.image);
     	t.addParticipant(p);
-    	t.setExternalCall(eC);
+    	t.setExternalCall(false);
 
 		// automaton
 		a.addBothStates(iS.image, eS.image, rES);
@@ -107,14 +110,13 @@ void DeployTransition(Hashtable<String, Automaton> auto, Graph g, ValidationChec
     	a.addRoleParticipant(p);
 
     	// graph
-    	g.addEdge(iS.image, eS.image, p);
-
+    	checks.getGraph().addEdge(iS.image, eS.image, p);
     	// checks
     	checks.getContractsRegistered().add(t.getId());
 	}
 }
 
-void NormalTransition(Hashtable<String, Automaton> auto, Graph g) throws CustomException:
+void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException:
 { 
 	Token iS;
  	Token eS;
@@ -125,7 +127,7 @@ void NormalTransition(Hashtable<String, Automaton> auto, Graph g) throws CustomE
  	Boolean rES = false;
 }
 {
-	iS = < STRING > p = ParticipantExtra() eC = ExternalCall() t = NormalAction(auto) eS = < STRING > (isES = < PLUS >)?
+	iS = < STRING > p = ParticipantExtra(checks) eC = ExternalCall() t = NormalAction(auto) eS = < STRING > (isES = < PLUS >)?
 	{
 	 	Automaton a = auto.get(t.getId());
 	 	if (a == null) 
@@ -140,13 +142,26 @@ void NormalTransition(Hashtable<String, Automaton> auto, Graph g) throws CustomE
     	t.addParticipant(p);
     	t.setExternalCall(eC);
 
+    	// external call
+    	if(eC)
+    	{
+    	 	String internalS = "I" + checks.getCounter();
+    		t.setToS(internalS);
+    		Transition okT = new Transition(".",internalS, eS.image, "OK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
+			Transition nokT = new Transition(".",internalS, eS.image, "NOK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
+			a.addTransition(okT);
+			a.addTransition(nokT);
+			a.getStates().add(internalS);
+    		checks.setCounter(checks.getCounter() + 1);
+		}
+
 		// automaton
 		a.addBothStates(iS.image, eS.image, rES);
     	a.addTransition(t);
     	a.addRoleParticipant(p);
 
 		// graph
-    	g.addEdge(iS.image, eS.image, p);
+    	checks.getGraph().addEdge(iS.image, eS.image, p);
 	}
 }
 
@@ -159,7 +174,7 @@ boolean ExternalCall():
 	<EXTERNALCALL> { return true; }	  
 }
 
-String Participant():
+String Participant(ValidationChecks checks) throws CustomException:
 {
 	Token p1;
 	Token p2 = null;
@@ -169,13 +184,19 @@ String Participant():
  	p1 = < STRING > (p2 = <COLON> p3 = <STRING>)?
  	{
 		if(p2 == null)
+		{
+		 	checks.getParticipantsAll().add(p1.image);
 	 		return p1.image;
+	 	}
 		else
+		{
+		 	checks.addParticipantsRegistered(p1.image);
 			return p1.image.concat(p2.image).concat(p3.image);
+		}
 	}
 }
 
-String ParticipantExtra():
+String ParticipantExtra(ValidationChecks checks) throws CustomException:
 {
   	String p1;
   	String p2;
@@ -183,7 +204,7 @@ String ParticipantExtra():
   	Set < String > parts = new HashSet < String > ();
 }
 {
-	p1 = Participant() (join = <MOREPART> p2 = Participant() { parts.add(join.image.concat(p2)); })*
+	p1 = Participant(checks) (join = <MOREPART> p2 = Participant(checks) { parts.add(join.image.concat(p2)); })*
 	{
 		String concat = String.join("", parts);
 		return p1.concat(concat);
@@ -196,7 +217,7 @@ Transition DeployAction(Hashtable<String, Automaton> auto):
 	Token c;
 }
 {
-  	< STARTLABEL > c = < STRING > < RPAR >
+  	< STARTLABEL > < LPAR > c = < STRING > < RPAR >
 	{
 	  	return new Transition(c.image, "starts", ".");
 	}

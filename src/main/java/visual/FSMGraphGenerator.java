@@ -19,7 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class FSMGraphGenerator {
-
+	
     public static Graph generateFSMGraph(String fsmTextJson) {
         JSONObject fsm = new JSONObject(fsmTextJson);
 
@@ -27,6 +27,7 @@ public class FSMGraphGenerator {
         String initialState = fsm.getString(JSON_INITIAL_STATE);
         JSONArray finalStates = fsm.getJSONArray(JSON_END_STATES);
         JSONArray transitions = fsm.getJSONArray(JSON_TRANSITIONS);
+        JSONArray intTransitions = fsm.getJSONArray(JSON_INTERNAL_TRANSITIONS);
         
         // Create a directed graph
         Graph graph = new MultiGraph("FSMGraph");
@@ -36,20 +37,28 @@ public class FSMGraphGenerator {
         	String state = states.getString(i);
         	addNode(state, graph, initialState, finalStates);
         }
-
     	addNode("_", graph, initialState, finalStates);
 
-        // Add transitions as edges
+    	// Add transitions as edges
+    	addEdges(transitions, graph, false);
+    	addEdges(intTransitions, graph, true);
+
+        return graph;
+    }
+    
+    private static void addEdges(JSONArray transitions, Graph g, boolean interNal) {
+    	// Add transitions as edges
         for (int i = 0; i < transitions.length(); i++) {
             JSONObject transition = transitions.getJSONObject(i);
             String from = transition.getString(JSON_FROM);
             String to = transition.getString(JSON_TO);
-            String action = transition.getString(JSON_LABEL);
-           	Edge edge = graph.addEdge(from + "-" + to, from, to, true);
-           	edge.setAttribute("ui.label", action);            
+            String action = ".";
+            if(interNal)
+            	action = "-";
+            action = action.concat(transition.getString(JSON_LABEL));
+           	Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
+           	edge.setAttribute("ui.label", action); 
         }
-
-        return graph;
     }
     
     private static void addNode(String state, Graph g, String iState, JSONArray fStates) {
@@ -80,7 +89,7 @@ public class FSMGraphGenerator {
         }
 
         node.setAttribute("ui.class", getNodeClass(nodeAttributes));
-        node.setAttribute("ui.label", state); // Set the node label
+        node.setAttribute("ui.label", state);
     }
     
     
