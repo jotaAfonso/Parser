@@ -3,299 +3,214 @@
  */
 options
 {
-  static = false;
+ static = false;
 }
 
 PARSER_BEGIN(Parser)
 package parser;
-import java.io.*;
-import java.util.*;
-import utils.*;
+import data.*;
+import java.util.Hashtable;
+import java.util.HashSet;
+import java.util.Set;
+import validations.*;
+import exceptions.CustomException;
 
 public class Parser
-{
-  private static final String ERROR_NO_INPUT_FILE = "Requires input file path.";
-
-  private static final String POSSIBLE_ARGS = "Arguments available - <input_file_path> <output_file_name>";
-
-  public static void main(String args []) throws ParseException, IOException
-  {
-    if (args.length == 0)
-    {
-      System.out.printf("%s\n", POSSIBLE_ARGS);
-      System.err.printf("%s\n", ERROR_NO_INPUT_FILE);
-    }
-    else
-    {
-      // final String STRUCTURE = "Enter an expression like \"(S1) (d | d:D) c.operation (S2);\" :\n";
-      String inputFilePath = args [0];
-      String outputFilePath = "global_type";
-      if (args.length > 1) 
-      outputFilePath = args [1];
-      System.out.print(inputFilePath);
-      BufferedReader objReader = new BufferedReader(new FileReader(inputFilePath));
-      Parser parser = new Parser(objReader);
-      Data d = new Data();
-      Validations valid = new Validations();
-      boolean endOfFile = false;
-      while (!endOfFile)
-      {
-        try
-        {
-          switch (parser.one_line(d))
-          {
-            case 0 : 
-            break;
-            case 1 : 
-            endOfFile = true;
-            break;
-            default : 
-            break;
-          }
-        }
-        catch (Exception e)
-        {
-          System.out.println("NOK.");
-          System.out.println(e.getMessage());
-          break;
-        }
-        catch (Error e)
-        {
-          System.out.println("Oops.");
-          System.out.println(e.getMessage());
-          break;
-        }
-      }
-      valid.validateParsedInput(d, outputFilePath);
-    }
-  }
-}
+{}
 
 PARSER_END(Parser)
 
-SKIP :
+<*> SKIP :
 {
-  " "
-| "\r"
-| "\t"
-| "\n"
+	< " " | "\t" | "\r" | "\n" | "\r\n" >
+	|
+	<"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+	|
+	<"/*"(~["/"])*  "*""/" >
 }
 
 TOKEN :
 {
-  < #NUMBER : [ "0"-"9" ] >
-| < #LETTER : [ "a"-"z", "A"-"Z" ] >
-| < STRING : (< LETTER >)+ >
-| < DIGIT : (< NUMBER >)+ >
-| < EMPTYSTATE : "(_)" >
-| < STATE :
-    "("
-    (
-      < LETTER > (< DIGIT >)*
-    )
-    ")" >
-| < START : "starts(" < STRING > ")" >
-| < METHOD : < STRING > "()" >
-| < INTERNALOPERATIONS : "-" < METHOD > >
-| < CONTRACTOPERATION : "." < METHOD > >
+ 	< UNDERSCORE : "_" >
+ 	|
+ 	< PLUS : "+" >
+ 	|
+ 	< COLON : ":" >
+	|
+ 	< NUMBER : [ "0"-"9" ] >
+	|
+	< LPAR : "(" >
+  	|
+  	< RPAR : ")" >
+  	|
+  	< NORMALCALL : ">" >
+  	|
+  	< EXTERNALCALL : "<" >
+ 	|
+ 	< MOREPART : "|" > 
+  	|
+	< STRING : (["A"-"Z","a"-"z"])+(["A"-"Z","a"-"z","0"-"9"])* >
+	|
+	< STARTLABEL : "starts(" >
+	|
+	< OPERATIONTYPE : ("-" | ".") >
 }
 
-int one_line(Data d) :
+int Start(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) throws CustomException:
 {}
 {
-  action(d) (";")?
-  {
-    return 0;
-  }
-| "EOF;"
-  {
-    return 1;
-  }
-| "//"
-  (
-    < STRING >
-  | (< DIGIT >)
-  )*
-  (";")?
-  {
-    return 2;
-  }
+  	DeployTransition(auto, g, checks)
+	{
+	  	return 0;
+	}
+ 	| 
+ 	NormalTransition(auto, g)
+	{
+   	 	return 0;
+   	}
+   	|
+   	<EOF>
+   	{
+   	 	return 1;
+   	}
 }
 
-void action(Data d) :
+void DeployTransition(Hashtable<String, Automaton> auto, Graph g, ValidationChecks checks) throws CustomException:
 {
+  	Token iS;
+ 	Token eS;
+ 	String p;
+ 	Transition t;
+ 	Token isES = null;
+ 	Boolean eC = false;
+ 	Boolean rES = false;
 }
 {
-  deployAction(d)
-| normalAction(d)
-| endStates(d)
+  	iS = < UNDERSCORE >	p = ParticipantExtra() eC = ExternalCall() t = DeployAction(auto) eS = < STRING > (isES = < PLUS >)?
+	{
+	 	Automaton a = auto.get(t.getId());
+	 	if (a == null) 
+    		a = auto.put(t.getId(), new Automaton(t.getId()));
+    	a = auto.get(t.getId());
+
+		// transition
+    	t.setFromS(iS.image);
+    	if(isES != null)
+    		rES = true;
+    	t.setToS(eS.image);
+    	t.addParticipant(p);
+    	t.setExternalCall(eC);
+
+		// automaton
+		a.addBothStates(iS.image, eS.image, rES);
+    	a.addTransition(t);
+    	a.addRoleParticipant(p);
+
+    	// graph
+    	g.addEdge(iS.image, eS.image, p);
+
+    	// checks
+    	checks.getContractsRegistered().add(t.getId());
+	}
 }
 
-void normalAction(Data d) :
-{
-  Token iState;
-  Token contract;
-  String part;
+void NormalTransition(Hashtable<String, Automaton> auto, Graph g) throws CustomException:
+{ 
+	Token iS;
+ 	Token eS;
+ 	String p;
+ 	Transition t;
+ 	Token isES = null;
+ 	Boolean eC = false;
+ 	Boolean rES = false;
 }
 {
-  iState = < STATE > part = participantChoice() contract = < STRING > actionChoice(d, contract, part, iState)
-  {
-    Automaton a = d.getContractById(contract.image);
-    if (a == null) 
-    d.addContract(contract.image);
-    a = d.getContractById(contract.image);
-    a.addState(iState.image);
-    a.addParticipantChoice(part);
-  }
+	iS = < STRING > p = ParticipantExtra() eC = ExternalCall() t = NormalAction(auto) eS = < STRING > (isES = < PLUS >)?
+	{
+	 	Automaton a = auto.get(t.getId());
+	 	if (a == null) 
+    		a = auto.put(t.getId(), new Automaton(t.getId()));
+    	a = auto.get(t.getId());
+
+		// transition
+    	t.setFromS(iS.image);
+    	if(isES != null)
+    		rES = true;
+    	t.setToS(eS.image);
+    	t.addParticipant(p);
+    	t.setExternalCall(eC);
+
+		// automaton
+		a.addBothStates(iS.image, eS.image, rES);
+    	a.addTransition(t);
+    	a.addRoleParticipant(p);
+
+		// graph
+    	g.addEdge(iS.image, eS.image, p);
+	}
 }
 
-void actionChoice(Data d, Token cId, 
-String part, Token iState) :
+boolean ExternalCall():
 {
-  Token op;
-  Token state;
-  Automaton a = null;
-  Graph g = null;
-  Transition t;
 }
 {
-  op = < CONTRACTOPERATION > state = < STATE >
-  {
-    a = d.getContractById(cId.image);
-    if (a == null) 
-    d.addContract(cId.image);
-    a = d.getContractById(cId.image);
-    a.addState(state.image);
-    g = d.getGraph();
-    g.addEdge(iState.image, state.image, part);
-    t = new Transition(iState.image, state.image, op.image, part);
-    a.addOperation(t);
-    d.addTransitions(t);
-  }
-| op = < INTERNALOPERATIONS > state = < STATE >
-  {
-    a = d.getContractById(cId.image);
-    if (a == null) 
-    d.addContract(cId.image);
-    a = d.getContractById(cId.image);
-    a.addState(state.image);
-    g = d.getGraph();
-    g.addEdge(iState.image, state.image, part);
-    t = new Transition(iState.image, state.image, op.image, part);
-    a.addInternalOperation(t);
-    d.addTransitions(t);
-  }
+	<NORMALCALL> { return false; }
+	|
+	<EXTERNALCALL> { return true; }	  
 }
 
-String participantChoice() :
+String Participant():
 {
-  Token par;
-  String bothPart;
+	Token p1;
+	Token p2 = null;
+	Token p3 = null;
 }
 {
-  "(" par = < STRING > bothPart = bothParticipantChoice()
-  {
-    return par.image + bothPart;
-  }
-| bothPart = eitherParticipantChoice()
-  {
-    return bothPart;
-  }
-}
-
-String bothParticipantChoice() :
-{
-  Token par;
-  Token role = null;
-  String newBothPart;
-}
-{
-  "|" par = < STRING > ":" role = < STRING > ")"
-  {
-    return "|" + par.image + ":" + role.image;
-  }
-| newBothPart = newParticipantBoth() "|" par = < STRING > ")"
-  {
-    return newBothPart + "|" + par;
-  }
+ 	p1 = < STRING > (p2 = <COLON> p3 = <STRING>)?
+ 	{
+		if(p2 == null)
+	 		return p1.image;
+		else
+			return p1.image.concat(p2.image).concat(p3.image);
+	}
 }
 
-String newParticipantBoth() :
+String ParticipantExtra():
 {
-  Token role;
+  	String p1;
+  	String p2;
+  	Token join;
+  	Set < String > parts = new HashSet < String > ();
 }
 {
-  ":" role = < STRING >
-  {
-    return ":" + role;
-  }
-}
-
-// For either one
-String eitherParticipantChoice() :
-{
-  Token par;
-  Token role = null;
-}
-{
-  par = < STRING > (":" role = < STRING >)?
-  {
-    String result = par.image;
-    if (role != null) 
-    result = result + ":" + role;
-    return result;
-  }
+	p1 = Participant() (join = <MOREPART> p2 = Participant() { parts.add(join.image.concat(p2)); })*
+	{
+		String concat = String.join("", parts);
+		return p1.concat(concat);
+	}
 }
 
-void deployAction(Data d) :
+
+Transition DeployAction(Hashtable<String, Automaton> auto):
 {
-  Token method = null;
-  Token eState = null;
-  Token par;
-  Token role;
-  Transition t;
+	Token c;
 }
 {
-  < EMPTYSTATE > par = < STRING > ":" role = < STRING > 
-  method = < START > eState = < STATE >
-  {
-    Automaton a = d.getContractById(method.image);
-    if (a == null) 
-    d.addContract(method.image);
-    a = d.getContractById(method.image);
-    d.addRegisteredContract(method.image);
-    a.addState(eState.image);
-    a.setInitialState(eState.image);
-    a.addParticipant(par.image);
-    a.addRoleParticipant(role.image, par.image);
-    a.addRole(role.image);
-    t = new Transition("(_)", eState.image, method.image, par.image + ":" + role.image);
-    a.addOperation(t);
-    d.addTransitions(t);
-  }
+  	< STARTLABEL > c = < STRING > < RPAR >
+	{
+	  	return new Transition(c.image, "starts", ".");
+	}
 }
 
-void endStates(Data d) :
+Transition NormalAction(Hashtable<String, Automaton> auto):
 {
-  Token iState;
-  Token cID;
-  Token eState = null;
-  List < String > stateList = new ArrayList < String > ();
+	Token c;
+ 	Token aType;
+ 	Token aLabel;
 }
 {
-  "ENDSTATES -" cID = < STRING > "-" "{" iState = < STATE >
-  (
-    "," 
-    eState = < STATE >
-    {
-      stateList.add(eState.image);
-    }
-  )*
-  "}"
-  {
-    String cId = UtilsParser.getContractIdFromMethod(cID.image);
-    Automaton a = d.getContractById(cId);
-    a.addEndState(iState.image);
-    a.addEndStates(stateList);
-  }
+	c = < STRING > aType = < OPERATIONTYPE > aLabel = < STRING > < LPAR > < RPAR >
+	{
+		return new Transition(c.image, aLabel.image, aType.image);
+	}
 }

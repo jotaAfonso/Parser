@@ -1,0 +1,2 @@
+_ p:P|p > starts(c) S1
+S1 p > c.action() S2+

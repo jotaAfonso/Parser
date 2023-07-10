@@ -11,25 +11,29 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int NUMBER = 5;
+  int UNDERSCORE = 4;
   /** RegularExpression Id. */
-  int LETTER = 6;
+  int PLUS = 5;
   /** RegularExpression Id. */
-  int STRING = 7;
+  int COLON = 6;
   /** RegularExpression Id. */
-  int DIGIT = 8;
+  int NUMBER = 7;
   /** RegularExpression Id. */
-  int EMPTYSTATE = 9;
+  int LPAR = 8;
   /** RegularExpression Id. */
-  int STATE = 10;
+  int RPAR = 9;
   /** RegularExpression Id. */
-  int START = 11;
+  int NORMALCALL = 10;
   /** RegularExpression Id. */
-  int METHOD = 12;
+  int EXTERNALCALL = 11;
   /** RegularExpression Id. */
-  int INTERNALOPERATIONS = 13;
+  int MOREPART = 12;
   /** RegularExpression Id. */
-  int CONTRACTOPERATION = 14;
+  int STRING = 13;
+  /** RegularExpression Id. */
+  int STARTLABEL = 14;
+  /** RegularExpression Id. */
+  int OPERATIONTYPE = 15;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -37,32 +41,21 @@ public interface ParserConstants {
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
-    "\" \"",
-    "\"\\r\"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "<NUMBER>",
-    "<LETTER>",
-    "<STRING>",
-    "<DIGIT>",
-    "\"(_)\"",
-    "<STATE>",
-    "<START>",
-    "<METHOD>",
-    "<INTERNALOPERATIONS>",
-    "<CONTRACTOPERATION>",
-    "\";\"",
-    "\"EOF;\"",
-    "\"//\"",
-    "\"(\"",
-    "\"|\"",
+    "<token of kind 1>",
+    "<token of kind 2>",
+    "<token of kind 3>",
+    "\"_\"",
+    "\"+\"",
     "\":\"",
+    "<NUMBER>",
+    "\"(\"",
     "\")\"",
-    "\"ENDSTATES -\"",
-    "\"-\"",
-    "\"{\"",
-    "\",\"",
-    "\"}\"",
+    "\">\"",
+    "\"<\"",
+    "\"|\"",
+    "<STRING>",
+    "\"starts(\"",
+    "<OPERATIONTYPE>",
   };
 
 }

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static utils.Constants.*;
+
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -21,57 +23,64 @@ public class FSMGraphGenerator {
     public static Graph generateFSMGraph(String fsmTextJson) {
         JSONObject fsm = new JSONObject(fsmTextJson);
 
-        JSONArray states = fsm.getJSONArray("states");
-        JSONArray initialStates = fsm.getJSONArray("initialStates");
-        JSONArray finalStates = fsm.getJSONArray("finalStates");
-        JSONArray transitions = fsm.getJSONArray("transitions");
-
+        JSONArray states = fsm.getJSONArray(JSON_STATES);
+        String initialState = fsm.getString(JSON_INITIAL_STATE);
+        JSONArray finalStates = fsm.getJSONArray(JSON_END_STATES);
+        JSONArray transitions = fsm.getJSONArray(JSON_TRANSITIONS);
+        
         // Create a directed graph
         Graph graph = new MultiGraph("FSMGraph");
 
         // Add states as nodes
         for (int i = 0; i < states.length(); i++) {
-            String state = states.getString(i);
-            Node node = graph.addNode(state);
-            Map<String, Boolean> nodeAttributes = new HashMap<>();
-
-            if (initialStates.toList().contains(state)) {
-                nodeAttributes.put("initial", true);
-            }
-            if (finalStates.toList().contains(state)) {
-                nodeAttributes.put("final", true);
-            }
-
-            Pattern pattern = Pattern.compile("I(\\d+)");
-            Matcher matcher = pattern.matcher(state);
-            if (matcher.find()) {
-                nodeAttributes.put("external", true);
-            }
-
-            if (state.equals("_")) {
-                nodeAttributes.put("open", true);
-            }
-
-            if (!initialStates.toList().contains(state) && !finalStates.toList().contains(state) &&
-                    !nodeAttributes.containsKey("external") && !nodeAttributes.containsKey("open")) {
-                nodeAttributes.put("normal", true);
-            }
-
-            node.setAttribute("ui.class", getNodeClass(nodeAttributes));
-            node.setAttribute("ui.label", state); // Set the node label
+        	String state = states.getString(i);
+        	addNode(state, graph, initialState, finalStates);
         }
+
+    	addNode("_", graph, initialState, finalStates);
 
         // Add transitions as edges
         for (int i = 0; i < transitions.length(); i++) {
             JSONObject transition = transitions.getJSONObject(i);
-            String from = transition.getString("from");
-            String to = transition.getString("to");
-            String action = transition.getString("actionCalled");
-            Edge edge = graph.addEdge(from + "-" + to, from, to, true);
-            edge.setAttribute("ui.label", action);
+            String from = transition.getString(JSON_FROM);
+            String to = transition.getString(JSON_TO);
+            String action = transition.getString(JSON_LABEL);
+           	Edge edge = graph.addEdge(from + "-" + to, from, to, true);
+           	edge.setAttribute("ui.label", action);            
         }
 
         return graph;
+    }
+    
+    private static void addNode(String state, Graph g, String iState, JSONArray fStates) {
+    	
+        Node node = g.addNode(state);
+        Map<String, Boolean> nodeAttributes = new HashMap<>();
+
+        if (iState.equals(state)) {
+            nodeAttributes.put("initial", true);
+        }
+        if (fStates.toList().contains(state)) {
+            nodeAttributes.put("final", true);
+        }
+
+        Pattern pattern = Pattern.compile("I(\\d+)");
+        Matcher matcher = pattern.matcher(state);
+        if (matcher.find()) {
+            nodeAttributes.put("external", true);
+        }
+
+        if (state.equals("_")) {
+            nodeAttributes.put("open", true);
+        }
+
+        if (!iState.equals(state) && !fStates.toList().contains(state) &&
+                !nodeAttributes.containsKey("external") && !nodeAttributes.containsKey("open")) {
+            nodeAttributes.put("normal", true);
+        }
+
+        node.setAttribute("ui.class", getNodeClass(nodeAttributes));
+        node.setAttribute("ui.label", state); // Set the node label
     }
     
     

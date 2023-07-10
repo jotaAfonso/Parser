@@ -1,4 +1,4 @@
-package utils;
+package validations;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -6,12 +6,9 @@ import java.util.Map;
 
 public class Graph {
 
-	//private Map<String, LinkedHashSet<String>> map = new HashMap<String, LinkedHashSet<String>>();
 	private Map<String, HashMap<String, String>> map = new HashMap<String, HashMap<String, String>>();
-
+	
 	public void addEdge(String node1, String node2, String part) {
-		node1 = UtilsParser.removeParenthesisFromString(node1);
-		node2 = UtilsParser.removeParenthesisFromString(node2);
 		HashMap<String, String> adjacent = map.get(node1);
 		if (adjacent == null) {
 			adjacent = new HashMap<String, String>();
