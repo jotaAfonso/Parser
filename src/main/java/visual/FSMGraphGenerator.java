@@ -1,5 +1,6 @@
 package visual;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -58,6 +59,7 @@ public class FSMGraphGenerator {
             action = action.concat(transition.getString(JSON_LABEL));
            	Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
            	edge.setAttribute("ui.label", action); 
+            edge.setAttribute("ui.style", "text-size: 20px;");
         }
     }
     
@@ -92,9 +94,26 @@ public class FSMGraphGenerator {
         node.setAttribute("ui.label", state);
     }
     
+    private static String getColorRGB(Color color) {
+	    // Get RGB values
+	    int rgb = color.getRGB();
+	    int r = (rgb >> 16) & 0xFF;
+	    int g = (rgb >> 8) & 0xFF;
+	    int b = rgb & 0xFF;
+	    return String.format("#%02X%02X%02X", r, g, b);
+    }
     
+
     public static void drawFSMGraph(Graph graph) {
-    	
+    	String formating = String.format(
+				"node { fill-color: white; size: 40px, 40px; stroke-mode: plain; stroke-color: %s; text-size: 20px; text-alignment: center; }"
+						+ "node.initial { fill-color: %s; }" + "node.final { fill-color: %s; }"
+						+ "node.external { fill-color: %s; }" + "node.normal { fill-color: %s; }"
+						+ "edge { text-size: 25px; text-alignment: along; text-visibility-mode: hidden; }"
+						+ "edge .text { visibility-mode: normal; visibility: visible; text-alignment: along; }",
+				getColorRGB(Color.BLACK), getColorRGB(Color.GREEN), getColorRGB(Color.RED), getColorRGB(Color.BLACK),
+				getColorRGB(Color.GRAY));
+		graph.setAttribute("ui.stylesheet", formating);
         Viewer viewer = graph.display();
         viewer.enableAutoLayout();
     }
