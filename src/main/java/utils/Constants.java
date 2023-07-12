@@ -25,8 +25,11 @@ public class Constants {
 	public static final String REPLACE_1 = "%s1";
 	public static final String REPLACE_2 = "%s2";
 		
-	//	ERROR MESSAGES
-	public static final String EXCEPTION_TRANS_PART_REGIST = "Participant %s1 is already being registered in the transition with the role %s2\n.";
+	//	EXCEPTION MESSAGES
+	public static final String EXCEPTION_TRANS_PART_REGIST = "Participant %s1 is already registered in the transition with the role %s2\n.";
+	public static final String EXCEPTION_START_PARTICIPANT = "Only a new participant can deploy a contract.";
+	public static final String EXCEPTION_VARIABLE_ALREADY_EXISTS_WITH_THIS_ID = "There is already a variable with the following id - %s1.";
+	public static final String EXCEPTION_VARIABLE_WAS_NOT_INITIALIZE_CORRECTLY = "The variable %s1 was not initialized.";
 
 	//	JSON AUTOMATA ELEMENTS
 	public static final String JSON_ID = "id";
@@ -49,7 +52,7 @@ public class Constants {
 	public static final String JSON_POST_COND = "postCondition";
 	public static final String JSON_EXTERNAL_CALL = "externalCall";
 
-	//	VALIDATIONS
+	//	VALIDATIONS - ERROR MESSAGES
 	private static final String ERROR = "ERROR";
 	public static final String ERROR_CONTRACT = ERROR + " - CONTRACT";
 	public static final String ERROR_CONTRACT_MESSAGE = "Contract %s1 is not deployed.\n";

@@ -1,0 +1,470 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+ static = false;
+}
+
+PARSER_BEGIN(Parser)
+package parser.mainparser;
+import data.*;
+import java.util.*;
+import validations.*;
+import exceptions.CustomException;
+import utils.*;
+import types.*;
+import ast.*;
+
+public class Parser
+{}
+
+PARSER_END(Parser)
+
+<*> SKIP :
+{
+	< " " | "\t" | "\r" | "\n" | "\r\n" >
+	|
+	<"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+	|
+	<"/*"(~["/"])*  "*""/" >
+}
+
+TOKEN :
+{
+  	< INT: "int" >
+  	|
+  	< BOOL: "bool" >
+ 	|
+ 	< PTYPE: "PType">
+ 	|
+ 	< STRING: "string"> 
+}
+
+TOKEN :
+{
+  	< PLUS : "+" >
+  	|
+  	< MINUS : "-">
+  	|
+  	< TIMES : "*">
+  	|
+  	< DIV : "/">
+	|
+ 	< UNDERSCORE : "_" >
+ 	|
+ 	< COLON : ":" >
+ 	|
+  	< COMMA: "," >
+	|
+	< TRUE : "true" >
+  	|
+  	< FALSE : "false" > 
+	|
+	< LBRACKET : "{" >
+	|
+	< RBRACKET : "}" >
+	|
+	< LPAR : "(" >
+  	|
+  	< RPAR : ")" >
+ 	| 
+  	< OR : "||" >
+  	|
+  	< AND : "&&" >
+  	|
+	< EQ : "==" >
+	|
+	< NEQ : "!=" >
+	|
+	< LEQ : "<=" >
+	|
+	< GEQ: ">=" >
+	|
+	< LT : "<" >
+	|
+	< GT : ">" >
+	|
+	< NOT: "!" >
+	|
+  	< SEQ: ";" >
+  	|
+  	< VAR : "var" >
+  	|
+  	< VARASS : ":=" >
+ 	|
+ 	< MOREPART : "|" > 
+  	|
+	< STARTLABEL : "starts" >
+	|
+	< DOT : ["."]  >
+	|
+	< Num: (["0"-"9"]) + >
+	|
+	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* >
+}
+
+int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException :
+{}
+{
+  	DeployTransition(auto,checks)
+	{
+	  	return 0;
+	}
+ 	| 
+ 	NormalTransition(auto, checks)
+	{
+   	 	return 0;
+   	}
+   	|
+   	<EOF>
+   	{
+   	 	return 1;
+   	}
+}
+
+void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException :
+{
+  	Token iS;
+ 	Token eS;
+ 	String p;
+ 	Transition t;
+ 	Token isES = null;
+ 	Boolean eC = false;
+ 	Boolean rES = false;
+ 	ASTNode postC = null;
+ 	List<ASTId> gV = null;
+ 	List<ASTVar> aV = null;
+}
+{
+  	iS = < UNDERSCORE > <LBRACKET> <RBRACKET> p = ParticipantExtra() <GT> t = DeployAction(auto) <LBRACKET> (postC = Assertion())? <RBRACKET> eS = < ID > (isES = < PLUS >)?
+	{
+	 	Automaton a = auto.get(t.getId());
+	 	if (a == null) 
+    		a = auto.put(t.getId(), new Automaton(t.getId()));
+    	a = auto.get(t.getId());
+
+		// transition
+    	t.setFromS(iS.image);
+    	if(isES != null)
+    		rES = true;
+    	t.setToS(eS.image);
+    	t.addParticipant(p);
+    	t.setExternalCall(eC);
+
+    	// asserion
+    	if(postC != null) { 
+	    	t.setPostCondition(postC.toString());
+	    	if(postC.checkIfItHasVar()) { 
+	    		gV = postC.getVars();
+				a.addGlobalVars(gV, t.getLocalVars());
+	    	}
+	    	if(postC.checkIfItHasIds()) {
+				aV = postC.getIds();
+				CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
+	    	}
+    		postC.typeCheck();
+		}
+
+		// automaton
+		a.addBothStates(iS.image, eS.image, rES);
+    	a.addTransition(t);
+    	a.addRoleParticipant(p,true);
+
+
+    	// checks
+    	checks.getGraph().addEdge(iS.image, eS.image, p);
+    	checks.getContractsRegistered().add(t.getId());
+	}
+}
+
+void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException:
+{ 
+	Token iS;
+ 	Token eS;
+ 	String p;
+ 	Transition t;
+ 	Token isES = null;
+ 	Boolean eC = false;
+ 	Boolean rES = false;
+ 	ASTNode postC = null;
+ 	ASTNode preC = null;
+ 	List<ASTId> lV = null;
+ 	List<ASTVar> aV = null;
+}
+{
+	iS = < ID > <LBRACKET> (preC = Assertion())? <RBRACKET> p = ParticipantExtra() eC = ExternalCall() t = NormalAction(auto) <LBRACKET> (postC = Assertion())? <RBRACKET> eS = < ID > (isES = < PLUS >)?
+	{
+	 	Automaton a = auto.get(t.getId());
+	 	if (a == null) 
+    		a = auto.put(t.getId(), new Automaton(t.getId()));
+    	a = auto.get(t.getId());
+
+		// transition
+    	t.setFromS(iS.image);
+    	if(isES != null)
+    		rES = true;
+    	t.setToS(eS.image);
+    	t.addParticipant(p);
+    	t.setExternalCall(eC);
+
+    	// asserion_pre
+    	if(preC != null) { 
+	    	t.setPostCondition(preC.toString());
+	    	if(preC.checkIfItHasVar()) { 
+	    		lV = preC.getVars();
+				t.addLocalVars(lV, a.getGlobalVars());
+	    	}
+	    	if(preC.checkIfItHasIds()) {
+				aV = preC.getIds();
+				CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
+	    	}
+    		preC.typeCheck();
+		}
+    	
+		// asserion_post
+    	if(postC != null) { 
+	    	t.setPostCondition(postC.toString());
+	    	if(postC.checkIfItHasVar()) { 
+	    		lV = postC.getVars();
+				t.addLocalVars(lV, a.getGlobalVars());
+	    	}
+	    	if(postC.checkIfItHasIds()) {
+				aV = postC.getIds();
+				CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
+	    	}
+    		postC.typeCheck();
+		}
+
+		// automaton
+		a.addBothStates(iS.image, eS.image, rES);
+    	a.addTransition(t);
+    	a.addRoleParticipant(p,false);
+
+		// graph
+    	checks.getGraph().addEdge(iS.image, eS.image, p);
+	}
+}
+
+boolean ExternalCall():
+{
+}
+{
+	<GT> { return false; }
+	|
+	<LT> { return true; }	  
+}
+
+String Participant():
+{
+	Token p1;
+	Token p2 = null;
+	Token p3 = null;
+}
+{
+ 	p1 = < ID > (p2 = <COLON> p3 = <ID>)?
+ 	{
+		if(p2 == null)
+	 		return p1.image;
+		else
+			return p1.image.concat(p2.image).concat(p3.image);
+	}
+}
+
+String ParticipantExtra():
+{
+  	String p1;
+  	String p2;
+  	Token join;
+  	Set < String > parts = new HashSet < String > ();
+}
+{
+	p1 = Participant() (join = <MOREPART> p2 = Participant() { parts.add(join.image.concat(p2)); })*
+	{
+		String concat = String.join("", parts);
+		return p1.concat(concat);
+	}
+}
+
+
+Transition DeployAction(Hashtable<String, Automaton> auto):
+{
+	Token c;
+	List<Param> param = null;
+}
+{
+  	< STARTLABEL > < LPAR > c = < ID > (<COMMA> param = ParamList())? < RPAR >
+	{
+	  	return new Transition(c.image, "starts", ".", param);
+	}
+}
+
+Transition NormalAction(Hashtable<String, Automaton> auto):
+{
+	Token c;
+ 	String aType;
+ 	Token aLabel;
+	List<Param> param;
+}
+{
+	c = < ID > aType = OperationType() aLabel = < ID > < LPAR > param = ParamList() < RPAR >
+	{
+	  	Transition r = new Transition(c.image, aLabel.image, aType, param);
+		return r;
+	}
+}
+
+
+String OperationType():
+{
+  	Token aType;
+}
+{
+	(	  aType = <MINUS> 
+	|
+	aType = <DOT>) { return aType.image; }	  
+}
+
+//	ASSERTIONS - PARAMETERS
+List<Param> ParamList():
+{List<Param> l = new LinkedList<Param>(); Token x; IType t;}
+{  
+	[x=<ID> <COLON> t=Type() { l.add(new Param(x.image,t));}
+	
+	( <COMMA> x=<ID> <COLON> t=Type() {l.add(new Param(x.image,t));} )*]
+	
+	{ return l; }
+}
+
+IType Type():
+{IType t,t1; List<IType > types = new LinkedList<IType >();}
+{	
+  	(
+    <INT> { t = IntType.singleton; }
+    | 
+    <BOOL> { t = BoolType.singleton; }
+	|
+    <STRING> { t = StringType.singleton; }
+    |
+    <ID> <COLON> <PTYPE>  { t = ParticipantType.singleton; }
+    )
+	{ return t; }
+}
+
+// ASSERTIONS
+
+ASTNode Assertion():
+{ ASTNode e; }
+{
+   e = Seq() { return e; }
+}
+
+ASTNode Seq():
+{ ASTNode e1,e2;}
+{
+  e1 = Assign()
+  [
+	<SEQ> e2 = Seq()
+		{
+			e1 = new ASTSeq(e1, e2);
+	 	}
+  ] 
+  { return e1; }
+}
+
+ASTNode Assign():
+{ ASTNode e1,e2;}
+{
+  e1 = Disjunction()
+  [
+	<VARASS> e2 = Assign()
+		{
+			e1 = new ASTAssign(e1, e2);
+	 	}
+  ] 
+  { return e1; }
+}
+
+
+ASTNode Disjunction():
+{ ASTNode e1,e2; }
+{
+  e1 = Conjunction()
+  (<OR> e2 = Conjunction() { e1 = new ASTOr(e1,e2); }
+  )*
+  { return e1; }
+}
+
+ASTNode Conjunction():
+{ ASTNode e1,e2; }
+{
+  e1 = BooleanExp()
+  ( <AND> e2 = BooleanExp() { e1 = new ASTAnd(e1,e2); }
+  )*
+  { return e1; }
+}
+
+ASTNode BooleanExp():
+{ ASTNode e1,e2; }
+{
+	e1 = Exp() 
+ 	 (<EQ> e2 = BooleanExp() { e1 = new ASTEq(e1,e2); }
+ 	 |<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
+ 	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
+ 	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
+ 	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }
+ 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })* { return e1; } 
+}
+
+ASTNode Exp() :
+{ ASTNode e1, e2; }
+{
+   e1 = Term() 
+     ( <PLUS> e2 = Term() { e1 = new ASTAdd(e1,e2); }
+     | <MINUS> e2 = Term() { e1 = new ASTSub(e1,e2); }
+     )*
+     { return e1; }
+}
+
+ASTNode Term() :
+{ ASTNode e1, e2; }
+{
+     e1 = Unary()
+     ( <TIMES> e2 = Unary() { e1 = new ASTMul(e1,e2); }
+     | <DIV> e2 = Unary() { e1 = new ASTDiv(e1,e2); }
+     )*
+     { return e1; }
+}
+
+ASTNode Unary() :
+{ ASTNode e1, e2; }
+{
+     e1 = Call() { return e1; }
+     | 
+     < MINUS > e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
+	 | 
+     <NOT> e1 = Unary() { return new ASTNot(e1); }
+}
+
+ASTNode Call():
+{ASTNode e1; List<ASTNode > l;}
+{
+  e1 = Fact()
+  {return e1;}
+}
+
+ASTNode Fact() :
+{ Token x; ASTNode e1, e2,e3; IType t; List<Param > l;}
+{
+ 	x = <Num> { return new ASTNum(Integer.parseInt(x.image)); }
+	| 
+	<LPAR> e1 = Seq() <RPAR> { return e1; }
+	|
+	< TRUE > { return new ASTBool(true); }
+	|
+	< FALSE > { return new ASTBool(false); }
+	|
+	< VAR > t = Type() x = < ID > { return new ASTId(x.image, t); }
+	|	// get type of existing variable
+	x = < ID > { return new ASTVar(x.image); } 
+}

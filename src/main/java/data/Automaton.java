@@ -2,12 +2,17 @@ package data;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ast.ASTId;
 import exceptions.CustomException;
+import types.IType;
 import utils.CommonUtils;
 
 import static utils.Constants.*;
@@ -34,10 +39,12 @@ public class Automaton {
 	@JsonProperty(JSON_ROLE_PARTICIPANTS)
 	private List<AssociationRP> roleParticipant = new ArrayList<AssociationRP>();
 	
+	private Map<String,IType> globalVars = new HashMap<String,IType>();
+	
 	public Automaton(String id) {
 		this.id = id;
 	}
-
+	
 	public String getId() {
 		return id;
 	}
@@ -121,7 +128,7 @@ public class Automaton {
 			this.getEndS().add(endS);
 	}
 	
-	public void addRoleParticipant(String p) throws CustomException {
+	public void addRoleParticipant(String p, boolean isDeploy) throws CustomException {
 		System.out.print("part - " + p + "\n");
 		String[] elements = p.split("\\|");
 		for(String e : elements) {
@@ -129,6 +136,8 @@ public class Automaton {
 				String[] individual = e.split("\\:", 0);
 				addRoles(individual[1]);
 				addAssociations(individual[0], individual[1]);
+			} else if(!e.contains(COLON) && isDeploy) {
+				throw new CustomException(EXCEPTION_START_PARTICIPANT);
 			}
 		}
 	}
@@ -149,5 +158,24 @@ public class Automaton {
 				associationE.getParticipants().add(p);
 		} else 
 			this.getRoleParticipant().add(new AssociationRP(r, p));
+	}
+
+	@JsonIgnore
+	public Map<String,IType> getGlobalVars() {
+		return globalVars;
+	}
+
+	public void setGlobalVars(Map<String,IType> globalVars) {
+		this.globalVars = globalVars;
+	}
+	
+	public void addGlobalVars(List<ASTId> globalVars, Map<String,IType> localVars) throws CustomException {
+		for(ASTId v : globalVars)
+			if(!this.getGlobalVars().containsKey(v.getId()) && !localVars.containsKey(v.getId()))
+				this.getGlobalVars().put(v.getId(), v.getType());
+			else {
+				String msg = CommonUtils.replaceInExceptionOne(EXCEPTION_VARIABLE_ALREADY_EXISTS_WITH_THIS_ID, v.getId());
+				throw new CustomException(msg);
+			}
 	}
 }

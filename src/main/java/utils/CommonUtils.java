@@ -3,8 +3,13 @@ package utils;
 import static utils.Constants.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import ast.ASTVar;
+import exceptions.CustomException;
+import types.IType;
 
 public class CommonUtils {
 	
@@ -24,5 +29,18 @@ public class CommonUtils {
 	
 	public static List<String> setToList(Set<String> setValue) {
 		return setValue.stream().collect(Collectors.toList());
+	}
+	
+	public static void addTypeToIds(List<ASTVar> ids, Map<String,IType> globalV, Map<String,IType> localV) throws CustomException {
+		for(ASTVar id : ids) {
+			if(globalV.containsKey(id.getId()))
+				id.setType(globalV.get(id.getId()));
+			else if(localV.containsKey(id.getId()))
+				id.setType(localV.get(id.getId()));
+			else {
+				String msg = CommonUtils.replaceInExceptionOne(EXCEPTION_VARIABLE_WAS_NOT_INITIALIZE_CORRECTLY, id.getId());
+				throw new CustomException(msg);
+			}
+		}			
 	}
 }

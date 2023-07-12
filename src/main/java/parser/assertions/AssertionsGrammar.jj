@@ -1,0 +1,248 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = false;}PARSER_BEGIN(AssertionsGrammar)package parser.assertions;
+
+import ast.*;
+import types.*;
+import utils.Param;
+import java.util.List;
+import java.util.LinkedList;
+
+public class AssertionsGrammar{}PARSER_END(AssertionsGrammar)
+SKIP :
+{
+  " "
+| "\t"
+| "\r"
+| "\n"
+}
+
+TOKEN :
+{
+ 
+  < PLUS : "+" >
+  |
+  < MINUS : "-">
+  |
+  < TIMES : "*">
+  |
+  < DIV : "/">
+  |
+
+  
+  < LPAR : "(" >
+  |
+  < RPAR : ")" >
+  
+  |
+  
+  < TRUE : "true" >
+  |
+  < FALSE : "false" >
+  | 
+ 
+  < Num: (["0"-"9"]) + >
+  |
+  < PTYPE: "PType" > 
+  |
+  
+  < OR : "||" >
+  |
+  < AND : "&&" >
+  |
+  < EQ : "==" >
+  |
+  < NEQ : "!=" >
+  |
+  < LEQ : "<=" >
+  |
+  < GEQ: ">=" >
+  |
+  < LT : "<" >
+  |
+  < GT : ">" >
+  |
+  < NOT: "!" > 
+  
+  |
+  
+  < EL : ";;" >
+  |
+  < DECL : "decl" >
+  | 
+  < IN : "in" >
+  | 
+  < END: "end" >
+  | 
+  < ASS: "=" >
+  |
+  < SEQ: ";" >
+  |
+  < VAR : "var" >
+  |
+  < VARASS : ":=" >
+  |
+   < IF: "if" >
+  |
+  < THEN: "then" >
+  |
+  < ELSE : "else" >
+  |
+  < WHILE: "while" >
+  |
+  < DO: "do" >
+  | 
+   < COLON: ":" >
+  |
+  < COMMA: "," >
+  |
+  < FUN: "fun" >
+  |
+  < ARROW: "->" >
+  |
+  < INT: "int" >
+  |
+  < BOOL: "bool" >
+  | 
+  < ID: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"] )* >
+}
+
+ASTNode Start():
+{ ASTNode e; }
+{
+   e = Seq() <EL>  { return e; }
+}
+
+ASTNode Seq():
+{ ASTNode e1,e2;}
+{
+  e1 = Assign()
+  [
+	<SEQ> e2 = Seq()
+		{
+			e1 = new ASTSeq(e1, e2);
+	 	}
+  ] 
+  { return e1; }
+}
+
+ASTNode Assign():
+{ ASTNode e1,e2;}
+{
+  e1 = Disjunction()
+  [
+	<VARASS> e2 = Assign()
+		{
+			e1 = new ASTAssign(e1, e2);
+	 	}
+  ] 
+  { return e1; }
+}
+
+
+ASTNode Disjunction():
+{ ASTNode e1,e2; }
+{
+  e1 = Conjunction()
+  (<OR> e2 = Conjunction() { e1 = new ASTOr(e1,e2); }
+  )*
+  { return e1; }
+}
+
+ASTNode Conjunction():
+{ ASTNode e1,e2; }
+{
+  e1 = BooleanExp()
+  ( <AND> e2 = BooleanExp() { e1 = new ASTAnd(e1,e2); }
+  )*
+  { return e1; }
+}
+
+ASTNode BooleanExp():
+{ ASTNode e1,e2; }
+{
+	e1 = Exp() 
+ 	 (<EQ> e2 = BooleanExp() { e1 = new ASTEq(e1,e2); }
+ 	 |<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
+ 	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
+ 	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
+ 	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }
+ 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })* { return e1; } 
+}
+
+ASTNode Exp() :
+{ ASTNode e1, e2; }
+{
+   e1 = Term() 
+     ( <PLUS> e2 = Term() { e1 = new ASTAdd(e1,e2); }
+     | <MINUS> e2 = Term() { e1 = new ASTSub(e1,e2); }
+     )*
+     { return e1; }
+}
+
+ASTNode Term() :
+{ ASTNode e1, e2; }
+{
+     e1 = Unary()
+     ( <TIMES> e2 = Unary() { e1 = new ASTMul(e1,e2); }
+     | <DIV> e2 = Unary() { e1 = new ASTDiv(e1,e2); }
+     )*
+     { return e1; }
+}
+
+ASTNode Unary() :
+{ ASTNode e1, e2; }
+{
+     e1 = Call() { return e1; }
+     | 
+     < MINUS > e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
+	 | 
+     <NOT> e1 = Unary() { return new ASTNot(e1); }
+}
+
+ASTNode Call():
+{ASTNode e1; List<ASTNode > l;}
+{
+  e1 = Fact()
+  {return e1;}
+}
+
+ASTNode Fact() :
+{ Token x; ASTNode e1, e2,e3; IType t; List<Param > l;}
+{
+ 	x = <Num> { return new ASTNum(Integer.parseInt(x.image)); }
+	| 
+	<LPAR> e1 = Seq() <RPAR> { return e1; }
+	|
+	< TRUE > { return new ASTBool(true); }
+	|
+	< FALSE > { return new ASTBool(false); }
+	|
+	< VAR > t = Type() x = < ID > { return new ASTId(x.image, t); }
+	|	// get type of existing variable
+	x = < ID > { return new ASTId(x.image); } 
+}
+
+//	ASSERTIONS - PARAM
+List<Param> ParamList():
+{List<Param> l = new LinkedList<Param>(); Token x; IType t;}
+{  
+	[x=<ID> <COLON> t=Type() { l.add(new Param(x.image,t));}
+	
+	( <COMMA> x=<ID> <COLON> t=Type() {l.add(new Param(x.image,t));} )*]
+	
+	{ return l; }
+}
+
+IType Type():
+{IType t,t1; List<IType > types = new LinkedList<IType >();}
+{
+  	(
+    <INT> { t = IntType.singleton; }
+    | 
+    <BOOL> { t = BoolType.singleton; }
+    |
+    <ID> <COLON> <PTYPE>  { t = ParticipantType.singleton; }
+   	)
+	{ return t; }
+}

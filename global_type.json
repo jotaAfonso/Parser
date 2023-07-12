@@ -1,0 +1,167 @@
+{
+  "id" : "c",
+  "initialState" : "S0",
+  "states" : [ "S3", "S4", "S5", "S0", "S1", "S2" ],
+  "finalStates" : [ "S5" ],
+  "transitions" : [ {
+    "localVars" : { },
+    "from" : "S2",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "b" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  }, {
+    "localVars" : { },
+    "from" : "S3",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "o" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  }, {
+    "localVars" : { },
+    "from" : "S4",
+    "to" : "S1",
+    "actionLabel" : "mo",
+    "newParts" : [ {
+      "role" : "B",
+      "participants" : [ "b1" ]
+    } ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "b" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  }, {
+    "localVars" : { },
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "a",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "o" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  }, {
+    "localVars" : {
+      "y" : {
+        "type" : "int"
+      }
+    },
+    "from" : "_",
+    "to" : "S0",
+    "actionLabel" : "starts",
+    "newParts" : [ {
+      "role" : "O",
+      "participants" : [ "o" ]
+    } ],
+    "existantParts" : [ ],
+    "input" : "y:int",
+    "preCondition" : "",
+    "postCondition" : "var x := 10 ; x := 3",
+    "externalCall" : false
+  }, {
+    "localVars" : {
+      "y" : {
+        "type" : "int"
+      }
+    },
+    "from" : "S0",
+    "to" : "S1",
+    "actionLabel" : "mO",
+    "newParts" : [ {
+      "role" : "B",
+      "participants" : [ "b" ]
+    } ],
+    "existantParts" : [ ],
+    "input" : "y:int",
+    "preCondition" : "",
+    "postCondition" : "y := 3",
+    "externalCall" : false
+  }, {
+    "localVars" : { },
+    "from" : "S0",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "o" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  }, {
+    "localVars" : { },
+    "from" : "S1",
+    "to" : "S3",
+    "actionLabel" : "r",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "o" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  } ],
+  "internalTransitions" : [ {
+    "localVars" : { },
+    "from" : "S3",
+    "to" : "S4",
+    "actionLabel" : "s",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "b" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  }, {
+    "localVars" : { },
+    "from" : "S3",
+    "to" : "S5",
+    "actionLabel" : "l",
+    "newParts" : [ ],
+    "existantParts" : [ {
+      "role" : "",
+      "participants" : [ "b" ]
+    } ],
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "externalCall" : false
+  } ],
+  "roles" : [ "B", "O" ],
+  "rPAssociation" : [ {
+    "role" : "O",
+    "participants" : [ "o" ]
+  }, {
+    "role" : "B",
+    "participants" : [ "b", "b1" ]
+  } ]
+}

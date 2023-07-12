@@ -110,7 +110,7 @@ public class FSMGraphGenerator {
 						+ "node.initial { fill-color: %s; }" + "node.final { fill-color: %s; }"
 						+ "node.external { fill-color: %s; }" + "node.normal { fill-color: %s; }"
 						+ "edge { text-size: 25px; text-alignment: along; text-visibility-mode: hidden; }"
-						+ "edge .text { visibility-mode: normal; visibility: visible; text-alignment: along; }",
+						+ "edge .text {text-alignment: along; }",
 				getColorRGB(Color.BLACK), getColorRGB(Color.GREEN), getColorRGB(Color.RED), getColorRGB(Color.BLACK),
 				getColorRGB(Color.GRAY));
 		graph.setAttribute("ui.stylesheet", formating);
