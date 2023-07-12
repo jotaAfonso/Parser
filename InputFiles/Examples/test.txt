@@ -1,6 +1,6 @@
-_ {} o:O > starts(c, y:int) {var int x := 10; x := 3} S0
-S0 {y := 3} b:B > c.mO(y:int) {} S1
-S0 {} o > c.h() {} S5+
+_ {} o:O > starts(c, y:int) {var int x := 0 } S0
+S0 {} b:B > c.mO(y:int) {} S1
+S0 {} o > c.h() {x > 10} S5+
 S1 {} o > c.r() {} S3
 S1 {} o > c.a() {} S2
 S2 {} b > c.h() {} S5

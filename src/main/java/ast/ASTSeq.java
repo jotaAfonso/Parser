@@ -25,6 +25,9 @@ public class ASTSeq implements ASTNode {
 	@Override
 	public IType typeCheck() throws TypingException {
 		left.typeCheck();
+		System.out.println(left.typeCheck());
+		System.out.println(right.typeCheck());
+		System.out.println();
 		return type = right.typeCheck();
 	}
 

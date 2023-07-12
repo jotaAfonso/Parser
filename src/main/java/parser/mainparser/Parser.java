@@ -91,15 +91,16 @@ public class Parser implements ParserConstants {
         // asserion
         if(postC != null) {
                 t.setPostCondition(postC.toString());
-                if(postC.checkIfItHasVar()) {
-                        gV = postC.getVars();
-                                a.addGlobalVars(gV, t.getLocalVars());
-                }
-                if(postC.checkIfItHasIds()) {
-                                aV = postC.getIds();
-                                CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
-                }
-                postC.typeCheck();
+//                if(postC.checkIfItHasVar()) {
+//                        gV = postC.getVars();
+//                                a.addGlobalVars(gV, t.getLocalVars());
+//                }
+//                if(postC.checkIfItHasIds()) {
+//                                aV = postC.getIds();
+//                                CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
+//                }
+                if(!postC.typeCheck().equals(BoolType.singleton))
+                	throw new TypingException();
                 }
 
                 // automaton

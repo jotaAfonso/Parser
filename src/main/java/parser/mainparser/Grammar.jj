@@ -163,7 +163,8 @@ void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
 				aV = postC.getIds();
 				CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
 	    	}
-    		postC.typeCheck();
+    		if(!postC.typeCheck().equals(BoolType.singleton))
+                	throw new TypingException();
 		}
 
 		// automaton
@@ -219,7 +220,8 @@ void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
 				aV = preC.getIds();
 				CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
 	    	}
-    		preC.typeCheck();
+    		if(!preC.typeCheck().equals(BoolType.singleton))
+                	throw new TypingException();
 		}
     	
 		// asserion_post
@@ -233,7 +235,8 @@ void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
 				aV = postC.getIds();
 				CommonUtils.addTypeToIds(aV, a.getGlobalVars(), t.getLocalVars());
 	    	}
-    		postC.typeCheck();
+    		if(!postC.typeCheck().equals(BoolType.singleton))
+                	throw new TypingException();
 		}
 
 		// automaton
