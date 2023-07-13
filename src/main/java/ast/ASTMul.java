@@ -3,9 +3,9 @@ package ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.TypingException;
 import types.IType;
 import types.IntType;
-import types.TypingException;
 
 public class ASTMul implements ASTNode {
 
@@ -36,17 +36,12 @@ public class ASTMul implements ASTNode {
 	public boolean checkIfItHasVar() {
 		return this.left.checkIfItHasVar() || this.right.checkIfItHasVar();
 	}
-	
+		
 	@Override
-	public boolean checkIfItHasIds() {
-		return this.left.checkIfItHasIds() || this.right.checkIfItHasIds();
-	}
-	
-	@Override
-	public List<ASTId> getVars() {
-		List<ASTId> ll = this.left.getVars();
-		List<ASTId> rl = this.right.getVars();
-		List<ASTId> result = new ArrayList<ASTId>();
+	public List<ASTVar> getVars() {
+		List<ASTVar> ll = this.left.getVars();
+		List<ASTVar> rl = this.right.getVars();
+		List<ASTVar> result = new ArrayList<ASTVar>();
 
 		result.addAll(ll);
 		result.addAll(rl);
@@ -55,10 +50,10 @@ public class ASTMul implements ASTNode {
 	}
 	
 	@Override
-	public List<ASTVar> getIds() {
-		List<ASTVar> ll = this.left.getIds();
-		List<ASTVar> rl = this.right.getIds();
-		List<ASTVar> result = new ArrayList<ASTVar>();
+	public List<ASTId> getIds() {
+		List<ASTId> ll = this.left.getIds();
+		List<ASTId> rl = this.right.getIds();
+		List<ASTId> result = new ArrayList<ASTId>();
 
 		result.addAll(ll);
 		result.addAll(rl);

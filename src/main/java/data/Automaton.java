@@ -10,7 +10,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import ast.ASTId;
+import ast.ASTVar;
 import exceptions.CustomException;
 import types.IType;
 import utils.CommonUtils;
@@ -129,7 +129,6 @@ public class Automaton {
 	}
 	
 	public void addRoleParticipant(String p, boolean isDeploy) throws CustomException {
-		System.out.print("part - " + p + "\n");
 		String[] elements = p.split("\\|");
 		for(String e : elements) {
 			if(e.contains(COLON)) {
@@ -169,8 +168,8 @@ public class Automaton {
 		this.globalVars = globalVars;
 	}
 	
-	public void addGlobalVars(List<ASTId> globalVars, Map<String,IType> localVars) throws CustomException {
-		for(ASTId v : globalVars)
+	public void addGlobalVars(List<ASTVar> globalVars, Map<String,IType> localVars) throws CustomException {
+		for(ASTVar v : globalVars)
 			if(!this.getGlobalVars().containsKey(v.getId()) && !localVars.containsKey(v.getId()))
 				this.getGlobalVars().put(v.getId(), v.getType());
 			else {

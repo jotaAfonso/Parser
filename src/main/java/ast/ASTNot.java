@@ -1,11 +1,10 @@
 package ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.TypingException;
 import types.BoolType;
 import types.IType;
-import types.TypingException;
 
 public class ASTNot implements ASTNode {
 
@@ -36,18 +35,12 @@ public class ASTNot implements ASTNode {
 	}
 	
 	@Override
-	public boolean checkIfItHasIds() {
-		return this.node.checkIfItHasIds();
-	}
-	
-	@Override
-	public List<ASTId> getVars() {
+	public List<ASTVar> getVars() {
 		return this.node.getVars();
 	}
 	
 	@Override
-	public List<ASTVar> getIds() {
-		List<ASTVar> result = new ArrayList<ASTVar>();	
-		return result;
+	public List<ASTId> getIds() {
+		return this.node.getIds();
 	}
 }

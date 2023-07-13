@@ -11,7 +11,7 @@ public class Constants {
 	public static final String POSSIBLE_ARGS = "Arguments available - <input_file_path> <output_file_name>";
 	
 	//	FILES
-	public static final String PATH_TEST = "inputFiles/Examples/test.txt";
+	public static final String PATH_TEST = "inputFiles/Examples/simpleMarketPlaceExternalCall.txt";
 	public static final String DEFAULT_OUTPUT = "global_type";
 	
 	//	STATES
@@ -28,7 +28,7 @@ public class Constants {
 	//	EXCEPTION MESSAGES
 	public static final String EXCEPTION_TRANS_PART_REGIST = "Participant %s1 is already registered in the transition with the role %s2\n.";
 	public static final String EXCEPTION_START_PARTICIPANT = "Only a new participant can deploy a contract.";
-	public static final String EXCEPTION_VARIABLE_ALREADY_EXISTS_WITH_THIS_ID = "There is already a variable with the following id - %s1.";
+	public static final String EXCEPTION_VARIABLE_ALREADY_EXISTS_WITH_THIS_ID = "There is a parameter with the same id - %s1.\n Change either the variable id or the parameter id.";
 	public static final String EXCEPTION_VARIABLE_WAS_NOT_INITIALIZE_CORRECTLY = "The variable %s1 was not initialized.";
 
 	//	JSON AUTOMATA ELEMENTS
@@ -61,5 +61,8 @@ public class Constants {
 	public static final String ERROR_PARTICIPANT = ERROR + " - PARTICIPANT";
 	public static final String ERROR_PARTICIPANT_MESSAGE = "Participant %s is not registered.\n";
 	public static final String PARTICIPANT_ALREADY_REGISTERED = "Participant %s1 is already registered.\n";
-	
+
+	public static final String ERROR_NO_PATH_BETWEEN_STATES = "There is no path valid path between the state, %s1, and the state, %s2.\n";
+	public static final String ERROR_NO_PATH_BETWEEN_TO_ENDSTATE = "There is no path valid path between the state, %s1, and any endState.\n";
+	public static final String ERROR_PARTICIPANT_WAS_NOT_REGISTERED_PREVIOUSLY = "The participant, %s1, was not registered prior to the action %s2.\n";
 }

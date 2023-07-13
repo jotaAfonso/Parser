@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import ast.ASTVar;
+import ast.ASTId;
 import exceptions.CustomException;
 import types.IType;
 
@@ -31,8 +31,8 @@ public class CommonUtils {
 		return setValue.stream().collect(Collectors.toList());
 	}
 	
-	public static void addTypeToIds(List<ASTVar> ids, Map<String,IType> globalV, Map<String,IType> localV) throws CustomException {
-		for(ASTVar id : ids) {
+	public static void addTypeToIds(List<ASTId> ids, Map<String,IType> globalV, Map<String,IType> localV) throws CustomException {
+		for(ASTId id : ids) {
 			if(globalV.containsKey(id.getId()))
 				id.setType(globalV.get(id.getId()));
 			else if(localV.containsKey(id.getId()))

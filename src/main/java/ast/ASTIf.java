@@ -2,9 +2,9 @@ package ast;
 
 import java.util.List;
 
+import exceptions.TypingException;
 import types.BoolType;
 import types.IType;
-import types.TypingException;
 
 // imply
 public class ASTIf implements ASTNode {
@@ -40,18 +40,12 @@ public class ASTIf implements ASTNode {
 	}
 	
 	@Override
-	public boolean checkIfItHasIds() {
-		return false;
-	}
-	
-	@Override
-	public List<ASTId> getVars() {
-
+	public List<ASTVar> getVars() {
 		return null;
 	}
 	
 	@Override
-	public List<ASTVar> getIds() {
+	public List<ASTId> getIds() {
 		return null;
 	}
 }

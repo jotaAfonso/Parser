@@ -7,7 +7,7 @@ import static utils.Constants.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import ast.ASTId;
+import ast.ASTVar;
 import exceptions.CustomException;
 import types.IType;
 import utils.CommonUtils;
@@ -224,8 +224,8 @@ public class Transition {
 		this.localVars = localVars;
 	}
 	
-	public void addLocalVars(List<ASTId> globalVars, Map<String, IType> mapGlobal) throws CustomException {
-		for(ASTId v : globalVars)
+	public void addLocalVars(List<ASTVar> globalVars, Map<String, IType> mapGlobal) throws CustomException {
+		for(ASTVar v : globalVars)
 			if(!this.getLocalVars().containsKey(v.getId()) && !mapGlobal.containsKey(v.getId()))
 				this.getLocalVars().put(v.getId(), v.getType());
 			else {

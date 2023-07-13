@@ -1,15 +1,22 @@
 package ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.TypingException;
+
+import java.util.ArrayList;
+
 import types.IType;
-import types.TypingException;
 
 public class ASTVar implements ASTNode {
 
 	String id;
 	IType type;
+
+	public ASTVar(String id, IType type) {
+		this.id = id;
+		this.type = type;
+	}
 	
 	public ASTVar(String id) {
 		this.id = id;
@@ -22,10 +29,6 @@ public class ASTVar implements ASTNode {
 	public IType getType() {
 		return this.type;
 	}
-	
-	public void setType(IType type) {
-		this.type = type;
-	}
 
 	@Override
 	public IType typeCheck() throws TypingException {
@@ -34,29 +37,23 @@ public class ASTVar implements ASTNode {
 	
 	@Override
 	public String toString() {
-		return id;
+		return "var " + id;
 	}
 	
 	@Override
 	public boolean checkIfItHasVar() {
-		return false;
-	}
-	
-	@Override
-	public boolean checkIfItHasIds() {
 		return true;
 	}
 
 	@Override
-	public List<ASTId> getVars() {
-		List<ASTId> result = new ArrayList<ASTId>();
+	public List<ASTVar> getVars() {
+		List<ASTVar> result = new ArrayList<ASTVar>();
+		result.add(this);
 		return result;
 	}
 	
 	@Override
-	public List<ASTVar> getIds() {
-		List<ASTVar> result = new ArrayList<ASTVar>();
-		result.add(this);
-		return result;
+	public List<ASTId> getIds() {
+		return new ArrayList<ASTId>();		
 	}
 }

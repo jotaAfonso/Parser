@@ -1,22 +1,24 @@
+package main;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Hashtable;
 
 import static utils.Constants.*;
 
-import parser.mainparser.*;
-import types.TypingException;
+import parser.*;
 import data.Automaton;
 import exceptions.CustomException;
+import exceptions.TypingException;
 import validations.ValidationChecks;
 
 public class Main {
 
 	private static boolean testFlag = true;
 
-	public static void main(String[] args) throws parser.mainparser.ParseException, parser.assertions.ParseException, CustomException, TypingException {
+	public static void main(String[] args) throws ParseException, CustomException, TypingException {
 		if (args.length <= 2 && args.length > 0 || testFlag) {
 			String outputF = DEFAULT_OUTPUT;
 			String inputF = PATH_TEST;
@@ -62,6 +64,32 @@ public class Main {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
+		}
+	}
+	
+	public static boolean accept(String s, boolean isPath) throws ParseException, FileNotFoundException {
+		Parser parser;
+		if(isPath) {
+			BufferedReader objReader = new BufferedReader(new FileReader(s));
+			parser = new Parser(objReader);
+		} else {
+			ByteArrayInputStream st = new ByteArrayInputStream(s.getBytes());
+			parser = new Parser(st);
+		}
+		Hashtable<String, Automaton> auto = new Hashtable<String, Automaton>();
+		ValidationChecks checks = new ValidationChecks();
+		
+		try {
+			parser.Start(auto, checks);
+			return true;
+		} catch (TokenMgrError e) {
+			return false;
+		} catch (ParseException e) {
+			return false;
+		} catch (CustomException e) {
+			return false;
+		} catch (TypingException e) {
+			return false;
 		}
 	}
 }

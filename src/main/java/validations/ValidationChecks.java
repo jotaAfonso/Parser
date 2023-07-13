@@ -2,9 +2,11 @@ package validations;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Set;
 import static utils.Constants.*;
 
@@ -15,7 +17,9 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import data.AssociationRP;
 import data.Automaton;
+import data.Transition;
 import exceptions.CustomException;
 import utils.CommonUtils;
 
@@ -23,13 +27,14 @@ public class ValidationChecks {
 
 	private Graph graph;
 	private int counter = 0;
+	private boolean foundRegistryOfRoleFlag = false;
 
 	private Set<String> participantsAll = new HashSet<String>();
 	private Set<String> participantsRegistered = new HashSet<String>();
 	private Set<String> contractsRegistered = new HashSet<String>();
-	
+
 	private FSMGraphGenerator visuals;
-	
+
 	public ValidationChecks() {
 		this.graph = new Graph();
 		this.setVisuals(new FSMGraphGenerator());
@@ -63,9 +68,9 @@ public class ValidationChecks {
 //			// checks if a participant was previously registered
 //			this.checkRegistrationOfParticipants(a, this.getGraph());
 		}
-		
+
 		toFileAndImage(auto, outputF);
-		
+
 	}
 
 	public void checkIfContractsWereStarted(Set<String> autoIds) throws CustomException {
@@ -100,7 +105,7 @@ public class ValidationChecks {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}	
+		}
 	}
 
 	public Set<String> getParticipantsRegistered() {
@@ -112,13 +117,13 @@ public class ValidationChecks {
 	}
 
 	public void addParticipantsRegistered(String p) throws CustomException {
-		if(this.getParticipantsRegistered().contains(p))
+		if (this.getParticipantsRegistered().contains(p))
 			throw new CustomException(CommonUtils.replaceInExceptionOne(PARTICIPANT_ALREADY_REGISTERED, p));
 		else
 			this.getParticipantsRegistered().add(p);
 	}
-	
-	public void checkValidityOfParticipants(Automaton a) throws CustomException {		
+
+	public void checkValidityOfParticipants(Automaton a) throws CustomException {
 		Set<String> regPartSet = this.getParticipantsRegistered();
 		if (this.getParticipantsAll().containsAll(regPartSet)) {
 			Set<String> result = new HashSet<String>(regPartSet);
@@ -136,131 +141,152 @@ public class ValidationChecks {
 			}
 		}
 	}
-//
-//	private void checkValidityOfStates(Automaton a, Graph g) throws CustomException {		
-//		String initS = a.getInitialS();
-//		List<String> endS = CommonUtils.setToList(a.getEndS());
-//
-////		for (String s : a.getStates()) {
-////			if (!s.equals(initS) && !endS.contains(s)) {
-////				checkPath(g, s, endS);
-////				checkIfPathExists(g, initS, s);
-////			} else if (endS.contains(s)) 
-////				checkIfPathExists(g, initS, s);
-////			else
-////				checkPath(g, s, endS);
-////		}
-//	}
 
-//	private void checkRegistrationOfParticipants(Automaton a, Graph g) {
-//		String initS = a.getInitialS();
-//		List<String> endS = CommonUtils.setToList(a.getEndS());
-//
-//		for (Transition op : a.getTransitions()) {
-//			if (!endS.contains(op.getFromS())) {
-//				for(AssociationRP nP : op.getNewParts())
-//					for(String p : nP.getParticipants())
-//						checkIfPathStatePartExists(a, g, initS, op.getToS(), p);
-//			}
-//		}
-//	}
-//
-//	private void checkPath(Graph graph, String state, List<String> endS) throws CustomException {
-//		for (String e : endS) {
-//			if (!checkIfPathExists(graph, state, e)) {
-//				throw new CustomException("");
-//			}
-//		}
-//	}
+	private void checkValidityOfStates(Automaton a, Graph g) throws CustomException {
+		String initS = a.getInitialS();
+		List<String> endS = CommonUtils.setToList(a.getEndS());
 
-	//	private void checkIfPathStatePartExists(Automaton a, Graph graph, String start, String end, String part) {
-//		LinkedList<String> visited = new LinkedList<String>();
-//		visited.add(start);
-//		boolean result = false;
-//		Transition starter = a.getTransitions().stream().filter(x -> x.getFromS().equals("_")).findAny().get();
-//		for(AssociationRP nP : starter.getNewParts()) {}
-////			if()
-////			if (!nP.split("[:]")[0].equals(part))
-////			//	result = breadthFirstParticipant(graph, visited, start, end, part, false);
-//	}
+		for (String s : a.getStates()) {
+			if (!s.equals(initS) && !endS.contains(s)) {
+				checkPathToEnd(g, s, endS);
+				checkPathFromBeginning(g, initS, s);
+			} else if (endS.contains(s))
+				checkPathFromBeginning(g, initS, s);
+			else
+				checkPathToEnd(g, s, endS);
+		}
+	}
 
-//	private boolean checkIfPathExists(Graph graph, String start, String end) {
-//		LinkedList<String> visited = new LinkedList<String>();
-//		visited.add(start);
-//		boolean flag = false;
-//		boolean result = breadthFirst(graph, visited, start, end, flag);
-//		if (!result) {
-//			System.out.println("No path Exists between " + start + " and " + end);
-//		}
-//		return result;
-//	}
+	private void checkRegistrationOfParticipants(Automaton a, Graph g) throws CustomException {
+		String initS = a.getInitialS();
+		List<String> endS = CommonUtils.setToList(a.getEndS());
+
+		for (Transition op : a.getTransitions()) {
+			if (!endS.contains(op.getFromS())) {
+				for (AssociationRP nP : op.getExistantParts()) {
+					for (String p : nP.getParticipants()) {
+						if (!checkIfPathStatePartExists(a, g, initS, op.getToS(), p)) {
+							String msg = CommonUtils.replaceInExceptionTwo(ERROR_PARTICIPANT_WAS_NOT_REGISTERED_PREVIOUSLY, p, op.getActionLabel());
+							throw new CustomException(msg);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void checkPathToEnd(Graph graph, String state, List<String> endS) throws CustomException {
+		boolean noPath = true;
+		for (String e : endS) {
+			if (checkIfPathExists(graph, state, e)) {
+				noPath = false;
+				break;
+			}
+		}
+		if (noPath) {
+			String msg = CommonUtils.replaceInExceptionOne(ERROR_NO_PATH_BETWEEN_TO_ENDSTATE, state);
+			throw new CustomException(msg);
+		}
+	}
+
+	private void checkPathFromBeginning(Graph graph, String start, String end) throws CustomException {
+		boolean existsPath = checkIfPathExists(graph, start, end);
+		if (!existsPath) {
+			String msg = CommonUtils.replaceInExceptionTwo(ERROR_NO_PATH_BETWEEN_STATES, start, end);
+			throw new CustomException(msg);
+		}
+	}
+
+	private boolean checkIfPathExists(Graph graph, String start, String end) {
+		LinkedList<String> visited = new LinkedList<String>();
+		visited.add(start);
+		return breadthFirst(graph, visited, start, end, false);
+	}
+
+	private boolean checkIfPathStatePartExists(Automaton a, Graph graph, String start, String end, String part)
+			throws CustomException {
+		LinkedList<String> visited = new LinkedList<String>();
+		visited.add(start);
+		boolean result = true;
+		Transition starter = a.getTransitions().stream().filter(x -> x.getFromS().equals("_")).findAny().get();
+		for (AssociationRP nP : starter.getNewParts()) {
+			for (String p : nP.getParticipants()) {
+				if (!p.equals(part)) {
+					result = breadthFirstParticipant(graph, visited, start, end, part, false);
+				}
+			}
+		}
+		return result;
+	}
+
 //
-//	private boolean breadthFirstParticipant(Graph graph, LinkedList<String> visited, String start, String end,
-//			String part, boolean reachedEndFlag) {
-//		String nodeC = visited.getLast();
-//		LinkedList<String> nodes = graph.adjacentNodes(nodeC);
-//		HashMap<String, String> map = graph.adjacentNodesPart(nodeC);
+	private boolean breadthFirstParticipant(Graph graph, LinkedList<String> visited, String start, String end,
+			String part, boolean reachedEndFlag) {
+		String nodeC = visited.getLast();
+		LinkedList<String> nodes = graph.adjacentNodes(nodeC);
+		HashMap<String, String> map = graph.adjacentNodesPart(nodeC);
+
+		if (nodes.isEmpty())
+			this.setFoundRegistryOfRoleFlag(false);
+
+		for (String node : nodes) {
+			if (visited.contains(node)) {
+				// loop
+				continue;
+			}
+			if (node.equals(end) && this.isFoundRegistryOfRoleFlag()) {
+				visited.add(node);
+				reachedEndFlag = true;
+				visited.removeLast();
+				break;
+			}
+			if (map.get(node).contains(":") && map.get(node).split("[:]")[0].equals(part)) {
+				this.setFoundRegistryOfRoleFlag(true);
+			}
+		}
+
+		for (String node : nodes) {
+			if (visited.contains(node) || node.equals(end)) {
+				continue;
+			}
+			visited.addLast(node);
+
+			reachedEndFlag = breadthFirstParticipant(graph, visited, start, end, part, reachedEndFlag);
+			if (reachedEndFlag)
+				break;
+			visited.removeLast();
+		}
+
+		return reachedEndFlag;
+	}
+
 //
-//		if (nodes.isEmpty())
-//			this.setFoundRegistryOfRoleFlagP(false);
-//
-//		for (String node : nodes) {
-//			if (visited.contains(node)) {
-//				// loop
-//				continue;
-//			}
-//			if (node.equals(end) && this.getFoundRegistryOfRoleFlag()) {
-//				visited.add(node);
-//				reachedEndFlag = true;
-//				visited.removeLast();
-//				break;
-//			}
-//			if (map.get(node).contains(":") && map.get(node).split("[:]")[0].equals(part)) {
-//				this.setFoundRegistryOfRoleFlagP(true);
-//			}
-//		}
-//
-//		for (String node : nodes) {
-//			if (visited.contains(node) || node.equals(end)) {
-//				continue;
-//			}
-//			visited.addLast(node);
-//
-//			reachedEndFlag = breadthFirstParticipant(graph, visited, start, end, part, reachedEndFlag);
-//			if (reachedEndFlag)
-//				break;
-//			visited.removeLast();
-//		}
-//
-//		return reachedEndFlag;
-//	}
-//
-//	private boolean breadthFirst(Graph graph, LinkedList<String> visited, String start, String end, boolean flag) {
-//		LinkedList<String> nodes = graph.adjacentNodes(visited.getLast());
-//
-//		for (String node : nodes) {
-//			if (visited.contains(node)) {
-//				continue;
-//			}
-//			if (node.equals(end)) {
-//				visited.add(node);
-//				flag = true;
-//				visited.removeLast();
-//				break;
-//			}
-//		}
-//
-//		for (String node : nodes) {
-//			if (visited.contains(node) || node.equals(end)) {
-//				continue;
-//			}
-//			visited.addLast(node);
-//			flag = breadthFirst(graph, visited, start, end, flag);
-//			visited.removeLast();
-//		}
-//
-//		return flag;
-//	}
+	private boolean breadthFirst(Graph graph, LinkedList<String> visited, String start, String end, boolean flag) {
+		LinkedList<String> nodes = graph.adjacentNodes(visited.getLast());
+
+		for (String node : nodes) {
+			if (visited.contains(node)) {
+				continue;
+			}
+			if (node.equals(end)) {
+				visited.add(node);
+				flag = true;
+				visited.removeLast();
+				break;
+			}
+		}
+
+		for (String node : nodes) {
+			if (visited.contains(node) || node.equals(end)) {
+				continue;
+			}
+			visited.addLast(node);
+			flag = breadthFirst(graph, visited, start, end, flag);
+			visited.removeLast();
+		}
+
+		return flag;
+	}
 
 	public Set<String> getContractsRegistered() {
 		return contractsRegistered;
@@ -273,7 +299,7 @@ public class ValidationChecks {
 	public Set<String> getParticipantsAll() {
 		return participantsAll;
 	}
-	
+
 	public void setParticipantsAll(Set<String> participantsAll) {
 		this.participantsAll = participantsAll;
 	}
@@ -284,5 +310,13 @@ public class ValidationChecks {
 
 	public void setCounter(int counter) {
 		this.counter = counter;
+	}
+
+	public boolean isFoundRegistryOfRoleFlag() {
+		return foundRegistryOfRoleFlag;
+	}
+
+	public void setFoundRegistryOfRoleFlag(boolean foundRegistryOfRoleFlag) {
+		this.foundRegistryOfRoleFlag = foundRegistryOfRoleFlag;
 	}
 }

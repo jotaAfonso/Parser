@@ -5,24 +5,24 @@ import java.util.List;
 
 import exceptions.TypingException;
 import types.IType;
-import types.IntType;
+import types.StringType;
 
-public class ASTNum implements ASTNode {
+public class ASTString implements ASTNode {
 
-	int val;
+	String val;
 
-	public ASTNum(int n) {
+	public ASTString(String n) {
 		val = n;
 	}
 
 	@Override
 	public String toString() {
-		return String.valueOf(val);
+		return val;
 	}
 
 	@Override
 	public IType typeCheck() throws TypingException {
-		return IntType.singleton;
+		return StringType.singleton;
 	}
 	
 	@Override

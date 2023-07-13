@@ -3,9 +3,9 @@ package ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.TypingException;
 import types.BoolType;
 import types.IType;
-import types.TypingException;
 
 public class ASTBool implements ASTNode {
 
@@ -31,19 +31,12 @@ public class ASTBool implements ASTNode {
 	}
 	
 	@Override
-	public boolean checkIfItHasIds() {
-		return false;
+	public List<ASTVar> getVars() {
+		return new ArrayList<ASTVar>();
 	}
 	
 	@Override
-	public List<ASTId> getVars() {
-		List<ASTId> result = new ArrayList<ASTId>();
-		return result;
-	}
-	
-	@Override
-	public List<ASTVar> getIds() {
-		List<ASTVar> result = new ArrayList<ASTVar>();
-		return result;
+	public List<ASTId> getIds() {
+		return new ArrayList<ASTId>();		
 	}
 }
