@@ -7,6 +7,7 @@ import com.beust.jcommander.Parameters;
 
 import main.converter.PathConverter;
 import main.validators.FileParameterValidator;
+import main.validators.FileParameterOptionalValidator;
 
 @Parameters(separators = "=")
 public class MainCLIParameters {
@@ -22,7 +23,7 @@ public class MainCLIParameters {
 	private Path inputFile;
 	
 	@Parameter(names = {"-o", "--outputFile"},
-			validateWith = FileParameterValidator.class,
+			validateWith = FileParameterOptionalValidator.class,
 			converter = PathConverter.class,
 			description = "Path to the destination file. If not specified it will have the same path as the input file.")
 	private Path outputFile;
