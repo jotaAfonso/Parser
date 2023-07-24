@@ -1,2 +1,1 @@
-(_) o:O starts(c) (_);
-EOF;
+_ {} o:O > starts() {} S0

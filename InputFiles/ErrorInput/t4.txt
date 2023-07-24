@@ -1,14 +1,1 @@
-(_) b:B starts(c) (S0);
-(S0) b c.m() (S1);
-(S0) b c.m() (S2);
-(S0) b c.m() (S3);
-(S1) t:T c.m() (S4);
-(S2) b c.m() (S4);
-(S3) b c.m() (S5);
-(S4) t c.m() (S6);
-(S5) b c.m() (S7);
-(S6) b c.m() (S7);
-(S7) b c.m() (S8);
-(S8) b c.m() (S9);
-ENDSTATES - c - {(S9)};
-EOF;
+_ {true && true} o:O > starts(c) {} S0
