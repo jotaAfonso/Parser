@@ -4,21 +4,7 @@
   "states" : [ "S3", "S4", "S5", "S0", "S1", "S2" ],
   "finalStates" : [ "S5" ],
   "transitions" : [ {
-    "from" : "S1",
-    "to" : "S2",
-    "actionLabel" : "a",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S3",
+    "from" : "S0",
     "to" : "S5",
     "actionLabel" : "h",
     "newParts" : [ ],
@@ -50,11 +36,11 @@
     "to" : "S1",
     "actionLabel" : "mO",
     "newParts" : [ {
-      "role" : "C",
-      "participants" : [ "c" ]
-    }, {
       "role" : "B",
       "participants" : [ "b" ]
+    }, {
+      "role" : "C",
+      "participants" : [ "c" ]
     } ],
     "existantParts" : {
       "role" : "",
@@ -66,55 +52,13 @@
     "internal" : false,
     "externalCall" : false
   }, {
-    "from" : "S0",
-    "to" : "S5",
-    "actionLabel" : "h",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
     "from" : "S3",
-    "to" : "S4",
-    "actionLabel" : "s",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "b" ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : true,
-    "externalCall" : false
-  }, {
-    "from" : "S1",
-    "to" : "S3",
-    "actionLabel" : "r",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S2",
     "to" : "S5",
     "actionLabel" : "h",
     "newParts" : [ ],
     "existantParts" : {
       "role" : "",
-      "participants" : [ "b" ]
+      "participants" : [ "o" ]
     },
     "input" : "",
     "preCondition" : "",
@@ -154,6 +98,62 @@
     "preCondition" : "",
     "postCondition" : "",
     "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S2",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "b" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "a",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S1",
+    "to" : "S3",
+    "actionLabel" : "r",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S3",
+    "to" : "S4",
+    "actionLabel" : "s",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "b" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : true,
     "externalCall" : false
   } ],
   "roles" : [ "B", "C", "O" ],

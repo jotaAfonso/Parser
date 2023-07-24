@@ -1,170 +1,90 @@
 {
-  "id" : "c",
-  "initialState" : "S0",
-  "states" : [ "S3", "S4", "S5", "S0", "S1", "S2" ],
-  "finalStates" : [ "S5" ],
-  "transitions" : [ {
-    "from" : "_",
-    "to" : "S0",
-    "actionLabel" : "starts",
-    "newParts" : [ {
-      "role" : "O",
-      "participants" : [ "o" ]
-    } ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ ]
+  "id": "c",
+  "role": "B",
+  "participants": [ "b", "b1" ],
+  "initialState": "S0",
+  "states": [ "S0", "S1", "S5", "S2", "S3", "S4" ],
+  "finalStates": [ "S5" ],
+  "transitions": [
+    {
+      "from": "S1",
+      "to": "S2",
+      "actionLabel": "?a",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : null,
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S1",
-    "to" : "S3",
-    "actionLabel" : "r",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
+    {
+      "from": "S0",
+      "to": "S1",
+      "actionLabel": "!makeO",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S0",
-    "to" : "S1",
-    "actionLabel" : "mO",
-    "newParts" : [ {
-      "role" : "B",
-      "participants" : [ "b" ]
-    }, {
-      "role" : "C",
-      "participants" : [ "c" ]
-    } ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ ]
+    {
+      "from": "S4",
+      "to": "S1",
+      "actionLabel": "!mo",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S2",
-    "to" : "S5",
-    "actionLabel" : "h",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "b" ]
+    {
+      "from": "S1",
+      "to": "S3",
+      "actionLabel": "?r",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S3",
-    "to" : "S5",
-    "actionLabel" : "h",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
+    {
+      "from": "S0",
+      "to": "S5",
+      "actionLabel": "?h",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S3",
-    "to" : "S4",
-    "actionLabel" : "s",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "b" ]
+    {
+      "from": "S3",
+      "to": "S5",
+      "actionLabel": "?h",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : true,
-    "externalCall" : false
-  }, {
-    "from" : "S3",
-    "to" : "S5",
-    "actionLabel" : "l",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "b" ]
+    {
+      "from": "_",
+      "to": "S0",
+      "actionLabel": "findContract()",
+      "input": "",
+      "preCondition": "",
+      "postCondition": "var x := 10"
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : true,
-    "externalCall" : false
-  }, {
-    "from" : "S4",
-    "to" : "S1",
-    "actionLabel" : "mo",
-    "newParts" : [ {
-      "role" : "B",
-      "participants" : [ "b1" ]
-    } ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "b" ]
+    {
+      "from": "S2",
+      "to": "S5",
+      "actionLabel": "!h",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S0",
-    "to" : "S5",
-    "actionLabel" : "h",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
+    {
+      "from": "S3",
+      "to": "S5",
+      "actionLabel": "!l",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
     },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S1",
-    "to" : "S2",
-    "actionLabel" : "a",
-    "newParts" : [ ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ "o" ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  } ],
-  "roles" : [ "B", "C", "O" ],
-  "rPAssociation" : [ {
-    "role" : "O",
-    "participants" : [ "o" ]
-  }, {
-    "role" : "B",
-    "participants" : [ "b", "b1" ]
-  }, {
-    "role" : "C",
-    "participants" : [ "c" ]
-  } ]
+    {
+      "from": "S3",
+      "to": "S4",
+      "actionLabel": "!s",
+      "input": "",
+      "preCondition": "",
+      "postCondition": ""
+    }
+  ]
 }

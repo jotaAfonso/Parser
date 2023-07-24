@@ -66,9 +66,13 @@ public class FSMGraphGenerator {
             JSONObject transition = transitions.getJSONObject(i);
             String from = transition.getString(JSON_FROM);
             String to = transition.getString(JSON_TO);
-            String action = ".";
-            if(transition.getBoolean(JSON_INTERNAL))
-            	action = "-";
+            String action = "";
+            if(!transition.isNull(JSON_INTERNAL)) {
+            	if(transition.getBoolean(JSON_INTERNAL))
+            		action = "-";
+            	else
+            		action = ".";
+            }
             action = action.concat(transition.getString(JSON_LABEL));
            	Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
            	edge.setAttribute("ui.label", action); 
