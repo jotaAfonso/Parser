@@ -1,0 +1,9 @@
+{"id":"c","role":"O","participants":["o"],"initialState":"S0","states":["S0","S1","S5","S2","S3"],"finalStates":["S5"],"transitions":[
+{"from":"_","to":"S0","actionLabel":"starts(c)"},
+{"from":"S0","to":"S1","actionLabel":"?mO()"},
+{"from":"S1","to":"S2","actionLabel":"!a()"},
+{"from":"S2","to":"S5","actionLabel":"!h()"},
+{"from":"S1","to":"S3","actionLabel":"!r()"},
+{"from":"S3","to":"S1","actionLabel":"?mO()"},
+{"from":"S0","to":"S5","actionLabel":"!h()"}
+], "internalTransitions" : []}

@@ -1,7 +1,7 @@
 package validations;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -21,13 +21,13 @@ import data.AssociationRP;
 import data.Automaton;
 import data.Transition;
 import exceptions.CustomException;
+import main.MainCLIParameters;
 import utils.CommonUtils;
 
 public class ValidationChecks {
 
 	private Graph graph;
 	private int counter = 0;
-	private boolean foundRegistryOfRoleFlag = false;
 
 	private Set<String> participantsAll = new HashSet<String>();
 	private Set<String> participantsRegistered = new HashSet<String>();
@@ -56,20 +56,19 @@ public class ValidationChecks {
 		this.visuals = visuals;
 	}
 
-	// TODO: confirm for all contracts not just one
-	public void validate(Hashtable<String, Automaton> auto, String outputF) throws CustomException {
+	public void validate(Hashtable<String, Automaton> auto, MainCLIParameters args) throws CustomException {
 		this.checkIfContractsWereStarted(auto.keySet());
 		for (Automaton a : auto.values()) {
 //			// checks if a state has a path a valid path from the initial state
 //			// and also checks if it has a valid path to at least one end state
-//			this.checkValidityOfStates(a, this.getGraph());
+			this.checkValidityOfStates(a, this.getGraph());
 //			// checks if all participants are registered
 			this.checkValidityOfParticipants(a);
 //			// checks if a participant was previously registered
-//			this.checkRegistrationOfParticipants(a, this.getGraph());
+			this.checkRegistrationOfParticipants(a, this.getGraph());
 		}
 
-		toFileAndImage(auto, outputF);
+		toFileAndImage(auto, args);
 
 	}
 
@@ -85,18 +84,26 @@ public class ValidationChecks {
 			if (!result.isEmpty()) {
 				String msg = ERROR_CONTRACT.concat(" - ").concat(ERROR_CONTRACT_MESSAGE);
 				List<String> rL = CommonUtils.setToList(result);
-				msg = CommonUtils.replaceInExceptionOne(msg, rL.get(0));
+				msg = CommonUtils.replaceMsgOne(msg, rL.get(0));
 				throw new CustomException(msg);
 			}
 		}
 	}
 
-	private void toFileAndImage(Hashtable<String, Automaton> auto, String outputF) {
+	private void toFileAndImage(Hashtable<String, Automaton> auto, MainCLIParameters args) {
+		Path outputP;
+		if (args.getOutputPath() == null) {
+			outputP = args.getInputPath().getParent();
+			outputP = outputP.resolve("global_type.json");
+		} else
+			outputP = args.getOutputPath();
+			
 		for (Automaton a : auto.values()) {
 			ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 			try {
-				mapper.writeValue(Paths.get(outputF.concat(".json")).toFile(), a);
-				FSMGraphGenerator.generateGraph(outputF.concat(".json"));
+				mapper.writeValue(outputP.toFile(), a);
+				if(args.isVisual())
+					FSMGraphGenerator.generateGraph(outputP.toString());
 				System.out.print("File Generated");
 			} catch (StreamWriteException e) {
 				e.printStackTrace();
@@ -106,6 +113,7 @@ public class ValidationChecks {
 				e.printStackTrace();
 			}
 		}
+
 	}
 
 	public Set<String> getParticipantsRegistered() {
@@ -118,12 +126,12 @@ public class ValidationChecks {
 
 	public void addParticipantsRegistered(String p) throws CustomException {
 		if (this.getParticipantsRegistered().contains(p))
-			throw new CustomException(CommonUtils.replaceInExceptionOne(PARTICIPANT_ALREADY_REGISTERED, p));
+			throw new CustomException(CommonUtils.replaceMsgOne(PARTICIPANT_ALREADY_REGISTERED, p));
 		else
 			this.getParticipantsRegistered().add(p);
 	}
 
-	public void checkValidityOfParticipants(Automaton a) throws CustomException {
+	private void checkValidityOfParticipants(Automaton a) throws CustomException {
 		Set<String> regPartSet = this.getParticipantsRegistered();
 		if (this.getParticipantsAll().containsAll(regPartSet)) {
 			Set<String> result = new HashSet<String>(regPartSet);
@@ -136,7 +144,7 @@ public class ValidationChecks {
 			if (!result.isEmpty()) {
 				String msg = ERROR_PARTICIPANT.concat(" - ").concat(ERROR_PARTICIPANT_MESSAGE);
 				List<String> rL = CommonUtils.setToList(result);
-				msg = CommonUtils.replaceInExceptionOne(msg, rL.get(0));
+				msg = CommonUtils.replaceMsgOne(msg, rL.get(0));
 				throw new CustomException(msg);
 			}
 		}
@@ -163,12 +171,11 @@ public class ValidationChecks {
 
 		for (Transition op : a.getTransitions()) {
 			if (!endS.contains(op.getFromS())) {
-				for (AssociationRP nP : op.getExistantParts()) {
-					for (String p : nP.getParticipants()) {
-						if (!checkIfPathStatePartExists(a, g, initS, op.getToS(), p)) {
-							String msg = CommonUtils.replaceInExceptionTwo(ERROR_PARTICIPANT_WAS_NOT_REGISTERED_PREVIOUSLY, p, op.getActionLabel());
-							throw new CustomException(msg);
-						}
+				for (String p : op.getExistentParts().getParticipants()) {
+					if (!checkIfPathStatePartExists(a, g, initS, op.getFromS(), p)) {
+						String msg = CommonUtils.replaceMsgTwo(ERROR_PARTICIPANT_WAS_NOT_REGISTERED_PREVIOUSLY, p,
+								op.getActionLabel());
+						throw new CustomException(msg);
 					}
 				}
 			}
@@ -184,7 +191,7 @@ public class ValidationChecks {
 			}
 		}
 		if (noPath) {
-			String msg = CommonUtils.replaceInExceptionOne(ERROR_NO_PATH_BETWEEN_TO_ENDSTATE, state);
+			String msg = CommonUtils.replaceMsgOne(ERROR_NO_PATH_BETWEEN_TO_ENDSTATE, state);
 			throw new CustomException(msg);
 		}
 	}
@@ -192,7 +199,7 @@ public class ValidationChecks {
 	private void checkPathFromBeginning(Graph graph, String start, String end) throws CustomException {
 		boolean existsPath = checkIfPathExists(graph, start, end);
 		if (!existsPath) {
-			String msg = CommonUtils.replaceInExceptionTwo(ERROR_NO_PATH_BETWEEN_STATES, start, end);
+			String msg = CommonUtils.replaceMsgTwo(ERROR_NO_PATH_BETWEEN_STATES, start, end);
 			throw new CustomException(msg);
 		}
 	}
@@ -200,7 +207,7 @@ public class ValidationChecks {
 	private boolean checkIfPathExists(Graph graph, String start, String end) {
 		LinkedList<String> visited = new LinkedList<String>();
 		visited.add(start);
-		return breadthFirst(graph, visited, start, end, false);
+		return breadthFirstSearch(graph, visited, start, end, "", false, false, false);
 	}
 
 	private boolean checkIfPathStatePartExists(Automaton a, Graph graph, String start, String end, String part)
@@ -210,82 +217,52 @@ public class ValidationChecks {
 		boolean result = true;
 		Transition starter = a.getTransitions().stream().filter(x -> x.getFromS().equals("_")).findAny().get();
 		for (AssociationRP nP : starter.getNewParts()) {
-			for (String p : nP.getParticipants()) {
-				if (!p.equals(part)) {
-					result = breadthFirstParticipant(graph, visited, start, end, part, false);
-				}
+			if (!nP.getParticipants().contains(part)) {
+				result = breadthFirstSearch(graph, visited, start, end, part, false, false, true);
 			}
 		}
 		return result;
 	}
 
-//
-	private boolean breadthFirstParticipant(Graph graph, LinkedList<String> visited, String start, String end,
-			String part, boolean reachedEndFlag) {
-		String nodeC = visited.getLast();
-		LinkedList<String> nodes = graph.adjacentNodes(nodeC);
-		HashMap<String, String> map = graph.adjacentNodesPart(nodeC);
+	private boolean breadthFirstParticipantCondition(String participantsOfEdge, String participantTarget) {
+		for (String pE : participantsOfEdge.split("[|]")) {
+			if (pE.contains(":") && pE.split("[:]")[0].equals(participantTarget))
+				return true;
+		}
+		return false;
+	}
 
-		if (nodes.isEmpty())
-			this.setFoundRegistryOfRoleFlag(false);
+	private boolean breadthFirstSearch(Graph graph, LinkedList<String> visited, String start, String end, String part,
+			boolean reachedEndFlag, boolean participantRegistered, boolean conditionFlag) {
 
-		for (String node : nodes) {
+		String currentNode = visited.getLast();
+		LinkedList<String> adjacentNodes = graph.adjacentNodes(currentNode);
+		HashMap<String, String> adjacentNodesParticipants = graph.adjacentNodesPart(currentNode);
+
+		for (String node : adjacentNodes) {
 			if (visited.contains(node)) {
-				// loop
 				continue;
 			}
-			if (node.equals(end) && this.isFoundRegistryOfRoleFlag()) {
+			if (node.equals(end) && (!conditionFlag || (conditionFlag && participantRegistered))) {
 				visited.add(node);
 				reachedEndFlag = true;
 				visited.removeLast();
 				break;
 			}
-			if (map.get(node).contains(":") && map.get(node).split("[:]")[0].equals(part)) {
-				this.setFoundRegistryOfRoleFlag(true);
-			}
+			if (conditionFlag && breadthFirstParticipantCondition(adjacentNodesParticipants.get(node), part))
+				participantRegistered = true;
 		}
 
-		for (String node : nodes) {
+		for (String node : adjacentNodes) {
 			if (visited.contains(node) || node.equals(end)) {
 				continue;
 			}
 			visited.addLast(node);
-
-			reachedEndFlag = breadthFirstParticipant(graph, visited, start, end, part, reachedEndFlag);
-			if (reachedEndFlag)
-				break;
+			reachedEndFlag = breadthFirstSearch(graph, visited, start, end, part, reachedEndFlag, participantRegistered,
+					conditionFlag);
 			visited.removeLast();
 		}
-
 		return reachedEndFlag;
-	}
-
-//
-	private boolean breadthFirst(Graph graph, LinkedList<String> visited, String start, String end, boolean flag) {
-		LinkedList<String> nodes = graph.adjacentNodes(visited.getLast());
-
-		for (String node : nodes) {
-			if (visited.contains(node)) {
-				continue;
-			}
-			if (node.equals(end)) {
-				visited.add(node);
-				flag = true;
-				visited.removeLast();
-				break;
-			}
-		}
-
-		for (String node : nodes) {
-			if (visited.contains(node) || node.equals(end)) {
-				continue;
-			}
-			visited.addLast(node);
-			flag = breadthFirst(graph, visited, start, end, flag);
-			visited.removeLast();
-		}
-
-		return flag;
 	}
 
 	public Set<String> getContractsRegistered() {
@@ -310,13 +287,5 @@ public class ValidationChecks {
 
 	public void setCounter(int counter) {
 		this.counter = counter;
-	}
-
-	public boolean isFoundRegistryOfRoleFlag() {
-		return foundRegistryOfRoleFlag;
-	}
-
-	public void setFoundRegistryOfRoleFlag(boolean foundRegistryOfRoleFlag) {
-		this.foundRegistryOfRoleFlag = foundRegistryOfRoleFlag;
 	}
 }

@@ -6,13 +6,20 @@ public class Constants {
 		
 	}
 	
+	// VALIDATORS MESSAGES
+	public static final String FILE_DOES_NOT_EXIST = "%s1 does not exist: ";
+	public static final String IT_IS_NOT_A_FILE = "%s1 is not a file: ";
+		
 	//	MESSAGES
 	public static final String ERROR_NO_INPUT_FILE = "Requires at least the input file path.";
 	public static final String POSSIBLE_ARGS = "Arguments available - <input_file_path> <output_file_name>";
 	
 	//	FILES
-	public static final String PATH_TEST = "inputFiles/Examples/simpleMarketPlaceExternalCall.txt";
-	public static final String DEFAULT_OUTPUT = "global_type";
+	public static final String PATH_TEST = "inputFiles/Examples/simpleMarketPlace.txt";
+	public static final String PATH_TEST_T = "inputFiles/Examples/simpleMarketPlaceExternalCall.txt";
+	public static final String PATH_TEST_OG = "inputFiles/Examples/simpleMarketPlace.txt";
+	public static final String DEFAULT_OUTPUT = "projection2";
+	
 	
 	//	STATES
 	public static final String PRE_INITIAL_STATE = "_";
@@ -46,10 +53,11 @@ public class Constants {
 	public static final String JSON_TO = "to";
 	public static final String JSON_LABEL = "actionLabel";
 	public static final String JSON_NEW_PART = "newParts";
-	public static final String JSON_EXISTANT_PART = "existantParts";
+	public static final String JSON_EXISTENT_PART = "existantParts";
 	public static final String JSON_INPUT = "input";
 	public static final String JSON_PRE_COND = "preCondition";
 	public static final String JSON_POST_COND = "postCondition";
+	public static final String JSON_INTERNAL = "internal";
 	public static final String JSON_EXTERNAL_CALL = "externalCall";
 
 	//	VALIDATIONS - ERROR MESSAGES

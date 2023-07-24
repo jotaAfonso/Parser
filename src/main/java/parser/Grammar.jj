@@ -130,10 +130,7 @@ void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
   	Token iS, eS, isES = null;
  	String p;
  	Transition t;
- 	Boolean eC = false, rES = false;
  	ASTNode postC = null;
- 	List<ASTVar> globalV = null;
- 	List<ASTId> idsV = null;
 }
 {
   	iS = < UNDERSCORE > <LBRACKET> <RBRACKET>
@@ -141,42 +138,7 @@ void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
   			<LBRACKET> (postC = Assertion())? <RBRACKET>
   				eS = < ID > (isES = < PLUS >)?
 	{
-	 	Automaton a = auto.get(t.getId());
-	 	if (a == null) 
-    		a = auto.put(t.getId(), new Automaton(t.getId()));
-    	a = auto.get(t.getId());
-
-		// transition
-    	t.setFromS(iS.image);
-    	if(isES != null)
-    		rES = true;
-    	t.setToS(eS.image);
-    	t.addParticipant(p);
-    	t.setExternalCall(eC);
-
-    	// assertion
-    	if(postC != null) { 
-	    	t.setPostCondition(postC.toString());
-	    	if(postC.checkIfItHasVar()) { 
-	    		globalV = postC.getVars();
-				a.addGlobalVars(globalV, t.getLocalVars());
-	    	}
-	    	idsV = postC.getIds();
-	    	if(!idsV.isEmpty())
-	    		CommonUtils.addTypeToIds(idsV, a.getGlobalVars(), t.getLocalVars());	 
-    		if(!postC.typeCheck().equals(AssignType.singleton))
-    			throw new TypingException();
-		}
-
-		// automaton
-		a.addBothStates(iS.image, eS.image, rES);
-    	a.addTransition(t);
-    	a.addRoleParticipant(p,true);
-
-
-    	// checks
-    	checks.getGraph().addEdge(iS.image, eS.image, p);
-    	checks.getContractsRegistered().add(t.getId());
+    	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, false, null, postC, p, true);
 	}
 }
 
@@ -185,9 +147,8 @@ void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
 	Token iS, eS, isES = null;
  	String p;
  	Transition t;
- 	Boolean eC = false, rES = false;
+ 	Boolean eC = false;
  	ASTNode postC = null, preC = null;
- 	List<ASTId> idsV = null;
 }
 {
 	iS = < ID > <LBRACKET> (preC = Assertion())? <RBRACKET>
@@ -195,61 +156,7 @@ void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
 			<LBRACKET> (postC = Assertion())? <RBRACKET>
 				eS = < ID > (isES = < PLUS >)?
 	{
-	 	Automaton a = auto.get(t.getId());
-	 	if (a == null) 
-    		a = auto.put(t.getId(), new Automaton(t.getId()));
-    	a = auto.get(t.getId());
-
-		// transition
-    	t.setFromS(iS.image);
-    	if(isES != null)
-    		rES = true;
-    	t.setToS(eS.image);
-    	t.addParticipant(p);
-    	t.setExternalCall(eC);
-
-    	// external call
-    	if(eC)
-    	{
-    	 	String internalS = "I" + checks.getCounter();
-    		t.setToS(internalS);
-    		Transition okT = new Transition(".",internalS, eS.image, "OK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
-			Transition nokT = new Transition(".",internalS, iS.image, "NOK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
-			a.addTransition(okT);
-			a.addTransition(nokT);
-			a.getStates().add(internalS);
-    		checks.setCounter(checks.getCounter() + 1);
-    		checks.getGraph().addEdge(okT.getFromS(), okT.getToS(), p);
-    		checks.getGraph().addEdge(nokT.getFromS(), nokT.getToS(), p);
-		}
-		
-    	// asserion_pre
-    	if(preC != null) { 
-	    	t.setPostCondition(preC.toString());
-			idsV = preC.getIds();
-    		if(!idsV.isEmpty())
-        	    CommonUtils.addTypeToIds(idsV, a.getGlobalVars(), t.getLocalVars());
-    		if(!preC.typeCheck().equals(BoolType.singleton))
-                	throw new TypingException();
-		}
-    	
-		// asserion_post
-    	if(postC != null) { 
-	    	t.setPostCondition(postC.toString());
-	    	idsV = postC.getIds();
-	    	if(!idsV.isEmpty())
-	    		CommonUtils.addTypeToIds(idsV, a.getGlobalVars(), t.getLocalVars());	
-    		if(!postC.typeCheck().equals(BoolType.singleton))
-                	throw new TypingException();
-		}
-
-		// automaton
-		a.addBothStates(iS.image, eS.image, rES);
-    	a.addTransition(t);
-    	a.addRoleParticipant(p,false);
-
-		// graph
-    	checks.getGraph().addEdge(iS.image, eS.image, p);
+	 	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, preC, postC, p, false);
 	}
 }
 
@@ -285,8 +192,7 @@ String ParticipantExtra():
 {
 	p1 = Participant() (join = <MOREPART> p2 = Participant() { parts.add(join.image.concat(p2)); })*
 	{
-		String concat = String.join("", parts);
-		return p1.concat(concat);
+		return p1.concat(String.join("", parts));
 	}
 }
 
@@ -312,8 +218,7 @@ Transition NormalAction(Hashtable<String, Automaton> auto):
 {
 	c = < ID > aType = OperationType() aLabel = < ID > < LPAR > param = ParamList() < RPAR >
 	{
-	  	Transition r = new Transition(c.image, aLabel.image, aType, param);
-		return r;
+	  	return new Transition(c.image, aLabel.image, aType, param);
 	}
 }
 
@@ -429,13 +334,13 @@ ASTNode BooleanExp():
   	ASTNode e1,e2;
 }
 {
-	e1 = Exp() 
- 	 (<EQ> e2 = BooleanExp() { e1 = new ASTEq(e1,e2); }
- 	 |<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
+	e1 = Exp()
+ 	 (<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
  	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
  	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
  	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }
- 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })* { return e1; } 
+ 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })*
+ 	 { return e1; } 
 }
 
 ASTNode Exp() :
@@ -477,9 +382,11 @@ ASTNode Fact() :
  	IType t;}
 {
  	x = <Num> { return new ASTNum(Integer.parseInt(x.image)); }
-	|	// exclusive to one word TODO: increase to whatever
+	// exclusive to one word
+	//TODO: increase to whatever
+	|
 	<QUOTATIONMARK> x = <ID> <QUOTATIONMARK > { return new ASTString(x.image); }
-	| 
+	|
 	<LPAR> e1 = Seq() <RPAR> { return e1; }
 	|
 	< TRUE > { return new ASTBool(true); }

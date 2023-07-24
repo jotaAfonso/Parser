@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Hashtable;
-
-import static utils.Constants.*;
 
 import parser.*;
 import data.Automaton;
@@ -14,33 +14,38 @@ import exceptions.CustomException;
 import exceptions.TypingException;
 import validations.ValidationChecks;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+
 public class Main {
 
-	private static boolean testFlag = true;
+	final static MainCLIParameters mainArgs = new MainCLIParameters();
 
-	public static void main(String[] args) throws ParseException, CustomException, TypingException {
-		if (args.length <= 2 && args.length > 0 || testFlag) {
-			String outputF = DEFAULT_OUTPUT;
-			String inputF = PATH_TEST;
-			if (args.length > 1) {
-				inputF = args[0];
-				outputF = args[1];
-			}
-
-			argumentsGiven(inputF, outputF);
-		} else {
-			noArgumentsGiven();
+	public static void main(String[] args) throws ParseException, CustomException, TypingException, IOException {
+		JCommander jCommander = new JCommander(mainArgs);
+		jCommander.setProgramName("parser");
+		
+		try {
+			jCommander.parse(args);
+			argumentsGiven(mainArgs);
+		} catch(ParameterException e) {
+			System.out.println(e.getMessage());
+			showUsage(jCommander);
+		}
+		
+		if(mainArgs.isHelp()) {
+			showUsage(jCommander);
 		}
 	}
 
-	private static void noArgumentsGiven() {
-		System.err.printf("%s\u005cn", ERROR_NO_INPUT_FILE);
-		System.out.printf("%s\u005cn", POSSIBLE_ARGS);
+	private static void showUsage(JCommander jCommander) {
+		jCommander.usage();
+		System.exit(0);
 	}
 
-	private static void argumentsGiven(String inputf, String outputf) throws ParseException, CustomException, TypingException {
+	private static void argumentsGiven(MainCLIParameters args) throws ParseException, CustomException, TypingException, IOException {
 		try {
-			BufferedReader objReader = new BufferedReader(new FileReader(PATH_TEST));
+			BufferedReader objReader = Files.newBufferedReader(args.getInputPath());
 			Parser parser = new Parser(objReader);
 			boolean endOfFile = false;
 
@@ -60,7 +65,7 @@ public class Main {
 				}
 			}
 			
-			checks.validate(auto, outputf);
+			checks.validate(auto, args);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());

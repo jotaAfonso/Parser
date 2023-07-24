@@ -8,6 +8,7 @@ import utils.*;
 import types.*;
 import ast.*;
 
+@SuppressWarnings("all")
 public class Parser implements ParserConstants {
 
   final public int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException, TypingException {
@@ -36,10 +37,7 @@ public class Parser implements ParserConstants {
         Token iS, eS, isES = null;
         String p;
         Transition t;
-        Boolean eC = false, rES = false;
         ASTNode postC = null;
-        List<ASTVar> globalV = null;
-        List<ASTId> idsV = null;
     iS = jj_consume_token(UNDERSCORE);
     jj_consume_token(LBRACKET);
     jj_consume_token(RBRACKET);
@@ -73,51 +71,15 @@ public class Parser implements ParserConstants {
       jj_la1[2] = jj_gen;
       ;
     }
-                Automaton a = auto.get(t.getId());
-                if (a == null)
-                a = auto.put(t.getId(), new Automaton(t.getId()));
-        a = auto.get(t.getId());
-
-                // transition
-        t.setFromS(iS.image);
-        if(isES != null)
-                rES = true;
-        t.setToS(eS.image);
-        t.addParticipant(p);
-        t.setExternalCall(eC);
-
-        // assertion
-        if(postC != null) {
-                t.setPostCondition(postC.toString());
-                if(postC.checkIfItHasVar()) {
-                        globalV = postC.getVars();
-                                a.addGlobalVars(globalV, t.getLocalVars());
-                }
-                idsV = postC.getIds();
-                if(!idsV.isEmpty())
-                        CommonUtils.addTypeToIds(idsV, a.getGlobalVars(), t.getLocalVars());
-                if(!postC.typeCheck().equals(AssignType.singleton))
-                        {if (true) throw new TypingException();}
-                }
-
-                // automaton
-                a.addBothStates(iS.image, eS.image, rES);
-        a.addTransition(t);
-        a.addRoleParticipant(p,true);
-
-
-        // checks
-        checks.getGraph().addEdge(iS.image, eS.image, p);
-        checks.getContractsRegistered().add(t.getId());
+        GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, false, null, postC, p, true);
   }
 
   final public void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException, TypingException {
         Token iS, eS, isES = null;
         String p;
         Transition t;
-        Boolean eC = false, rES = false;
+        Boolean eC = false;
         ASTNode postC = null, preC = null;
-        List<ASTId> idsV = null;
     iS = jj_consume_token(ID);
     jj_consume_token(LBRACKET);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -167,61 +129,7 @@ public class Parser implements ParserConstants {
       jj_la1[5] = jj_gen;
       ;
     }
-                Automaton a = auto.get(t.getId());
-                if (a == null)
-                a = auto.put(t.getId(), new Automaton(t.getId()));
-        a = auto.get(t.getId());
-
-                // transition
-        t.setFromS(iS.image);
-        if(isES != null)
-                rES = true;
-        t.setToS(eS.image);
-        t.addParticipant(p);
-        t.setExternalCall(eC);
-
-        // external call
-        if(eC)
-        {
-                String internalS = "I" + checks.getCounter();
-                t.setToS(internalS);
-                Transition okT = new Transition(".",internalS, eS.image, "OK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
-                        Transition nokT = new Transition(".",internalS, iS.image, "NOK", t.getNewParts(), t.getExistantParts(), t.getInput(), t.getPreCondition(), t.getPostCondition(), false);
-                        a.addTransition(okT);
-                        a.addTransition(nokT);
-                        a.getStates().add(internalS);
-                checks.setCounter(checks.getCounter() + 1);
-                checks.getGraph().addEdge(okT.getFromS(), okT.getToS(), p);
-                checks.getGraph().addEdge(iS.image, eS.image, p);
-                }
-
-        // asserion_pre
-        if(preC != null) {
-                t.setPostCondition(preC.toString());
-                        idsV = preC.getIds();
-                if(!idsV.isEmpty())
-                    CommonUtils.addTypeToIds(idsV, a.getGlobalVars(), t.getLocalVars());
-                if(!preC.typeCheck().equals(BoolType.singleton))
-                        {if (true) throw new TypingException();}
-                }
-
-                // asserion_post
-        if(postC != null) {
-                t.setPostCondition(postC.toString());
-                idsV = postC.getIds();
-                if(!idsV.isEmpty())
-                        CommonUtils.addTypeToIds(idsV, a.getGlobalVars(), t.getLocalVars());
-                if(!postC.typeCheck().equals(BoolType.singleton))
-                        {if (true) throw new TypingException();}
-                }
-
-                // automaton
-                a.addBothStates(iS.image, eS.image, rES);
-        a.addTransition(t);
-        a.addRoleParticipant(p,false);
-
-                // graph
-        checks.getGraph().addEdge(iS.image, eS.image, p);
+                GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, preC, postC, p, false);
   }
 
   final public boolean ExternalCall() throws ParseException {
@@ -280,8 +188,7 @@ public class Parser implements ParserConstants {
       p2 = Participant();
                                                                    parts.add(join.image.concat(p2));
     }
-                String concat = String.join("", parts);
-                {if (true) return p1.concat(concat);}
+                {if (true) return p1.concat(String.join("", parts));}
     throw new Error("Missing return statement in function");
   }
 
@@ -315,8 +222,7 @@ public class Parser implements ParserConstants {
     jj_consume_token(LPAR);
     param = ParamList();
     jj_consume_token(RPAR);
-                Transition r = new Transition(c.image, aLabel.image, aType, param);
-                {if (true) return r;}
+                {if (true) return new Transition(c.image, aLabel.image, aType, param);}
     throw new Error("Missing return statement in function");
   }
 
@@ -494,7 +400,6 @@ public class Parser implements ParserConstants {
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case EQ:
       case NEQ:
       case LEQ:
       case GEQ:
@@ -507,11 +412,6 @@ public class Parser implements ParserConstants {
         break label_5;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case EQ:
-        jj_consume_token(EQ);
-        e2 = BooleanExp();
-                                   e1 = new ASTEq(e1,e2);
-        break;
       case NEQ:
         jj_consume_token(NEQ);
         e2 = BooleanExp();
@@ -543,7 +443,7 @@ public class Parser implements ParserConstants {
         throw new ParseException();
       }
     }
-                                                           {if (true) return e1;}
+           {if (true) return e1;}
     throw new Error("Missing return statement in function");
   }
 
@@ -712,7 +612,7 @@ public class Parser implements ParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1001,0xa0098200,0x100,0xa0098200,0xa0098200,0x100,0x18000000,0x2000,0x0,0x4000,0x200,0x4000,0x0,0xb0,0x40000000,0x0,0x200000,0x400000,0x1f800000,0x1f800000,0x300,0x300,0xc00,0xc00,0xa0098200,0x80098000,};
+      jj_la1_0 = new int[] {0x1001,0xa0098200,0x100,0xa0098200,0xa0098200,0x100,0x18000000,0x2000,0x0,0x4000,0x200,0x4000,0x0,0xb0,0x40000000,0x0,0x200000,0x400000,0x1f000000,0x1f000000,0x300,0x300,0xc00,0xc00,0xa0098200,0x80098000,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x40,0x62,0x0,0x62,0x62,0x0,0x0,0x0,0x4,0x0,0x10,0x0,0x40,0x40,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x62,0x62,};

@@ -1,0 +1,195 @@
+{
+  "id" : "c",
+  "initialState" : "S0",
+  "states" : [ "S3", "S4", "S5", "I0", "S0", "S1", "S2" ],
+  "finalStates" : [ "S5" ],
+  "transitions" : [ {
+    "from" : "S1",
+    "to" : "S3",
+    "actionLabel" : "r",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S2",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "b" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S0",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S3",
+    "to" : "S5",
+    "actionLabel" : "l",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "b" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : true,
+    "externalCall" : false
+  }, {
+    "from" : "_",
+    "to" : "S0",
+    "actionLabel" : "starts",
+    "newParts" : [ {
+      "role" : "O",
+      "participants" : [ "o" ]
+    } ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ ]
+    },
+    "input" : null,
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S0",
+    "to" : "S1",
+    "actionLabel" : "mO",
+    "newParts" : [ {
+      "role" : "B",
+      "participants" : [ "b" ]
+    } ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S1",
+    "to" : "I0",
+    "actionLabel" : "a",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : true
+  }, {
+    "from" : "I0",
+    "to" : "S1",
+    "actionLabel" : "NOK",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S3",
+    "to" : "S4",
+    "actionLabel" : "s",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "b" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : true,
+    "externalCall" : false
+  }, {
+    "from" : "I0",
+    "to" : "S2",
+    "actionLabel" : "OK",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S3",
+    "to" : "S5",
+    "actionLabel" : "h",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S4",
+    "to" : "S1",
+    "actionLabel" : "mo",
+    "newParts" : [ {
+      "role" : "B",
+      "participants" : [ "b1" ]
+    } ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "b" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  } ],
+  "roles" : [ "B", "O" ],
+  "rPAssociation" : [ {
+    "role" : "o",
+    "participants" : [ "O" ]
+  }, {
+    "role" : "b",
+    "participants" : [ "B" ]
+  }, {
+    "role" : "b1",
+    "participants" : [ "B" ]
+  } ]
+}

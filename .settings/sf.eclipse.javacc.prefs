@@ -1,4 +1,4 @@
-CLEAR_CONSOLE=false
+CLEAR_CONSOLE=true
 FORMAT_BEFORE_SAVE=false
 JAVACC_OPTIONS=
 JJDOC_OPTIONS=
@@ -10,5 +10,5 @@ MARK_GEN_FILES_AS_DERIVED=true
 RUNTIME_JJJAR=C\:/Users/Afonso/eclipse/modeling-2022-09/eclipse/../../../.p2/pool/plugins/sf.eclipse.javacc_1.5.33/jars/javacc-5.0.jar
 RUNTIME_JTBJAR=C\:/Users/Afonso/eclipse/modeling-2022-09/eclipse/../../../.p2/pool/plugins/sf.eclipse.javacc_1.5.33/jars/jtb-1.4.11.jar
 RUNTIME_JVMOPTIONS=
-SUPPRESS_WARNINGS=false
+SUPPRESS_WARNINGS=true
 eclipse.preferences.version=1
