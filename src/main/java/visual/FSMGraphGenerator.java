@@ -15,6 +15,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.ui.spriteManager.Sprite;
+import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,6 +37,8 @@ public class FSMGraphGenerator {
 
         JSONArray states = fsm.getJSONArray(JSON_STATES);
         String initialState = fsm.getString(JSON_INITIAL_STATE);
+
+        String cID = fsm.getString(JSON_ID);
         JSONArray finalStates = fsm.getJSONArray(JSON_END_STATES);
         JSONArray transitions = fsm.getJSONArray(JSON_TRANSITIONS);
         
@@ -48,38 +52,13 @@ public class FSMGraphGenerator {
         }
     	addNode("_", graph, initialState, finalStates);
 
+    	SpriteManager sm = new SpriteManager(graph);
     	// Add transitions as edges
-    	addEdges(transitions, graph);
+    	addEdges(cID, transitions, graph, sm);
 
         return graph;
     }
-    
-    /**
-     * Adds the edges to the graph.
-     *
-     * @param transitions - transitions
-     * @param g - graph
-     */
-    private static void addEdges(JSONArray transitions, Graph g) {
-    	// Add transitions as edges
-        for (int i = 0; i < transitions.length(); i++) {
-            JSONObject transition = transitions.getJSONObject(i);
-            String from = transition.getString(JSON_FROM);
-            String to = transition.getString(JSON_TO);
-            String action = "";
-            if(!transition.isNull(JSON_INTERNAL)) {
-            	if(transition.getBoolean(JSON_INTERNAL))
-            		action = "-";
-            	else
-            		action = ".";
-            }
-            action = action.concat(transition.getString(JSON_LABEL));
-           	Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
-           	edge.setAttribute("ui.label", action); 
-            edge.setAttribute("ui.style", "text-size: 20px;");
-        }
-    }
-    
+        
     /**
      * Adds the node to the graph.
      *
@@ -109,14 +88,57 @@ public class FSMGraphGenerator {
         if (state.equals("_")) {
             nodeAttributes.put("open", true);
         }
-
+        
         if (!iState.equals(state) && !fStates.toList().contains(state) &&
                 !nodeAttributes.containsKey("external") && !nodeAttributes.containsKey("open")) {
-            nodeAttributes.put("normal", true);
+            nodeAttributes.put("normal_node", true);
         }
 
         node.setAttribute("ui.class", getNodeClass(nodeAttributes));
         node.setAttribute("ui.label", state);
+    }
+    
+    /**
+     * Adds the edges to the graph.
+     *
+     * @param transitions - transitions
+     * @param g - graph
+     */
+    private static void addEdges(String cID, JSONArray transitions, Graph g, SpriteManager sm) {
+    	// Add transitions as edges
+        for (int i = 0; i < transitions.length(); i++) {
+            JSONObject transition = transitions.getJSONObject(i);
+            String from = transition.getString(JSON_FROM);
+            String to = transition.getString(JSON_TO);
+            String input = transition.getString(JSON_INPUT);
+            String action = "";
+            if(!transition.isNull(JSON_INTERNAL)) {
+            	if(transition.getBoolean(JSON_INTERNAL))
+            		action = "-";
+            	else
+            		action = ".";
+            }
+            action = action.concat(transition.getString(JSON_LABEL));
+            String result = cID;
+            if(!transition.getString(JSON_LABEL).contains("start"))
+            	result = result.concat(action).concat("(").concat(input).concat(")");
+            else {
+            	result = action.replace(".", "").replace("-", "").concat("(").concat(cID);
+            	if(!input.isEmpty())
+            		result = result.concat(",");
+            	result = result.concat(input).concat(")");
+            }
+            Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
+           	//edge.setAttribute("layout.weight", 3); 
+            //edge.setAttribute("ui.style", "text-size: 15px; text-alignment: along; shape: line; text-offset: -100;");
+            
+            String spriteId = from.concat(action).concat(to).replace(".", "");
+            spriteId = spriteId.replace("-", "");
+            Sprite s = sm.addSprite(spriteId);
+            s.setAttribute("ui.label", result);
+            s.attachToEdge(from.concat(action).concat(to));
+            s.setPosition(0.5);
+        }
     }
     
     /**
@@ -141,15 +163,25 @@ public class FSMGraphGenerator {
      * @param graph - graph
      */
     public static void drawFSMGraph(Graph graph) {
-    	String formating = String.format(
-				"node { fill-color: white; size: 40px, 40px; stroke-mode: plain; stroke-color: %s; text-size: 20px; text-alignment: center; }"
-						+ "node.initial { fill-color: %s; }" + "node.final { fill-color: %s; }"
-						+ "node.external { fill-color: %s; }" + "node.normal { fill-color: %s; }"
-						+ "edge { text-size: 500px; text-alignment: along; }"
-						+ "edge .text {text-alignment: along; }",
+//    	String formating = String.format(
+//				"node { fill-color: white; size: 40px, 40px; stroke-mode: plain; 
+//    					stroke-color: %s; text-size: 20px; text-alignment: center; }"
+//						+ "node.initial { fill-color: %s; }" + "node.final { fill-color: %s; }"
+//						+ "node.external { fill-color: %s; }" + "node.normal { fill-color: %s; }"
+//						+ "edge { text-size: 500px; text-alignment: along; }"
+//						+ "edge .text {text-alignment: along; } layout.weight 5",
+//				getColorRGB(Color.BLACK), getColorRGB(Color.GREEN), getColorRGB(Color.RED), getColorRGB(Color.BLACK),
+//				getColorRGB(Color.GRAY));
+    	String formating = String.format("node { fill-color: white; size: 40px, "
+    			+ "40px; stroke-mode: plain; stroke-color: %s; text-size: 20px; text-alignment: center; }"
+				+ "node.initial { fill-color: %s; }" + "node.final { fill-color: %s; }"
+				+ "node.external { fill-color: %s; }" + "node.normal_node { fill-color: %s; } sprite { fill-mode: none; text-size:15; text-alignment: under; }" ,
 				getColorRGB(Color.BLACK), getColorRGB(Color.GREEN), getColorRGB(Color.RED), getColorRGB(Color.BLACK),
 				getColorRGB(Color.GRAY));
+
 		graph.setAttribute("ui.stylesheet", formating);
+		graph.setAttribute("ui.quality");
+		graph.setAttribute("ui.antialias");
         Viewer viewer = graph.display();
         viewer.enableAutoLayout();
     }
@@ -177,6 +209,8 @@ public class FSMGraphGenerator {
         try {
             String fsmTextJson = readJsonFile(filePath);
             System.setProperty("org.graphstream.ui", "swing");
+            System.setProperty("org.graphstream.ui.renderer",
+                    "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
             Graph fsmGraph = generateFSMGraph(fsmTextJson);
             drawFSMGraph(fsmGraph);
         } catch (IOException e) {

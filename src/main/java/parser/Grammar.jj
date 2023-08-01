@@ -335,7 +335,8 @@ ASTNode BooleanExp():
 }
 {
 	e1 = Exp()
- 	 (<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
+ 	 (<EQ> e2 = BooleanExp() { e1 = new ASTEq(e1,e2); }
+ 	 |<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
  	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
  	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
  	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }

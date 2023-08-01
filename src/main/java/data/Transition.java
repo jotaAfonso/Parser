@@ -82,6 +82,7 @@ public class Transition {
 		this.id = id;
 		this.actionLabel = label;
 		this.type = type;
+		this.input = "";
 		this.setParameters(param);
 		if (param != null && !param.isEmpty()) {
 			for (Param p : param) {

@@ -5,6 +5,7 @@ import java.util.List;
 
 import exceptions.TypingException;
 import types.AssignType;
+import types.BoolType;
 import types.IType;
 
 public class ASTAssign implements ASTNode {
@@ -26,7 +27,7 @@ public class ASTAssign implements ASTNode {
 		IType rightT = right.typeCheck();
 		
 		if(leftT == rightT)
-			return AssignType.singleton;
+			return BoolType.singleton;
 		else
 			throw new TypingException("Wrong types in assign");
 	}

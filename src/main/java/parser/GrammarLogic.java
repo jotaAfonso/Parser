@@ -9,6 +9,7 @@ import data.Automaton;
 import data.Transition;
 import exceptions.CustomException;
 import exceptions.TypingException;
+import types.AssignType;
 import types.BoolType;
 import utils.CommonUtils;
 import validations.ValidationChecks;
@@ -60,7 +61,7 @@ public class GrammarLogic {
 
 		// asserion_post
 		if (postC != null)
-			treatAssertion(a, t, postC, false);
+			treatAssertion(a, t, postC, deployFlag);
 
 		// automaton
 		addDataToAutomaton(a, t, iS.image, eS.image, (isES != null), p, deployFlag);
@@ -86,12 +87,19 @@ public class GrammarLogic {
 			throws CustomException, TypingException {
 		if (deployFlag && condition.checkIfItHasVar())
 			a.addGlobalVars(condition.getVars(), t.getLocalVars());
-
+		if(!deployFlag && condition.checkIfItHasVar())
+			throw new CustomException("Variables are only declared in the deploy/start method.");
+			
 		t.setPostCondition(condition.toString());
 		List<ASTId> idsV = condition.getIds();
 		if (idsV != null && !idsV.isEmpty())
 			CommonUtils.addTypeToIDs(idsV, a.getGlobalVars(), t.getLocalVars());
-		if (!condition.typeCheck().equals(BoolType.singleton))
+		
+		/* 
+		 * assertions are either of type boolean outside of deploy
+		 * or of type assign when the method is deploy/start
+		*/
+		if (!(condition.typeCheck().equals(BoolType.singleton) || (condition.typeCheck().equals(AssignType.singleton) && deployFlag)))
 			throw new TypingException();
 	}
 

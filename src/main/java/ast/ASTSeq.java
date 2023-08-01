@@ -35,6 +35,10 @@ public class ASTSeq implements ASTNode {
 		if(lt == rt && lt == BoolType.singleton)
 			return BoolType.singleton;
 		
+		// added so assign can be used outside of deploy post condition
+		if((lt == BoolType.singleton || lt == AssignType.singleton) && (rt == BoolType.singleton || rt == AssignType.singleton))
+			return BoolType.singleton;
+		
 		return SequenceType.singleton; 
 	}
 
