@@ -1,4 +1,4 @@
-_ {} o:O > starts(c) {a >= b; var int a := 0; var int b := 10 } S0
+_ {} o:O < starts(c) {var int a := 0; var int b := 10; a >= b} S0
 S0 {} b:B|c:C > c.mO() {} S1
 S0 {} o > c.h() {} S5+
 S1 {} o > c.r() {} S3

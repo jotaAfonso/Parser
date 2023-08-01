@@ -9,7 +9,6 @@ import types.*;
 import ast.*;
 
 /** Token Manager. */
-@SuppressWarnings("all")
 public class ParserTokenManager implements ParserConstants
 {
 

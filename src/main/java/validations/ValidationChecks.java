@@ -8,6 +8,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static utils.Constants.*;
 
 import visual.*;
@@ -97,12 +100,12 @@ public class ValidationChecks {
 			outputP = outputP.resolve("global_type.json");
 		} else
 			outputP = args.getOutputPath();
-			
+
 		for (Automaton a : auto.values()) {
 			ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 			try {
 				mapper.writeValue(outputP.toFile(), a);
-				if(args.isVisual())
+				if (args.isVisual())
 					FSMGraphGenerator.generateGraph(outputP.toString());
 				System.out.print("File Generated");
 			} catch (StreamWriteException e) {
@@ -198,10 +201,18 @@ public class ValidationChecks {
 
 	private void checkPathFromBeginning(Graph graph, String start, String end) throws CustomException {
 		boolean existsPath = checkIfPathExists(graph, start, end);
-		if (!existsPath) {
-			String msg = CommonUtils.replaceMsgTwo(ERROR_NO_PATH_BETWEEN_STATES, start, end);
-			throw new CustomException(msg);
+		if (existsPath) {
+			return;
 		}
+
+		Pattern pattern = Pattern.compile("I(\\d+)");
+		Matcher matcher = pattern.matcher(end);
+		if (matcher.find()) {
+			return;
+		}
+
+		String msg = CommonUtils.replaceMsgTwo(ERROR_NO_PATH_BETWEEN_STATES, start, end);
+		throw new CustomException(msg);
 	}
 
 	private boolean checkIfPathExists(Graph graph, String start, String end) {

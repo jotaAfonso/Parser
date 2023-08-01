@@ -130,15 +130,16 @@ void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
   	Token iS, eS, isES = null;
  	String p;
  	Transition t;
+ 	Boolean eC = false;
  	ASTNode postC = null;
 }
 {
   	iS = < UNDERSCORE > <LBRACKET> <RBRACKET>
-  		p = ParticipantExtra() <GT> t = DeployAction(auto)
+  		p = Participant() eC = ExternalCall() t = DeployAction(auto)
   			<LBRACKET> (postC = Assertion())? <RBRACKET>
   				eS = < ID > (isES = < PLUS >)?
 	{
-    	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, false, null, postC, p, true);
+    	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, null, postC, p, true);
 	}
 }
 

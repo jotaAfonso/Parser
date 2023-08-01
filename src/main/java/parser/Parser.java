@@ -8,7 +8,6 @@ import utils.*;
 import types.*;
 import ast.*;
 
-@SuppressWarnings("all")
 public class Parser implements ParserConstants {
 
   final public int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException, TypingException {
@@ -37,12 +36,13 @@ public class Parser implements ParserConstants {
         Token iS, eS, isES = null;
         String p;
         Transition t;
+        Boolean eC = false;
         ASTNode postC = null;
     iS = jj_consume_token(UNDERSCORE);
     jj_consume_token(LBRACKET);
     jj_consume_token(RBRACKET);
-    p = ParticipantExtra();
-    jj_consume_token(GT);
+    p = Participant();
+    eC = ExternalCall();
     t = DeployAction(auto);
     jj_consume_token(LBRACKET);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -71,7 +71,7 @@ public class Parser implements ParserConstants {
       jj_la1[2] = jj_gen;
       ;
     }
-        GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, false, null, postC, p, true);
+        GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, null, postC, p, true);
   }
 
   final public void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws ParseException, CustomException, TypingException {
