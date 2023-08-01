@@ -79,7 +79,13 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int Num = 37;
   /** RegularExpression Id. */
-  int ID = 38;
+  int CID = 38;
+  /** RegularExpression Id. */
+  int ID = 39;
+  /** RegularExpression Id. */
+  int EXISTS = 40;
+  /** RegularExpression Id. */
+  int FORALL = 41;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -124,7 +130,10 @@ public interface ParserConstants {
     "\"starts\"",
     "<DOT>",
     "<Num>",
+    "<CID>",
     "<ID>",
+    "\"\\u2203\"",
+    "\"\\u2200\"",
   };
 
 }

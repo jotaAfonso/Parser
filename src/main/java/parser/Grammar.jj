@@ -44,66 +44,39 @@ TOKEN :
 TOKEN :
 {
   	< PLUS : "+" >
-  	|
-  	< MINUS : "-">
-  	|
-  	< TIMES : "*">
-  	|
-  	< DIV : "/">
-	|
- 	< UNDERSCORE : "_" >
- 	|
- 	< COLON : ":" >
- 	|
-  	< COMMA: "," >
-	|
-	< TRUE : "true" >
-  	|
-  	< FALSE : "false" > 
-	|
-	< LBRACKET : "{" >
-	|
-	< RBRACKET : "}" >
-	|
-	< LPAR : "(" >
-  	|
-  	< RPAR : ")" >
- 	| 
-  	< OR : "||" >
-  	|
-  	< AND : "&&" >
-  	|
-	< EQ : "==" >
-	|
-	< NEQ : "!=" >
-	|
-	< LEQ : "<=" >
-	|
-	< GEQ: ">=" >
-	|
-	< LT : "<" >
-	|
-	< GT : ">" >
-	|
-	< NOT: "!" >
-	|
-  	< SEQ: ";" >
-  	|
-  	< VAR : "var" >
-  	|
-  	< VARASS : ":=" >
- 	|
- 	< QUOTATIONMARK : ["\""]>
- 	|
- 	< MOREPART : "|" > 
-  	|
-	< STARTLABEL : "starts" >
-	|
-	< DOT : ["."]  >
-	|
-	< Num: (["0"-"9"]) + >
-	|
-	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* >
+  	| < MINUS : "-">
+  	| < TIMES : "*">
+  	| < DIV : "/">
+	| < UNDERSCORE : "_" >
+ 	| < COLON : ":" >
+ 	| < COMMA: "," >
+	| < TRUE : "true" >
+  	| < FALSE : "false" > 
+	| < LBRACKET : "{" >
+	| < RBRACKET : "}" >
+	| < LPAR : "(" >
+  	| < RPAR : ")" >
+ 	| < OR : "||" >
+  	| < AND : "&&" >
+  	| < EQ : "==" >
+	| < NEQ : "!=" >
+	| < LEQ : "<=" >
+	| < GEQ: ">=" >
+	| < LT : "<" >
+	| < GT : ">" >
+	| < NOT: "!" >
+	| < SEQ: ";" >
+  	| < VAR : "var" >
+  	| < VARASS : ":=" >
+ 	| < QUOTATIONMARK : ["\""]>
+ 	| < MOREPART : "|" > 
+  	| < STARTLABEL : "starts" >
+	| < DOT : ["."]  >
+	| < Num: (["0"-"9"]) + >
+	| < CID : "P"(["A"-"Z","0"-"9"])* >
+	| < ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* >
+	| < EXISTS: "∃" >
+	| < FORALL: "∀" >
 }
 
 int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException :
@@ -175,7 +148,7 @@ String Participant():
 	Token p1, p2 = null, p3 = null;
 }
 {
- 	p1 = < ID > (p2 = <COLON> p3 = <ID>)?
+ 	p1 = < ID > (p2 = <COLON> p3 = <CID>)?
  	{
 		if(p2 == null)
 	 		return p1.image;
@@ -262,7 +235,7 @@ IType Type():
 	|
     <STRING> { t = StringType.singleton; }
     |
-    <ID> <COLON> <PTYPE>  { t = ParticipantType.singleton; }
+    <CID> <COLON> <PTYPE>  { t = ParticipantType.singleton; }
     )
 	{ return t; }
 }
@@ -274,7 +247,8 @@ ASTNode Assertion():
 	ASTNode e;
 }
 {
-   e = Seq() { return e; }
+	e = Seq()
+	 { return e; }
 }
 
 ASTNode Seq():
@@ -297,7 +271,7 @@ ASTNode Assign():
   	ASTNode e1,e2;
 }
 {
-  e1 = Disjunction()
+  e1 = ExistsAssertion()
   [
 	<VARASS> e2 = Assign()
 		{
@@ -308,6 +282,31 @@ ASTNode Assign():
 }
 
 
+ASTNode ExistsAssertion():
+{
+  ASTNode e1;
+  Token e2;
+}
+{
+	e1 = ForAllAssertion()
+	  (<EXISTS> e2 = <CID> { e1 = new ASTExists(e1,new ASTId(e2.image.substring(1))); }
+	  )*
+	  { return e1; }
+  
+}
+
+ASTNode ForAllAssertion():
+{
+  ASTNode e1;
+  Token e2;
+}
+{
+	e1 = Disjunction()
+	  (<FORALL> e2 = <CID> { e1 = new ASTForAll(e1,new ASTId(e2.image.substring(1))); }
+	  )*
+	  { return e1; }
+  
+}
 ASTNode Disjunction():
 {
   	ASTNode e1,e2;
@@ -371,10 +370,8 @@ ASTNode Unary() :
 }
 {
      e1 = Fact() { return e1; }
-     | 
-     < MINUS > e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
-	 | 
-     <NOT> e1 = Unary() { return new ASTNot(e1); }
+     | < MINUS > e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
+	 | <NOT> e1 = Unary() { return new ASTNot(e1); }
 }
 
 ASTNode Fact() :
@@ -388,14 +385,9 @@ ASTNode Fact() :
 	//TODO: increase to whatever
 	|
 	<QUOTATIONMARK> x = <ID> <QUOTATIONMARK > { return new ASTString(x.image); }
-	|
-	<LPAR> e1 = Seq() <RPAR> { return e1; }
-	|
-	< TRUE > { return new ASTBool(true); }
-	|
-	< FALSE > { return new ASTBool(false); }
-	|
-	< VAR > t = Type() x = < ID > { return new ASTVar(x.image, t); }
-	|
-	x = < ID > { return new ASTId(x.image); } 
+	| <LPAR> e1 = Seq() <RPAR> { return e1; }
+	| < TRUE > { return new ASTBool(true); }
+	| < FALSE > { return new ASTBool(false); }
+	| < VAR > t = Type() x = < ID > { return new ASTVar(x.image, t); }
+	| x = < ID > { return new ASTId(x.image); } 
 }

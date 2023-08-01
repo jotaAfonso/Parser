@@ -8,7 +8,7 @@
     "to" : "I0",
     "actionLabel" : "starts",
     "newParts" : [ {
-      "role" : "O",
+      "role" : "PO",
       "participants" : [ "o" ]
     } ],
     "existantParts" : {
@@ -17,7 +17,7 @@
     },
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "var int a := 0 ; var int b := 10 ; a >= b",
+    "postCondition" : "var int a := 0 ; var int b := 10 ; a >= b ; var int B := 0",
     "internal" : false,
     "externalCall" : true
   }, {
@@ -31,7 +31,7 @@
     },
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "",
+    "postCondition" : "a * b >= 50 && b < 90 && b ∃ B",
     "internal" : true,
     "externalCall" : false
   }, {
@@ -39,7 +39,7 @@
     "to" : "S1",
     "actionLabel" : "mo",
     "newParts" : [ {
-      "role" : "B",
+      "role" : "PB",
       "participants" : [ "b1" ]
     } ],
     "existantParts" : {
@@ -56,7 +56,7 @@
     "to" : "_",
     "actionLabel" : "NOK",
     "newParts" : [ {
-      "role" : "O",
+      "role" : "PO",
       "participants" : [ "o" ]
     } ],
     "existantParts" : {
@@ -93,7 +93,7 @@
     },
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "",
+    "postCondition" : "b ∃ B ; a ∀ B",
     "internal" : false,
     "externalCall" : false
   }, {
@@ -129,7 +129,7 @@
     "to" : "S0",
     "actionLabel" : "OK",
     "newParts" : [ {
-      "role" : "O",
+      "role" : "PO",
       "participants" : [ "o" ]
     } ],
     "existantParts" : {
@@ -160,10 +160,10 @@
     "to" : "S1",
     "actionLabel" : "mO",
     "newParts" : [ {
-      "role" : "B",
+      "role" : "PB",
       "participants" : [ "b" ]
     }, {
-      "role" : "C",
+      "role" : "PC",
       "participants" : [ "c" ]
     } ],
     "existantParts" : {
@@ -184,24 +184,24 @@
       "role" : "",
       "participants" : [ "o" ]
     },
-    "input" : "",
+    "input" : "b2:PType",
     "preCondition" : "",
     "postCondition" : "",
     "internal" : false,
     "externalCall" : false
   } ],
-  "roles" : [ "B", "C", "O" ],
+  "roles" : [ "PB", "PC", "PO" ],
   "rPAssociation" : [ {
     "role" : "o",
-    "participants" : [ "O" ]
+    "participants" : [ "PO" ]
   }, {
     "role" : "b",
-    "participants" : [ "B" ]
+    "participants" : [ "PB" ]
   }, {
     "role" : "c",
-    "participants" : [ "C" ]
+    "participants" : [ "PC" ]
   }, {
     "role" : "b1",
-    "participants" : [ "B" ]
+    "participants" : [ "PB" ]
   } ]
 }
