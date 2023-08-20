@@ -4,26 +4,9 @@
   "states" : [ "S3", "S4", "S5", "I0", "S0", "S1", "S2" ],
   "finalStates" : [ "S5" ],
   "transitions" : [ {
-    "from" : "_",
-    "to" : "I0",
-    "actionLabel" : "starts",
-    "newParts" : [ {
-      "role" : "PO",
-      "participants" : [ "o" ]
-    } ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "var int a := 0 ; var int b := 10 ; a >= b ; var int B := 0",
-    "internal" : false,
-    "externalCall" : true
-  }, {
-    "from" : "S3",
+    "from" : "S2",
     "to" : "S5",
-    "actionLabel" : "l",
+    "actionLabel" : "h",
     "newParts" : [ ],
     "existantParts" : {
       "role" : "",
@@ -31,8 +14,22 @@
     },
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "a * b >= 50 && b < 90 && b ∃ B",
-    "internal" : true,
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "a",
+    "newParts" : [ ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ "o" ]
+    },
+    "input" : "b2:PType",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
     "externalCall" : false
   }, {
     "from" : "S4",
@@ -52,26 +49,9 @@
     "internal" : false,
     "externalCall" : false
   }, {
-    "from" : "I0",
-    "to" : "_",
-    "actionLabel" : "NOK",
-    "newParts" : [ {
-      "role" : "PO",
-      "participants" : [ "o" ]
-    } ],
-    "existantParts" : {
-      "role" : "",
-      "participants" : [ ]
-    },
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "from" : "S1",
-    "to" : "S3",
-    "actionLabel" : "r",
+    "from" : "S0",
+    "to" : "S5",
+    "actionLabel" : "h",
     "newParts" : [ ],
     "existantParts" : {
       "role" : "",
@@ -85,16 +65,16 @@
   }, {
     "from" : "S3",
     "to" : "S5",
-    "actionLabel" : "h",
+    "actionLabel" : "l",
     "newParts" : [ ],
     "existantParts" : {
       "role" : "",
-      "participants" : [ "o" ]
+      "participants" : [ "b" ]
     },
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "b ∃ B ; a ∀ B",
-    "internal" : false,
+    "postCondition" : "a * b >= 50 && b < 90 && b ∃ B",
+    "internal" : true,
     "externalCall" : false
   }, {
     "from" : "S3",
@@ -112,12 +92,18 @@
     "externalCall" : false
   }, {
     "from" : "S0",
-    "to" : "S5",
-    "actionLabel" : "h",
-    "newParts" : [ ],
+    "to" : "S1",
+    "actionLabel" : "mO",
+    "newParts" : [ {
+      "role" : "PC",
+      "participants" : [ "c" ]
+    }, {
+      "role" : "PB",
+      "participants" : [ "b" ]
+    } ],
     "existantParts" : {
       "role" : "",
-      "participants" : [ "o" ]
+      "participants" : [ ]
     },
     "input" : "",
     "preCondition" : "",
@@ -142,13 +128,30 @@
     "internal" : false,
     "externalCall" : false
   }, {
-    "from" : "S2",
-    "to" : "S5",
-    "actionLabel" : "h",
+    "from" : "_",
+    "to" : "I0",
+    "actionLabel" : "starts",
+    "newParts" : [ {
+      "role" : "PO",
+      "participants" : [ "o" ]
+    } ],
+    "existantParts" : {
+      "role" : "",
+      "participants" : [ ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "var int a := 0 && var int b := 10 && a >= b && var int B := 0",
+    "internal" : false,
+    "externalCall" : true
+  }, {
+    "from" : "S1",
+    "to" : "S3",
+    "actionLabel" : "r",
     "newParts" : [ ],
     "existantParts" : {
       "role" : "",
-      "participants" : [ "b" ]
+      "participants" : [ "o" ]
     },
     "input" : "",
     "preCondition" : "",
@@ -156,15 +159,12 @@
     "internal" : false,
     "externalCall" : false
   }, {
-    "from" : "S0",
-    "to" : "S1",
-    "actionLabel" : "mO",
+    "from" : "I0",
+    "to" : "_",
+    "actionLabel" : "NOK",
     "newParts" : [ {
-      "role" : "PB",
-      "participants" : [ "b" ]
-    }, {
-      "role" : "PC",
-      "participants" : [ "c" ]
+      "role" : "PO",
+      "participants" : [ "o" ]
     } ],
     "existantParts" : {
       "role" : "",
@@ -176,32 +176,29 @@
     "internal" : false,
     "externalCall" : false
   }, {
-    "from" : "S1",
-    "to" : "S2",
-    "actionLabel" : "a",
+    "from" : "S3",
+    "to" : "S5",
+    "actionLabel" : "h",
     "newParts" : [ ],
     "existantParts" : {
       "role" : "",
       "participants" : [ "o" ]
     },
-    "input" : "b2:PType",
+    "input" : "",
     "preCondition" : "",
-    "postCondition" : "",
+    "postCondition" : "b ∃ B ; a ∀ B",
     "internal" : false,
     "externalCall" : false
   } ],
   "roles" : [ "PB", "PC", "PO" ],
   "rPAssociation" : [ {
-    "role" : "o",
-    "participants" : [ "PO" ]
+    "role" : "PO",
+    "participants" : [ "o" ]
   }, {
-    "role" : "b",
-    "participants" : [ "PB" ]
+    "role" : "PB",
+    "participants" : [ "b", "b1" ]
   }, {
-    "role" : "c",
-    "participants" : [ "PC" ]
-  }, {
-    "role" : "b1",
-    "participants" : [ "PB" ]
+    "role" : "PC",
+    "participants" : [ "c" ]
   } ]
 }
