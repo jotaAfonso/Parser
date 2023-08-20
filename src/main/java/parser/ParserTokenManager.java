@@ -9,6 +9,7 @@ import types.*;
 import ast.*;
 
 /** Token Manager. */
+@SuppressWarnings("all")
 public class ParserTokenManager implements ParserConstants
 {
 
@@ -151,10 +152,8 @@ private int jjMoveStringLiteralDfa0_0()
          return jjMoveStringLiteralDfa1_0(0x200000L);
       case 125:
          return jjStopAtPos(0, 18);
-      case 8704:
-         return jjStopAtPos(0, 41);
-      case 8707:
-         return jjStopAtPos(0, 40);
+      case 226:
+         return jjMoveStringLiteralDfa1_0(0x30000000000L);
       default :
          return jjMoveNfa_0(0, 0);
    }
@@ -200,6 +199,8 @@ private int jjMoveStringLiteralDfa1_0(long active0)
          if ((active0 & 0x200000L) != 0L)
             return jjStopAtPos(1, 21);
          break;
+      case 710:
+         return jjMoveStringLiteralDfa2_0(active0, 0x30000000000L);
       default :
          break;
    }
@@ -234,6 +235,14 @@ private int jjMoveStringLiteralDfa2_0(long old0, long active0)
          return jjMoveStringLiteralDfa3_0(active0, 0x8000L);
       case 121:
          return jjMoveStringLiteralDfa3_0(active0, 0x40L);
+      case 402:
+         if ((active0 & 0x10000000000L) != 0L)
+            return jjStopAtPos(2, 40);
+         break;
+      case 8364:
+         if ((active0 & 0x20000000000L) != 0L)
+            return jjStopAtPos(2, 41);
+         break;
       default :
          break;
    }
@@ -603,8 +612,8 @@ public static final String[] jjstrLiteralImages = {
 "\120\124\171\160\145", "\163\164\162\151\156\147", "\53", "\55", "\52", "\57", "\137", "\72", "\54", 
 "\164\162\165\145", "\146\141\154\163\145", "\173", "\175", "\50", "\51", "\174\174", "\46\46", 
 "\75\75", "\41\75", "\74\75", "\76\75", "\74", "\76", "\41", "\73", "\166\141\162", 
-"\72\75", null, "\174", "\163\164\141\162\164\163", null, null, null, null, "\u2203", 
-"\u2200", };
+"\72\75", null, "\174", "\163\164\141\162\164\163", null, null, null, null, 
+"\342\u02c6\u0192", "\342\u02c6\u20ac", };
 
 /** Lexer state names. */
 public static final String[] lexStateNames = {

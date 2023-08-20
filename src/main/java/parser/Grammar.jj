@@ -215,7 +215,8 @@ List<Param> ParamList():
   	Token x;
   	IType t;
 }
-{  
+{
+  	// t = Type or ID -> check if its a state if it is not gives error
 	[x=<ID> <COLON> t=Type() { l.add(new Param(x.image,t));}
 	
 	( <COMMA> x=<ID> <COLON> t=Type() {l.add(new Param(x.image,t));} )*]
@@ -240,30 +241,14 @@ IType Type():
 	{ return t; }
 }
 
-// ASSERTIONS
-
+// Assertion
 ASTNode Assertion():
 {
 	ASTNode e;
 }
 {
-	e = Seq()
+	e = Assign()
 	 { return e; }
-}
-
-ASTNode Seq():
-{
-  	ASTNode e1,e2;
-}
-{
-  e1 = Assign()
-  [
-	<SEQ> e2 = Seq()
-		{
-			e1 = new ASTSeq(e1, e2);
-	 	}
-  ] 
-  { return e1; }
 }
 
 ASTNode Assign():
@@ -271,7 +256,7 @@ ASTNode Assign():
   	ASTNode e1,e2;
 }
 {
-  e1 = ExistsAssertion()
+  e1 = Logical()
   [
 	<VARASS> e2 = Assign()
 		{
@@ -281,6 +266,32 @@ ASTNode Assign():
   { return e1; }
 }
 
+ASTNode Logical():
+{
+  	ASTNode e1,e2;
+}
+{
+  e1 = BooleanExp()
+  (<OR> e2 = BooleanExp() { e1 = new ASTOr(e1,e2); }
+  |<AND> e2 = BooleanExp() { e1 = new ASTAnd(e1,e2); }  
+  )*
+  { return e1; }
+}
+
+ASTNode BooleanExp():
+{
+  	ASTNode e1, e2;
+}
+{
+	e1 = Exp()
+ 	 (<EQ> e2 = Exp() { e1 = new ASTEq(e1,e2); }
+ 	 |<NEQ> e2 = Exp() { e1 = new ASTNeq(e1,e2); }
+ 	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
+ 	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
+ 	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }
+ 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })*
+ 	 { return e1; } 
+}
 
 ASTNode ExistsAssertion():
 {
@@ -301,76 +312,35 @@ ASTNode ForAllAssertion():
   Token e2;
 }
 {
-	e1 = Disjunction()
+	e1 = Logical()
 	  (<FORALL> e2 = <CID> { e1 = new ASTForAll(e1,new ASTId(e2.image.substring(1))); }
 	  )*
 	  { return e1; }
   
 }
-ASTNode Disjunction():
-{
-  	ASTNode e1,e2;
-}
-{
-  e1 = Conjunction()
-  (<OR> e2 = Conjunction() { e1 = new ASTOr(e1,e2); }
-  )*
-  { return e1; }
-}
-
-ASTNode Conjunction():
-{
-  	ASTNode e1,e2;
-}
-{
-  e1 = BooleanExp()
-  ( <AND> e2 = BooleanExp() { e1 = new ASTAnd(e1,e2); }
-  )*
-  { return e1; }
-}
-
-ASTNode BooleanExp():
-{
-  	ASTNode e1,e2;
-}
-{
-	e1 = Exp()
- 	 (<EQ> e2 = BooleanExp() { e1 = new ASTEq(e1,e2); }
- 	 |<NEQ> e2 = BooleanExp() { e1 = new ASTNeq(e1,e2); }
- 	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
- 	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
- 	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }
- 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })*
- 	 { return e1; } 
-}
 
 ASTNode Exp() :
 { ASTNode e1, e2; }
 {
-   e1 = Term() 
-     ( <PLUS> e2 = Term() { e1 = new ASTAdd(e1,e2); }
-     | <MINUS> e2 = Term() { e1 = new ASTSub(e1,e2); }
-     )*
-     { return e1; }
-}
-
-ASTNode Term() :
-{ ASTNode e1, e2; }
-{
-     e1 = Unary()
-     ( <TIMES> e2 = Unary() { e1 = new ASTMul(e1,e2); }
+   e1 = Unary() 
+     ( <PLUS> e2 = Unary() { e1 = new ASTAdd(e1,e2); }
+     | <MINUS> e2 = Unary() { e1 = new ASTSub(e1,e2); }
+     | <TIMES> e2 = Unary() { e1 = new ASTMul(e1,e2); }
      | <DIV> e2 = Unary() { e1 = new ASTDiv(e1,e2); }
      )*
      { return e1; }
 }
 
+/*
+	Atomic and negation
+*/
 ASTNode Unary() :
 {
  	ASTNode e1;
 }
 {
      e1 = Fact() { return e1; }
-     | < MINUS > e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
+     | <MINUS> e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
 	 | <NOT> e1 = Unary() { return new ASTNot(e1); }
 }
 
@@ -385,7 +355,7 @@ ASTNode Fact() :
 	//TODO: increase to whatever
 	|
 	<QUOTATIONMARK> x = <ID> <QUOTATIONMARK > { return new ASTString(x.image); }
-	| <LPAR> e1 = Seq() <RPAR> { return e1; }
+	| <LPAR> e1 = Assign() <RPAR> { return e1; }
 	| < TRUE > { return new ASTBool(true); }
 	| < FALSE > { return new ASTBool(false); }
 	| < VAR > t = Type() x = < ID > { return new ASTVar(x.image, t); }
