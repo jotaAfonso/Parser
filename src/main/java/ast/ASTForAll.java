@@ -9,17 +9,18 @@ import types.IType;
 
 public class ASTForAll implements ASTNode {
 
-	ASTNode left, right;
+	ASTNode left, middle, right;
 	IType type;
 	
-	public ASTForAll(ASTNode e1, ASTNode e2) {
-		left = e1;
-		right = e2;
+	public ASTForAll(ASTNode l, ASTNode m, ASTNode r) {
+		left = l;
+		middle = m;
+		right = r;
 	}
 
 	@Override
 	public String toString() {
-		return left.toString() + " ∀ " + right.toString();
+		return " ∀ " + left.toString() + middle.toString() + right.toString();
 	}
 
 	@Override

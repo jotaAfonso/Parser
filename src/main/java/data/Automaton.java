@@ -283,7 +283,7 @@ public class Automaton {
 	 * @throws CustomException - custom exception, tries to register a participant
 	 *                         that is already registered
 	 */
-	private void addAssociations(String p, String r) throws CustomException {
+	public void addAssociations(String p, String r) throws CustomException {
 		AssociationRP associationE = this.getRoleParticipant().stream().filter(x -> x.getRole().equals(r)).findAny()
 				.orElse(null);
 		if (associationE != null) {

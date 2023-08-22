@@ -37,7 +37,7 @@ public class ASTVar implements ASTNode {
 	
 	@Override
 	public String toString() {
-		return "var " + type.getType() + " " + id;
+		return type.getType() + " " + id;
 	}
 	
 	@Override

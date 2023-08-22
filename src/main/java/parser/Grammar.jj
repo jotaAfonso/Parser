@@ -24,21 +24,18 @@ PARSER_END(Parser)
 <*> SKIP :
 {
 	< " " | "\t" | "\r" | "\n" | "\r\n" >
-	|
-	<"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
-	|
-	<"/*"(~["/"])*  "*""/" >
+	| <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+	| <"/*"(~["/"])*  "*""/" >
 }
 
+// Types
 TOKEN :
 {
   	< INT: "int" >
-  	|
-  	< BOOL: "bool" >
- 	|
- 	< PTYPE: "PType">
- 	|
- 	< STRING: "string"> 
+  	| < BOOL: "bool" >
+ 	| < STRING: "string">
+ 	| < SET: "set">
+ 	// | < PTYPE: "PType">
 }
 
 TOKEN :
@@ -47,55 +44,89 @@ TOKEN :
   	| < MINUS : "-">
   	| < TIMES : "*">
   	| < DIV : "/">
-	| < UNDERSCORE : "_" >
- 	| < COLON : ":" >
- 	| < COMMA: "," >
-	| < TRUE : "true" >
-  	| < FALSE : "false" > 
-	| < LBRACKET : "{" >
-	| < RBRACKET : "}" >
-	| < LPAR : "(" >
-  	| < RPAR : ")" >
- 	| < OR : "||" >
-  	| < AND : "&&" >
-  	| < EQ : "==" >
-	| < NEQ : "!=" >
+}
+
+// Logical Operators :
+TOKEN :
+{
+  	< AND : "&&"  >
+  	| < NOT: "!" >
+	| < OR : "||" >
+}
+
+//Comparison operators
+TOKEN :
+{
+  	< EQ : "==" >
+	| < NEQ : "!=" | "<>" >
 	| < LEQ : "<=" >
 	| < GEQ: ">=" >
 	| < LT : "<" >
 	| < GT : ">" >
-	| < NOT: "!" >
-	| < SEQ: ";" >
+}
+
+// Boolean Values
+TOKEN :
+{
+  	< TRUE : "true" | "TRUE" >
+  	| < FALSE : "false" | "FALSE" > 
+}
+
+// Constants
+TOKEN :
+{
+	< STARTLABEL : "starts" | "STARTS" | "deploy" | "DEPLOY" >
+	| < CONTAINS : "in" > 
+}
+
+// Brackets
+TOKEN :
+{
+  	< LBRACKET : "{" >
+	| < RBRACKET : "}" >
+	| < LPAR : "(" >
+  	| < RPAR : ")" >
+  	| < SLPAR : "[" >
+  	| < SRPAR : "]" >
+}
+
+TOKEN :
+{
+	< UNDERSCORE : "_" >
+ 	| < COLON : ":" >
+ 	| < COMMA: "," >
   	| < VAR : "var" >
   	| < VARASS : ":=" >
- 	| < QUOTATIONMARK : ["\""]>
  	| < MOREPART : "|" > 
-  	| < STARTLABEL : "starts" >
 	| < DOT : ["."]  >
-	| < Num: (["0"-"9"]) + >
-	| < CID : "P"(["A"-"Z","0"-"9"])* >
-	| < ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* >
-	| < EXISTS: "∃" >
-	| < FORALL: "∀" >
+}
+
+// Quantifiers
+TOKEN :
+{
+  	<EXISTS: "∃" | "exists" >
+	| <FORALL: "∀" | "forall" >
+}
+
+TOKEN :
+{	
+  	< NUMBER : (["0"-"9"])+ >
+ 	| < #CHAR : ["A"-"Z","a"-"z"] >
+	| < #ID : (["A"-"Z","a"-"z"])+ >
+	| < IDWN : <CHAR> (<ID> | <NUMBER>)* >
+}
+
+TOKEN :
+{
+  < STRING_LITERAL : ["\""]  (~["\n","\r"])*  ["\""]>
 }
 
 int Start(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException :
 {}
 {
-  	DeployTransition(auto,checks)
-	{
-	  	return 0;
-	}
- 	| 
- 	NormalTransition(auto, checks)
-	{
-   	 	return 0;
-   	}
-   	|
-   	<EOF>
-   	{
-   	 	return 1;
-   	}
+  	DeployTransition(auto,checks) {	return 0; }
+ 	| NormalTransition(auto, checks) { return 0; }
+   	| <EOF>	{ return 1;	}
 }
 
 void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException :
@@ -110,7 +141,7 @@ void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
   	iS = < UNDERSCORE > <LBRACKET> <RBRACKET>
   		p = Participant() eC = ExternalCall() t = DeployAction(auto)
   			<LBRACKET> (postC = Assertion())? <RBRACKET>
-  				eS = < ID > (isES = < PLUS >)?
+  				eS = < IDWN > (isES = < PLUS >)?
 	{
     	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, null, postC, p, true);
 	}
@@ -125,22 +156,20 @@ void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
  	ASTNode postC = null, preC = null;
 }
 {
-	iS = < ID > <LBRACKET> (preC = Assertion())? <RBRACKET>
+	iS = < IDWN > <LBRACKET> (preC = Assertion())? <RBRACKET>
 		p = ParticipantExtra() eC = ExternalCall() t = NormalAction(auto)
 			<LBRACKET> (postC = Assertion())? <RBRACKET>
-				eS = < ID > (isES = < PLUS >)?
+				eS = < IDWN > (isES = < PLUS >)?
 	{
 	 	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, preC, postC, p, false);
 	}
 }
 
 boolean ExternalCall():
-{
-}
+{}
 {
 	<GT> { return false; }
-	|
-	<LT> { return true; }	  
+	| <LT> { return true; }	  
 }
 
 String Participant():
@@ -148,12 +177,10 @@ String Participant():
 	Token p1, p2 = null, p3 = null;
 }
 {
- 	p1 = < ID > (p2 = <COLON> p3 = <CID>)?
+ 	p1 = < IDWN > (p2 = <COLON> p3 = <IDWN>)?
  	{
-		if(p2 == null)
-	 		return p1.image;
-		else
-			return p1.image.concat(p2.image).concat(p3.image);
+		if(p2 == null) { return p1.image; }
+		else { return p1.image.concat(p2.image).concat(p3.image); }
 	}
 }
 
@@ -165,9 +192,7 @@ String ParticipantExtra():
 }
 {
 	p1 = Participant() (join = <MOREPART> p2 = Participant() { parts.add(join.image.concat(p2)); })*
-	{
-		return p1.concat(String.join("", parts));
-	}
+	{ return p1.concat(String.join("", parts)); }
 }
 
 
@@ -177,10 +202,8 @@ Transition DeployAction(Hashtable<String, Automaton> auto):
 	List<Param> param = null;
 }
 {
-  	< STARTLABEL > < LPAR > c = < ID > (<COMMA> param = ParamList())? < RPAR >
-	{
-	  	return new Transition(c.image, "starts", ".", param);
-	}
+  	< STARTLABEL > < LPAR > c = < IDWN > (<COMMA> param = ParamList())? < RPAR >
+	{ return new Transition(c.image, "starts", ".", param); }
 }
 
 Transition NormalAction(Hashtable<String, Automaton> auto):
@@ -190,10 +213,8 @@ Transition NormalAction(Hashtable<String, Automaton> auto):
 	List<Param> param;
 }
 {
-	c = < ID > aType = OperationType() aLabel = < ID > < LPAR > param = ParamList() < RPAR >
-	{
-	  	return new Transition(c.image, aLabel.image, aType, param);
-	}
+	c = < IDWN > aType = OperationType() aLabel = < IDWN > < LPAR > param = ParamList() < RPAR >
+	{ return new Transition(c.image, aLabel.image, aType, param); }
 }
 
 
@@ -202,10 +223,9 @@ String OperationType():
   	Token aType;
 }
 {
-	(
-	  aType = <MINUS> 
-	|
-	aType = <DOT>) { return aType.image; }	  
+	( aType = <MINUS>
+	| aType = <DOT>)
+	{ return aType.image; }	  
 }
 
 //	ASSERTIONS - PARAMETERS
@@ -217,118 +237,71 @@ List<Param> ParamList():
 }
 {
   	// t = Type or ID -> check if its a state if it is not gives error
-	[x=<ID> <COLON> t=Type() { l.add(new Param(x.image,t));}
-	
-	( <COMMA> x=<ID> <COLON> t=Type() {l.add(new Param(x.image,t));} )*]
-	
+	[x=<IDWN> <COLON> t=Type() { l.add(new Param(x.image, t));}
+	( <COMMA> x=<IDWN> <COLON> t=Type() {l.add(new Param(x.image, t));} )*]
 	{ return l; }
 }
 
 IType Type():
 {
   	IType t;
+  	Token role;
 }
 {	
-  	(
-    <INT> { t = IntType.singleton; }
-    | 
-    <BOOL> { t = BoolType.singleton; }
-	|
-    <STRING> { t = StringType.singleton; }
-    |
-    <CID> <COLON> <PTYPE>  { t = ParticipantType.singleton; }
-    )
+  	( <INT> { t = IntType.singleton; }
+    | <BOOL> { t = BoolType.singleton; }
+	| <STRING> { t = StringType.singleton; }
+    | role = <IDWN> { t = new ParticipantType(role.image); }
+    | <SET> { t = SetType.singleton; })
 	{ return t; }
 }
 
-// Assertion
 ASTNode Assertion():
 {
-	ASTNode e;
+	ASTNode n;
 }
 {
-	e = Assign()
-	 { return e; }
-}
-
-ASTNode Assign():
-{
-  	ASTNode e1,e2;
-}
-{
-  e1 = Logical()
-  [
-	<VARASS> e2 = Assign()
-		{
-			e1 = new ASTAssign(e1, e2);
-	 	}
-  ] 
-  { return e1; }
+	n = Logical()
+	{ return n; }
 }
 
 ASTNode Logical():
 {
-  	ASTNode e1,e2;
+  	ASTNode n1, n2;
 }
 {
-  e1 = BooleanExp()
-  (<OR> e2 = BooleanExp() { e1 = new ASTOr(e1,e2); }
-  |<AND> e2 = BooleanExp() { e1 = new ASTAnd(e1,e2); }  
-  )*
-  { return e1; }
+  	n1 = BooleanExp()
+  	(<OR> n2 = BooleanExp() { n1 = new ASTOr(n1, n2); }
+  	|<AND> n2 = BooleanExp() { n1 = new ASTAnd(n1, n2); })*
+  	{ return n1; }
 }
 
 ASTNode BooleanExp():
 {
-  	ASTNode e1, e2;
+  	ASTNode n1, n2;
 }
 {
-	e1 = Exp()
- 	 (<EQ> e2 = Exp() { e1 = new ASTEq(e1,e2); }
- 	 |<NEQ> e2 = Exp() { e1 = new ASTNeq(e1,e2); }
- 	 |<LT> e2 = Exp() { e1 = new ASTLt(e1,e2); }
- 	 |<GT> e2 = Exp() { e1 = new ASTGt(e1,e2); }
- 	 |<LEQ> e2 = Exp() { e1 = new ASTLeq(e1,e2); }
- 	 |<GEQ> e2 = Exp() { e1 = new ASTGeq(e1,e2); })*
- 	 { return e1; } 
-}
-
-ASTNode ExistsAssertion():
-{
-  ASTNode e1;
-  Token e2;
-}
-{
-	e1 = ForAllAssertion()
-	  (<EXISTS> e2 = <CID> { e1 = new ASTExists(e1,new ASTId(e2.image.substring(1))); }
-	  )*
-	  { return e1; }
-  
-}
-
-ASTNode ForAllAssertion():
-{
-  ASTNode e1;
-  Token e2;
-}
-{
-	e1 = Logical()
-	  (<FORALL> e2 = <CID> { e1 = new ASTForAll(e1,new ASTId(e2.image.substring(1))); }
-	  )*
-	  { return e1; }
-  
+	n1 = Exp()
+ 	( <EQ> n2 = Exp() { n1 = new ASTEq(n1, n2); }
+ 	| <NEQ> n2 = Exp() { n1 = new ASTNeq(n1, n2); }
+ 	| <LT> n2 = Exp() { n1 = new ASTLt(n1, n2); }
+ 	| <GT> n2 = Exp() { n1 = new ASTGt(n1, n2); }
+ 	| <LEQ> n2 = Exp() { n1 = new ASTLeq(n1, n2); }
+ 	| <GEQ> n2 = Exp() { n1 = new ASTGeq(n1, n2); }
+ 	| <VARASS> n2 = Exp() { n1 = new ASTAssign(n1, n2); }
+	| <CONTAINS> n2 = Exp() { return new ASTContains(n1, n2); })*
+ 	{ return n1; } 
 }
 
 ASTNode Exp() :
-{ ASTNode e1, e2; }
+{ ASTNode n1, n2; }
 {
-   e1 = Unary() 
-     ( <PLUS> e2 = Unary() { e1 = new ASTAdd(e1,e2); }
-     | <MINUS> e2 = Unary() { e1 = new ASTSub(e1,e2); }
-     | <TIMES> e2 = Unary() { e1 = new ASTMul(e1,e2); }
-     | <DIV> e2 = Unary() { e1 = new ASTDiv(e1,e2); }
-     )*
-     { return e1; }
+   	n1 = Unary() 
+   	( <PLUS> n2 = Unary() { n1 = new ASTAdd(n1, n2); }
+   	| <MINUS> n2 = Unary() { n1 = new ASTSub(n1, n2); }
+   	| <TIMES> n2 = Unary() { n1 = new ASTMul(n1, n2); }
+   	| <DIV> n2 = Unary() { n1 = new ASTDiv(n1, n2); })*
+   	{ return n1; }
 }
 
 /*
@@ -336,28 +309,29 @@ ASTNode Exp() :
 */
 ASTNode Unary() :
 {
- 	ASTNode e1;
+ 	ASTNode n1;
 }
 {
-     e1 = Fact() { return e1; }
-     | <MINUS> e1 = Unary() { return new ASTSub(new ASTNum(0),e1); }
-	 | <NOT> e1 = Unary() { return new ASTNot(e1); }
+   	n1 = Fact() { return n1; }
+	| <MINUS> n1 = Unary() { return new ASTSub(new ASTNum(0),n1); }
+	| <NOT> n1 = Unary() { return new ASTNot(n1); }
 }
 
 ASTNode Fact() :
 {
- 	Token x;
- 	ASTNode e1;
- 	IType t;}
+	Token t1, t2;
+	ASTNode n1;
+	IType ty1 = null;
+}
 {
- 	x = <Num> { return new ASTNum(Integer.parseInt(x.image)); }
-	// exclusive to one word
-	//TODO: increase to whatever
-	|
-	<QUOTATIONMARK> x = <ID> <QUOTATIONMARK > { return new ASTString(x.image); }
-	| <LPAR> e1 = Assign() <RPAR> { return e1; }
+ 	t1 = <NUMBER> { return new ASTNum(Integer.parseInt(t1.image)); }
+	| t1 = <STRING_LITERAL> { return new ASTString(t1.image); }
+	| <SLPAR> <SRPAR> { return new ASTSet(); }
+	| <LPAR> n1 = Logical() <RPAR> { return n1; }
 	| < TRUE > { return new ASTBool(true); }
 	| < FALSE > { return new ASTBool(false); }
-	| < VAR > t = Type() x = < ID > { return new ASTVar(x.image, t); }
-	| x = < ID > { return new ASTId(x.image); } 
+	| <EXISTS> t1 = <IDWN> t2 = <IDWN> n1 = Logical() { return new ASTExists(new ASTId(t1.image), new ASTId(t2.image), n1);}
+	| <FORALL> t1 = <IDWN> t2 = <IDWN> n1 = Logical() { return new ASTForAll(new ASTId(t1.image), new ASTId(t2.image), n1); }
+	| t1 = < IDWN > { return new ASTId(t1.image); }
+	| (ty1 = Type()) t1 = < IDWN > { return new ASTVar(t1.image, ty1); }
 }

@@ -2,6 +2,7 @@ package parser;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ast.ASTId;
 import ast.ASTNode;
@@ -9,9 +10,10 @@ import data.Automaton;
 import data.Transition;
 import exceptions.CustomException;
 import exceptions.TypingException;
-import types.AssignType;
 import types.BoolType;
+import types.ParticipantType;
 import utils.CommonUtils;
+import utils.Param;
 import validations.ValidationChecks;
 
 /**
@@ -62,7 +64,16 @@ public class GrammarLogic {
 		// asserion_post
 		if (postC != null)
 			treatAssertion(a, t, postC, deployFlag);
-
+		
+		List<Param> lparams = t.getParameters().stream().filter(x -> x.getType() instanceof ParticipantType).collect(Collectors.toList());
+		// participants in parameters
+		if(lparams != null && !lparams.isEmpty()) {
+			for(Param pa : lparams) {
+				ParticipantType type = (ParticipantType) pa.getType();
+				a.addAssociations(pa.getId(), type.getRole());
+			}
+		}			
+			
 		// automaton
 		addDataToAutomaton(a, t, iS.image, eS.image, (isES != null), p, deployFlag);
 
@@ -99,7 +110,7 @@ public class GrammarLogic {
 		 * assertions are either of type boolean outside of deploy
 		 * or of type assign when the method is deploy/start
 		*/
-		if (!(condition.typeCheck().equals(BoolType.singleton) || (condition.typeCheck().equals(AssignType.singleton) && deployFlag)))
+		if (!condition.typeCheck().equals(BoolType.singleton))
 			throw new TypingException();
 	}
 
