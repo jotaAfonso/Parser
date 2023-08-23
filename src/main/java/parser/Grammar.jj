@@ -278,7 +278,7 @@ ASTNode Logical():
 
 ASTNode BooleanExp():
 {
-  	ASTNode n1, n2;
+  	ASTNode n1, n2, n3;
 }
 {
 	n1 = Exp()
@@ -289,7 +289,7 @@ ASTNode BooleanExp():
  	| <LEQ> n2 = Exp() { n1 = new ASTLeq(n1, n2); }
  	| <GEQ> n2 = Exp() { n1 = new ASTGeq(n1, n2); }
  	| <VARASS> n2 = Exp() { n1 = new ASTAssign(n1, n2); }
-	| <CONTAINS> n2 = Exp() { return new ASTContains(n1, n2); })*
+	| <CONTAINS> n2 = Exp() { return new ASTContains(n1, n2);})*
  	{ return n1; } 
 }
 
@@ -320,7 +320,7 @@ ASTNode Unary() :
 ASTNode Fact() :
 {
 	Token t1, t2;
-	ASTNode n1;
+	ASTNode n1, n2, n3;
 	IType ty1 = null;
 }
 {
@@ -330,8 +330,8 @@ ASTNode Fact() :
 	| <LPAR> n1 = Logical() <RPAR> { return n1; }
 	| < TRUE > { return new ASTBool(true); }
 	| < FALSE > { return new ASTBool(false); }
-	| <EXISTS> t1 = <IDWN> t2 = <IDWN> n1 = Logical() { return new ASTExists(new ASTId(t1.image), new ASTId(t2.image), n1);}
-	| <FORALL> t1 = <IDWN> t2 = <IDWN> n1 = Logical() { return new ASTForAll(new ASTId(t1.image), new ASTId(t2.image), n1); }
+	| <EXISTS> n1 = Fact() n2 = Fact() n3 = Logical() { return new ASTExists(n1, n2, n3);}
+	| <FORALL> n1 = Fact() n2 = Fact() n3 = Logical() { return new ASTForAll(n1, n2, n3);}
 	| t1 = < IDWN > { return new ASTId(t1.image); }
 	| (ty1 = Type()) t1 = < IDWN > { return new ASTVar(t1.image, ty1); }
 }

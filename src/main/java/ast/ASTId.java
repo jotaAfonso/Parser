@@ -19,10 +19,6 @@ public class ASTId implements ASTNode {
 		return this.id;
 	}
 	
-	public IType getType() {
-		return this.type;
-	}
-	
 	public void setType(IType type) {
 		this.type = type;
 	}

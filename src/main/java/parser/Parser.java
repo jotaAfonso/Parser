@@ -373,7 +373,7 @@ public class Parser implements ParserConstants {
   }
 
   final public ASTNode BooleanExp() throws ParseException {
-        ASTNode n1, n2;
+        ASTNode n1, n2, n3;
     n1 = Exp();
     label_4:
     while (true) {
@@ -532,7 +532,7 @@ public class Parser implements ParserConstants {
 
   final public ASTNode Fact() throws ParseException {
         Token t1, t2;
-        ASTNode n1;
+        ASTNode n1, n2, n3;
         IType ty1 = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NUMBER:
@@ -564,17 +564,17 @@ public class Parser implements ParserConstants {
       break;
     case EXISTS:
       jj_consume_token(EXISTS);
-      t1 = jj_consume_token(IDWN);
-      t2 = jj_consume_token(IDWN);
-      n1 = Logical();
-                                                            {if (true) return new ASTExists(new ASTId(t1.image), new ASTId(t2.image), n1);}
+      n1 = Fact();
+      n2 = Fact();
+      n3 = Logical();
+                                                            {if (true) return new ASTExists(n1, n2, n3);}
       break;
     case FORALL:
       jj_consume_token(FORALL);
-      t1 = jj_consume_token(IDWN);
-      t2 = jj_consume_token(IDWN);
-      n1 = Logical();
-                                                            {if (true) return new ASTForAll(new ASTId(t1.image), new ASTId(t2.image), n1);}
+      n1 = Fact();
+      n2 = Fact();
+      n3 = Logical();
+                                                            {if (true) return new ASTForAll(n1, n2, n3);}
       break;
     case IDWN:
       t1 = jj_consume_token(IDWN);

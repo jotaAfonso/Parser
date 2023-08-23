@@ -1,6 +1,6 @@
 _ {} o:PO < deploy(c) {set y1 := [] && int x := 0} S0
 S0 {} b:PB|c:PC > c.mO(a:s) {} S1
-S0 {} o > c.h() {x in y1} S5+
+S0 {} o > c.h() {forall x y1 true} S5+
 S1 {} o > c.r() {} S3
 S1 {} o > c.a(b2:PB) {} S2
 S2 {} b > c.h() {} S5

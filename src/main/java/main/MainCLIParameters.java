@@ -30,6 +30,9 @@ public class MainCLIParameters {
 	
 	@Parameter(names = {"-fsm", "--fsm"}, description = "Displays the generated automaton as a fsm.")
 	private boolean visual;
+	
+	@Parameter(names = {"-t", "--tests"}, description = "Runs tests.")
+	private boolean test;
 
 	public boolean isHelp() {
 		return help;
@@ -45,5 +48,9 @@ public class MainCLIParameters {
 	
 	public boolean isVisual() {
 		return visual;
+	}
+	
+	public boolean isTest() {
+		return test;
 	}
 }

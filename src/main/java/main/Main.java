@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.util.Hashtable;
 
 import parser.*;
+import tests.ParserTests;
+import tests.Tuple2;
 import data.Automaton;
 import exceptions.CustomException;
 import exceptions.TypingException;
@@ -24,16 +26,16 @@ public class Main {
 	public static void main(String[] args) throws ParseException, CustomException, TypingException, IOException {
 		JCommander jCommander = new JCommander(mainArgs);
 		jCommander.setProgramName("parser");
-		
+
 		try {
 			jCommander.parse(args);
 			argumentsGiven(mainArgs);
-		} catch(ParameterException e) {
+		} catch (ParameterException e) {
 			System.out.println(e.getMessage());
 			showUsage(jCommander);
 		}
-		
-		if(mainArgs.isHelp()) {
+
+		if (mainArgs.isHelp()) {
 			showUsage(jCommander);
 		}
 	}
@@ -43,7 +45,16 @@ public class Main {
 		System.exit(0);
 	}
 
-	private static void argumentsGiven(MainCLIParameters args) throws ParseException, CustomException, TypingException, IOException {
+	private static void argumentsGiven(MainCLIParameters args)
+			throws ParseException, CustomException, TypingException, IOException {
+		
+		if(args.isTest()) {
+			ParserTests tests = new ParserTests();
+			tests.testPositiveCases();
+			tests.testNegativeCases();
+		}
+			
+		
 		try {
 			BufferedReader objReader = Files.newBufferedReader(args.getInputPath());
 			Parser parser = new Parser(objReader);
@@ -64,18 +75,21 @@ public class Main {
 					break;
 				}
 			}
-			
+
 			checks.validate(auto, args);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
 	}
-	
-	public static boolean accept(String s, boolean isPath) throws ParseException, FileNotFoundException {
+
+	public static Tuple2<String, Boolean> accept(String s, boolean isPath) throws FileNotFoundException {
 		Parser parser;
-		if(isPath) {
-			BufferedReader objReader = new BufferedReader(new FileReader(s));
+		if (isPath) {
+			BufferedReader objReader;
+
+			objReader = new BufferedReader(new FileReader(s));
+
 			parser = new Parser(objReader);
 		} else {
 			ByteArrayInputStream st = new ByteArrayInputStream(s.getBytes());
@@ -83,18 +97,19 @@ public class Main {
 		}
 		Hashtable<String, Automaton> auto = new Hashtable<String, Automaton>();
 		ValidationChecks checks = new ValidationChecks();
-		
+
 		try {
 			parser.Start(auto, checks);
-			return true;
+			return new Tuple2<String, Boolean>("", true);
 		} catch (TokenMgrError e) {
-			return false;
+			return new Tuple2<String, Boolean>(e.getMessage(), false);
 		} catch (ParseException e) {
-			return false;
+			return new Tuple2<String, Boolean>(e.getMessage(), false);
 		} catch (CustomException e) {
-			return false;
+			return new Tuple2<String, Boolean>(e.getMessage(), false);
 		} catch (TypingException e) {
-			return false;
+			return new Tuple2<String, Boolean>(e.getMessage(), false);
 		}
+
 	}
 }
