@@ -26,6 +26,8 @@ import org.json.JSONObject;
  */
 public class FSMGraphGenerator {
 	
+	public static String newline = System.getProperty("line.separator");
+	
     /**
      * Generate FSM graph.
      *
@@ -128,6 +130,11 @@ public class FSMGraphGenerator {
             		result = result.concat(",");
             	result = result.concat(input).concat(")");
             }
+            String pre = "{".concat(transition.getString(JSON_PRE_COND)).concat("}");
+            String post = "{".concat(transition.getString(JSON_POST_COND)).concat("}");
+            
+            result = pre + " " + result + " " + post;
+            
             Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
            	//edge.setAttribute("layout.weight", 3); 
             //edge.setAttribute("ui.style", "text-size: 15px; text-alignment: along; shape: line; text-offset: -100;");
@@ -161,8 +168,9 @@ public class FSMGraphGenerator {
      * Draws FSM graph.
      *
      * @param graph - graph
+     * @throws InterruptedException 
      */
-    public static void drawFSMGraph(Graph graph) {
+    public static void drawFSMGraph(Graph graph) throws InterruptedException {
 //    	String formating = String.format(
 //				"node { fill-color: white; size: 40px, 40px; stroke-mode: plain; 
 //    					stroke-color: %s; text-size: 20px; text-alignment: center; }"
@@ -175,15 +183,17 @@ public class FSMGraphGenerator {
     	String formating = String.format("node { fill-color: white; size: 40px, "
     			+ "40px; stroke-mode: plain; stroke-color: %s; text-size: 20px; text-alignment: center; }"
 				+ "node.initial { fill-color: %s; }" + "node.final { fill-color: %s; }"
-				+ "node.external { fill-color: %s; }" + "node.normal_node { fill-color: %s; } sprite { fill-mode: none; text-size:15; text-alignment: under; }" ,
+				+ "node.external { fill-color: %s; }" + "node.normal_node { fill-color: %s; } sprite { fill-mode: none; text-size:20; text-alignment: under; }" 
+				+ "edge {size: 50px}",
 				getColorRGB(Color.BLACK), getColorRGB(Color.GREEN), getColorRGB(Color.RED), getColorRGB(Color.BLACK),
 				getColorRGB(Color.GRAY));
 
 		graph.setAttribute("ui.stylesheet", formating);
-		graph.setAttribute("ui.quality");
 		graph.setAttribute("ui.antialias");
         Viewer viewer = graph.display();
         viewer.enableAutoLayout();
+        Thread.sleep(1000);
+        viewer.disableAutoLayout();
     }
     
     /**
@@ -202,8 +212,9 @@ public class FSMGraphGenerator {
      * Generates graph.
      *
      * @param filePath - file path
+     * @throws InterruptedException 
      */
-    public static void generateGraph(String filePath) {
+    public static void generateGraph(String filePath) throws InterruptedException {
         if (filePath.length() == 0)
         	filePath = "outputFiles/global_output.json"; 
         try {

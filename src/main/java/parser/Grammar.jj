@@ -49,9 +49,9 @@ TOKEN :
 // Logical Operators :
 TOKEN :
 {
-  	< AND : "&&"  >
-  	| < NOT: "!" >
-	| < OR : "||" >
+  	< AND : "AND"  >
+  	| < NOT: "NOT" >
+	| < OR : "OR" >
 }
 
 //Comparison operators
@@ -104,8 +104,8 @@ TOKEN :
 // Quantifiers
 TOKEN :
 {
-  	<EXISTS: "∃" | "exists" >
-	| <FORALL: "∀" | "forall" >
+  	<EXISTS: "∃" | "exists" | "EXISTS" >
+	| <FORALL: "∀" | "forall" | "FORALL" >
 }
 
 TOKEN :
@@ -261,19 +261,20 @@ ASTNode Assertion():
 	ASTNode n;
 }
 {
-	n = Logical()
+	n = LogicalExp()
 	{ return n; }
 }
 
-ASTNode Logical():
+ASTNode LogicalExp():
 {
   	ASTNode n1, n2;
 }
 {
-  	n1 = BooleanExp()
-  	(<OR> n2 = BooleanExp() { n1 = new ASTOr(n1, n2); }
-  	|<AND> n2 = BooleanExp() { n1 = new ASTAnd(n1, n2); })*
-  	{ return n1; }
+  	( n1 = BooleanExp()
+ 	| <OR> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { n1 = new ASTOr(n1, n2); }
+  	| <AND> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { n1 = new ASTAnd(n1, n2); }
+  	| <NOT> n1 = LogicalExp() { n1 = new ASTNot(n1); }
+ 	){ return n1; }
 }
 
 ASTNode BooleanExp():
@@ -281,57 +282,63 @@ ASTNode BooleanExp():
   	ASTNode n1, n2, n3;
 }
 {
-	n1 = Exp()
- 	( <EQ> n2 = Exp() { n1 = new ASTEq(n1, n2); }
- 	| <NEQ> n2 = Exp() { n1 = new ASTNeq(n1, n2); }
- 	| <LT> n2 = Exp() { n1 = new ASTLt(n1, n2); }
- 	| <GT> n2 = Exp() { n1 = new ASTGt(n1, n2); }
- 	| <LEQ> n2 = Exp() { n1 = new ASTLeq(n1, n2); }
- 	| <GEQ> n2 = Exp() { n1 = new ASTGeq(n1, n2); }
- 	| <VARASS> n2 = Exp() { n1 = new ASTAssign(n1, n2); }
-	| <CONTAINS> n2 = Exp() { return new ASTContains(n1, n2);})*
- 	{ return n1; } 
+	( n1 = ArithmeticExp()
+	 	( <EQ> n2 = ArithmeticExp() { n1 = new ASTEq(n1, n2); }
+	 	| <NEQ> n2 = ArithmeticExp() { n1 = new ASTNeq(n1, n2); }
+	 	| <LT> n2 = ArithmeticExp() { n1 = new ASTLt(n1, n2); }
+	 	| <GT> n2 = ArithmeticExp() { n1 = new ASTGt(n1, n2); }
+	 	| <LEQ> n2 = ArithmeticExp() { n1 = new ASTLeq(n1, n2); }
+	 	| <GEQ> n2 = ArithmeticExp() { n1 = new ASTGeq(n1, n2); }
+	 	| <VARASS> n2 = ArithmeticExp() { n1 = new ASTAssign(n1, n2); }
+		| <CONTAINS> n2 = ArithmeticExp() { return new ASTContains(n1, n2);})*
+	{ return n1; } )
+	| <EXISTS> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTExists(n1, n2, n3);}
+	| <FORALL> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTForAll(n1, n2, n3);}
 }
 
-ASTNode Exp() :
+ASTNode ArithmeticExp() :
 { ASTNode n1, n2; }
 {
-   	n1 = Unary() 
-   	( <PLUS> n2 = Unary() { n1 = new ASTAdd(n1, n2); }
-   	| <MINUS> n2 = Unary() { n1 = new ASTSub(n1, n2); }
-   	| <TIMES> n2 = Unary() { n1 = new ASTMul(n1, n2); }
-   	| <DIV> n2 = Unary() { n1 = new ASTDiv(n1, n2); })*
+   	n1 = UnaryExp() 
+   	( <PLUS> n2 = UnaryExp() { n1 = new ASTAdd(n1, n2); }
+   	| <MINUS> n2 = UnaryExp() { n1 = new ASTSub(n1, n2); }
+   	| <TIMES> n2 = UnaryExp() { n1 = new ASTMul(n1, n2); }
+   	| <DIV> n2 = UnaryExp() { n1 = new ASTDiv(n1, n2); })*
    	{ return n1; }
 }
 
 /*
 	Atomic and negation
 */
-ASTNode Unary() :
+ASTNode UnaryExp() :
 {
  	ASTNode n1;
 }
 {
-   	n1 = Fact() { return n1; }
-	| <MINUS> n1 = Unary() { return new ASTSub(new ASTNum(0),n1); }
-	| <NOT> n1 = Unary() { return new ASTNot(n1); }
+   	( n1 = AtomicExp() 
+	| <MINUS> n1 = UnaryExp() { n1 = new ASTSub(new ASTNum(0), n1); })
+	{ return n1; }
 }
 
-ASTNode Fact() :
+ASTNode AtomicExp() :
 {
 	Token t1, t2;
-	ASTNode n1, n2, n3;
+	ASTNode n1;
 	IType ty1 = null;
 }
 {
- 	t1 = <NUMBER> { return new ASTNum(Integer.parseInt(t1.image)); }
-	| t1 = <STRING_LITERAL> { return new ASTString(t1.image); }
-	| <SLPAR> <SRPAR> { return new ASTSet(); }
-	| <LPAR> n1 = Logical() <RPAR> { return n1; }
-	| < TRUE > { return new ASTBool(true); }
-	| < FALSE > { return new ASTBool(false); }
-	| <EXISTS> n1 = Fact() n2 = Fact() n3 = Logical() { return new ASTExists(n1, n2, n3);}
-	| <FORALL> n1 = Fact() n2 = Fact() n3 = Logical() { return new ASTForAll(n1, n2, n3);}
-	| t1 = < IDWN > { return new ASTId(t1.image); }
-	| (ty1 = Type()) t1 = < IDWN > { return new ASTVar(t1.image, ty1); }
+ 	( t1 = <NUMBER> { n1 = new ASTNum(Integer.parseInt(t1.image)); }
+	| t1 = <STRING_LITERAL> { n1 = new ASTString(t1.image); }
+	| <SLPAR> <SRPAR> { n1 = new ASTSet(); }
+	| <LPAR> n1 = ArithmeticExp() <RPAR>
+	| < TRUE > { n1 = new ASTBool(true); }
+	| < FALSE > { n1 = new ASTBool(false); }
+	| (ty1 = Type())? t1 = < IDWN > {
+		  if(ty1 == null)
+		  	{ n1 = new ASTId(t1.image); }
+		  else
+		  	{ n1 = new ASTVar(t1.image, ty1); }
+	})
+	{ return n1; }
+	  	
 }

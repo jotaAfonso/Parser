@@ -23,7 +23,7 @@ public class Main {
 
 	final static MainCLIParameters mainArgs = new MainCLIParameters();
 
-	public static void main(String[] args) throws ParseException, CustomException, TypingException, IOException {
+	public static void main(String[] args) throws ParseException, CustomException, TypingException, IOException, InterruptedException {
 		JCommander jCommander = new JCommander(mainArgs);
 		jCommander.setProgramName("parser");
 
@@ -46,7 +46,7 @@ public class Main {
 	}
 
 	private static void argumentsGiven(MainCLIParameters args)
-			throws ParseException, CustomException, TypingException, IOException {
+			throws ParseException, CustomException, TypingException, IOException, InterruptedException {
 		
 		if(args.isTest()) {
 			ParserTests tests = new ParserTests();

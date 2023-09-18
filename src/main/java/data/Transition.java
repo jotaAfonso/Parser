@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import ast.ASTVar;
 import exceptions.CustomException;
 import types.IType;
+import types.ParticipantType;
 import utils.CommonUtils;
 import utils.Param;
 
@@ -363,8 +364,17 @@ public class Transition {
 			this.parameters = parameters;
 			String input = "";
 			for (Param p : parameters) {
+				String type = "";
 				input = input.concat(", ");
-				input = input.concat(p.getId()).concat(":").concat(p.getType().getType());
+				input = input.concat(p.getId()).concat(":");
+				IType ltype = p.getType();
+				if(ltype instanceof ParticipantType) {
+					ParticipantType pType = (ParticipantType) ltype;
+					type = pType.role;
+				} else {
+					type = ltype.getType();
+				}
+				input = input.concat(type);	
 			}
 			if (!input.isEmpty())
 				input = input.substring(2);

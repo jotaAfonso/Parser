@@ -9,7 +9,7 @@ import visual.FSMGraphGenerator;
 
 public class VisualMain {
 	
-	public static void main(String[] args) throws ParseException, CustomException, TypingException {
+	public static void main(String[] args) throws ParseException, CustomException, TypingException, InterruptedException {
 		String filePath = DEFAULT_OUTPUT;
 		
 		if(args.length != 0)

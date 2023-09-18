@@ -1,10 +1,6 @@
-_ {} o:PO < deploy(c) {set y1 := [] && int x := 0} S0
-S0 {} b:PB|c:PC > c.mO(a:s) {} S1
-S0 {} o > c.h() {forall x y1 true} S5+
-S1 {} o > c.r() {} S3
-S1 {} o > c.a(b2:PB) {} S2
-S2 {} b > c.h() {} S5
-S3 {} b > c-l() {} S5
-S3 {} o > c.h() {} S5
-S3 {} b > c-s() {} S4
-S4 {} b|b1:PB > c.mo() {} S1
+_ {} o:PO > deploy(c) {AND(OR(false,true),true)} S0
+S0 {} b:PB > c.bid() {} S1
+S1 {} b > c.withdraw() {} S0
+S0 {} o > c.end() {} S0
+S1 {} o > c.end() {} S1
+S1 {} b > c.win() {} S2+

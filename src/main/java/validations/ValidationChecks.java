@@ -59,7 +59,7 @@ public class ValidationChecks {
 		this.visuals = visuals;
 	}
 
-	public void validate(Hashtable<String, Automaton> auto, MainCLIParameters args) throws CustomException {
+	public void validate(Hashtable<String, Automaton> auto, MainCLIParameters args) throws CustomException, InterruptedException {
 		this.checkIfContractsWereStarted(auto.keySet());
 		for (Automaton a : auto.values()) {
 //			// checks if a state has a path a valid path from the initial state
@@ -68,7 +68,7 @@ public class ValidationChecks {
 //			// checks if all participants are registered
 			this.checkValidityOfParticipants(a);
 //			// checks if a participant was previously registered
-			this.checkRegistrationOfParticipants(a, this.getGraph());
+//			this.checkRegistrationOfParticipants(a, this.getGraph());
 		}
 
 		toFileAndImage(auto, args);
@@ -93,7 +93,7 @@ public class ValidationChecks {
 		}
 	}
 
-	private void toFileAndImage(Hashtable<String, Automaton> auto, MainCLIParameters args) {
+	private void toFileAndImage(Hashtable<String, Automaton> auto, MainCLIParameters args) throws InterruptedException {
 		Path outputP;
 		if (args.getOutputPath() == null) {
 			outputP = args.getInputPath().getParent();
