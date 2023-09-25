@@ -88,6 +88,7 @@ TOKEN :
   	| < RPAR : ")" >
   	| < SLPAR : "[" >
   	| < SRPAR : "]" >
+  	| < QUOTE : "\"" >
 }
 
 TOKEN :
@@ -101,16 +102,12 @@ TOKEN :
 	| < DOT : ["."]  >
 }
 
-// Quantifiers
-TOKEN :
-{
-  	<EXISTS: "∃" | "exists" | "EXISTS" >
-	| <FORALL: "∀" | "forall" | "FORALL" >
-}
 
 TOKEN :
-{	
-  	< NUMBER : (["0"-"9"])+ >
+{	< EXISTS:  "exists" | "EXISTS" >
+	// "∀"
+	| < FORALL: "forall" | "FORALL" >
+  	| < NUMBER : (["0"-"9"])+ >
  	| < #CHAR : ["A"-"Z","a"-"z"] >
 	| < #ID : (["A"-"Z","a"-"z"])+ >
 	| < IDWN : <CHAR> (<ID> | <NUMBER>)* >
@@ -237,9 +234,19 @@ List<Param> ParamList():
 }
 {
   	// t = Type or ID -> check if its a state if it is not gives error
-	[x=<IDWN> <COLON> t=Type() { l.add(new Param(x.image, t));}
-	( <COMMA> x=<IDWN> <COLON> t=Type() {l.add(new Param(x.image, t));} )*]
+	[ t=TypeParam() <COLON> x=<IDWN> { l.add(new Param(x.image, t));}
+	( <COMMA> t=TypeParam() <COLON> x=<IDWN> {l.add(new Param(x.image, t));} )*]
 	{ return l; }
+}
+
+IType TypeParam():
+{
+  	IType t;
+  	Token role;
+}
+{	
+  	( role = <IDWN> { return new ParticipantType(role.image); }
+    | t = Type() { return t; })
 }
 
 IType Type():
@@ -248,12 +255,10 @@ IType Type():
   	Token role;
 }
 {	
-  	( <INT> { t = IntType.singleton; }
-    | <BOOL> { t = BoolType.singleton; }
-	| <STRING> { t = StringType.singleton; }
-    | role = <IDWN> { t = new ParticipantType(role.image); }
-    | <SET> { t = SetType.singleton; })
-	{ return t; }
+  	( <INT> { return IntType.singleton; }
+    | <BOOL> { return BoolType.singleton; }
+	| <STRING> { return StringType.singleton; }
+    | <SET> { return SetType.singleton; })
 }
 
 ASTNode Assertion():
@@ -271,10 +276,10 @@ ASTNode LogicalExp():
 }
 {
   	( n1 = BooleanExp()
- 	| <OR> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { n1 = new ASTOr(n1, n2); }
-  	| <AND> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { n1 = new ASTAnd(n1, n2); }
-  	| <NOT> n1 = LogicalExp() { n1 = new ASTNot(n1); }
- 	){ return n1; }
+ 	| <OR> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { return new ASTOr(n1, n2); }
+  	| <AND> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { return new ASTAnd(n1, n2); }
+  	| <NOT> n1 = LogicalExp() { return new ASTNot(n1); }
+ 	) { return n1; }
 }
 
 ASTNode BooleanExp():
@@ -283,13 +288,13 @@ ASTNode BooleanExp():
 }
 {
 	( n1 = ArithmeticExp()
-	 	( <EQ> n2 = ArithmeticExp() { n1 = new ASTEq(n1, n2); }
-	 	| <NEQ> n2 = ArithmeticExp() { n1 = new ASTNeq(n1, n2); }
-	 	| <LT> n2 = ArithmeticExp() { n1 = new ASTLt(n1, n2); }
-	 	| <GT> n2 = ArithmeticExp() { n1 = new ASTGt(n1, n2); }
-	 	| <LEQ> n2 = ArithmeticExp() { n1 = new ASTLeq(n1, n2); }
-	 	| <GEQ> n2 = ArithmeticExp() { n1 = new ASTGeq(n1, n2); }
-	 	| <VARASS> n2 = ArithmeticExp() { n1 = new ASTAssign(n1, n2); }
+	 	( <EQ> n2 = ArithmeticExp() { return new ASTEq(n1, n2); }
+	 	| <NEQ> n2 = ArithmeticExp() { return new ASTNeq(n1, n2); }
+	 	| <LT> n2 = ArithmeticExp() { return new ASTLt(n1, n2); }
+	 	| <GT> n2 = ArithmeticExp() { return new ASTGt(n1, n2); }
+	 	| <LEQ> n2 = ArithmeticExp() { return new ASTLeq(n1, n2); }
+	 	| <GEQ> n2 = ArithmeticExp() { return new ASTGeq(n1, n2); }
+	 	| <VARASS> n2 = ArithmeticExp() { return new ASTAssign(n1, n2); }
 		| <CONTAINS> n2 = ArithmeticExp() { return new ASTContains(n1, n2);})*
 	{ return n1; } )
 	| <EXISTS> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTExists(n1, n2, n3);}
@@ -300,10 +305,10 @@ ASTNode ArithmeticExp() :
 { ASTNode n1, n2; }
 {
    	n1 = UnaryExp() 
-   	( <PLUS> n2 = UnaryExp() { n1 = new ASTAdd(n1, n2); }
-   	| <MINUS> n2 = UnaryExp() { n1 = new ASTSub(n1, n2); }
-   	| <TIMES> n2 = UnaryExp() { n1 = new ASTMul(n1, n2); }
-   	| <DIV> n2 = UnaryExp() { n1 = new ASTDiv(n1, n2); })*
+   	( <PLUS> n2 = UnaryExp() { return new ASTAdd(n1, n2); }
+   	| <MINUS> n2 = UnaryExp() { return new ASTSub(n1, n2); }
+   	| <TIMES> n2 = UnaryExp() { return new ASTMul(n1, n2); }
+   	| <DIV> n2 = UnaryExp() { return new ASTDiv(n1, n2); })*
    	{ return n1; }
 }
 
@@ -316,7 +321,7 @@ ASTNode UnaryExp() :
 }
 {
    	( n1 = AtomicExp() 
-	| <MINUS> n1 = UnaryExp() { n1 = new ASTSub(new ASTNum(0), n1); })
+	| <MINUS> n1 = UnaryExp() { return new ASTSub(new ASTNum(0), n1); })
 	{ return n1; }
 }
 
@@ -327,18 +332,16 @@ ASTNode AtomicExp() :
 	IType ty1 = null;
 }
 {
- 	( t1 = <NUMBER> { n1 = new ASTNum(Integer.parseInt(t1.image)); }
-	| t1 = <STRING_LITERAL> { n1 = new ASTString(t1.image); }
-	| <SLPAR> <SRPAR> { n1 = new ASTSet(); }
-	| <LPAR> n1 = ArithmeticExp() <RPAR>
-	| < TRUE > { n1 = new ASTBool(true); }
-	| < FALSE > { n1 = new ASTBool(false); }
-	| (ty1 = Type())? t1 = < IDWN > {
+ 	( t1 = <NUMBER> { return new ASTNum(Integer.parseInt(t1.image)); }
+	| t1 = <STRING_LITERAL> { return new ASTString(t1.image); }
+	| <SLPAR> <SRPAR> { return new ASTSet(); }
+	| < TRUE > { return new ASTBool(true); }
+	| < FALSE > { return new ASTBool(false); }
+	|  LOOKAHEAD(2)(ty1 = Type())? t1 = < IDWN > {
 		  if(ty1 == null)
-		  	{ n1 = new ASTId(t1.image); }
+		  	{ return new ASTId(t1.image); }
 		  else
-		  	{ n1 = new ASTVar(t1.image, ty1); }
+		  	{ return new ASTVar(t1.image, ty1); }
 	})
-	{ return n1; }
 	  	
 }

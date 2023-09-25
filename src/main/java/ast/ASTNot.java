@@ -16,7 +16,7 @@ public class ASTNot implements ASTNode {
 
 	@Override
 	public String toString() {
-		return "!" + node.toString();
+		return "NOT" + node.toString();
 	}
 
 	@Override

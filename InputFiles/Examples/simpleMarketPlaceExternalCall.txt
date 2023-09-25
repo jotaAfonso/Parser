@@ -1,5 +1,5 @@
-_ {} o:O > starts(c) {} S0
-S0 {} b:B > c.mO() {} S1
+_ {} o:O > starts(c) { NOT AND(int x := 0, set y := [])} S0
+S0 {} b:B > c.makeOffer(int:value) {exists x y true} S1
 S0 {} o > c.h() {} S5+
 S1 {} o > c.r() {} S3
 S1 {} o < c.a() {} S2

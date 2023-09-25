@@ -66,33 +66,35 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int SRPAR = 30;
   /** RegularExpression Id. */
-  int UNDERSCORE = 31;
+  int QUOTE = 31;
   /** RegularExpression Id. */
-  int COLON = 32;
+  int UNDERSCORE = 32;
   /** RegularExpression Id. */
-  int COMMA = 33;
+  int COLON = 33;
   /** RegularExpression Id. */
-  int VAR = 34;
+  int COMMA = 34;
   /** RegularExpression Id. */
-  int VARASS = 35;
+  int VAR = 35;
   /** RegularExpression Id. */
-  int MOREPART = 36;
+  int VARASS = 36;
   /** RegularExpression Id. */
-  int DOT = 37;
+  int MOREPART = 37;
   /** RegularExpression Id. */
-  int EXISTS = 38;
+  int DOT = 38;
   /** RegularExpression Id. */
-  int FORALL = 39;
+  int EXISTS = 39;
   /** RegularExpression Id. */
-  int NUMBER = 40;
+  int FORALL = 40;
   /** RegularExpression Id. */
-  int CHAR = 41;
+  int NUMBER = 41;
   /** RegularExpression Id. */
-  int ID = 42;
+  int CHAR = 42;
   /** RegularExpression Id. */
-  int IDWN = 43;
+  int ID = 43;
   /** RegularExpression Id. */
-  int STRING_LITERAL = 44;
+  int IDWN = 44;
+  /** RegularExpression Id. */
+  int STRING_LITERAL = 45;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -130,6 +132,7 @@ public interface ParserConstants {
     "\")\"",
     "\"[\"",
     "\"]\"",
+    "\"\\\"\"",
     "\"_\"",
     "\":\"",
     "\",\"",

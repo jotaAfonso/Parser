@@ -18,7 +18,7 @@ public class ASTAnd implements ASTNode {
 
 	@Override
 	public String toString() {
-		return left.toString() + " && " + right.toString();
+		return "AND(" + left.toString() + ", " + right.toString() + ")" ;
 	}
 	
 	@Override

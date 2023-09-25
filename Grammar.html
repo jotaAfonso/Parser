@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>BNF for Grammar.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for Grammar.jj</H1>
+<H2 ALIGN=CENTER>TOKENS</H2>
+<TABLE>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;*&gt; SKIP : {
+&lt;" " | "\t" | "\r" | "\n" | "\r\n"&gt;
+| &lt;"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")&gt;
+| &lt;"/*" (~["/"])* "*" "/"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+// Types
+</PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;INT: "int"&gt;
+| &lt;BOOL: "bool"&gt;
+| &lt;STRING: "string"&gt;
+| &lt;SET: "set"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;PLUS: "+"&gt;
+| &lt;MINUS: "-"&gt;
+| &lt;TIMES: "*"&gt;
+| &lt;DIV: "/"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+// Logical Operators :
+</PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;AND: "AND"&gt;
+| &lt;NOT: "NOT"&gt;
+| &lt;OR: "OR"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+//Comparison operators
+</PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;EQ: "=="&gt;
+| &lt;NEQ: "!=" | "&lt;&gt;"&gt;
+| &lt;LEQ: "&lt;="&gt;
+| &lt;GEQ: "&gt;="&gt;
+| &lt;LT: "&lt;"&gt;
+| &lt;GT: "&gt;"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+// Boolean Values
+</PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;TRUE: "true" | "TRUE"&gt;
+| &lt;FALSE: "false" | "FALSE"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+// Constants
+</PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;STARTLABEL: "starts" | "STARTS" | "deploy" | "DEPLOY"&gt;
+| &lt;CONTAINS: "in"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+// Brackets
+</PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;LBRACKET: "{"&gt;
+| &lt;RBRACKET: "}"&gt;
+| &lt;LPAR: "("&gt;
+| &lt;RPAR: ")"&gt;
+| &lt;SLPAR: "["&gt;
+| &lt;SRPAR: "]"&gt;
+| &lt;QUOTE: "\""&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;UNDERSCORE: "_"&gt;
+| &lt;COLON: ":"&gt;
+| &lt;COMMA: ","&gt;
+| &lt;VAR: "var"&gt;
+| &lt;VARASS: ":="&gt;
+| &lt;MOREPART: "|"&gt;
+| &lt;DOT: ["."]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;EXISTS: "exists" | "EXISTS"&gt;
+| &lt;FORALL: "forall" | "FORALL"&gt;
+| &lt;NUMBER: (["0"-"9"])+&gt;
+| &lt;#CHAR: ["A"-"Z","a"-"z"]&gt;
+| &lt;#ID: (["A"-"Z","a"-"z"])+&gt;
+| &lt;IDWN: &lt;CHAR&gt; (&lt;ID&gt; | &lt;NUMBER&gt;)*&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;STRING_LITERAL: ["\""] (~["\n","\r"])* ["\""]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+</TABLE>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<TABLE>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod1">Start</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod2">DeployTransition</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>|</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod3">NormalTransition</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>|</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;EOF&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod2">DeployTransition</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;UNDERSCORE&gt; &lt;LBRACKET&gt; &lt;RBRACKET&gt; <A HREF="#prod4">Participant</A> <A HREF="#prod5">ExternalCall</A> <A HREF="#prod6">DeployAction</A> &lt;LBRACKET&gt; ( <A HREF="#prod7">Assertion</A> )? &lt;RBRACKET&gt; &lt;IDWN&gt; ( &lt;PLUS&gt; )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod3">NormalTransition</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDWN&gt; &lt;LBRACKET&gt; ( <A HREF="#prod7">Assertion</A> )? &lt;RBRACKET&gt; <A HREF="#prod8">ParticipantExtra</A> <A HREF="#prod5">ExternalCall</A> <A HREF="#prod9">NormalAction</A> &lt;LBRACKET&gt; ( <A HREF="#prod7">Assertion</A> )? &lt;RBRACKET&gt; &lt;IDWN&gt; ( &lt;PLUS&gt; )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod5">ExternalCall</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;GT&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>|</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;LT&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">Participant</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDWN&gt; ( &lt;COLON&gt; &lt;IDWN&gt; )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">ParticipantExtra</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod4">Participant</A> ( &lt;MOREPART&gt; <A HREF="#prod4">Participant</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">DeployAction</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;STARTLABEL&gt; &lt;LPAR&gt; &lt;IDWN&gt; ( &lt;COMMA&gt; <A HREF="#prod10">ParamList</A> )? &lt;RPAR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">NormalAction</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDWN&gt; <A HREF="#prod11">OperationType</A> &lt;IDWN&gt; &lt;LPAR&gt; <A HREF="#prod10">ParamList</A> &lt;RPAR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">OperationType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;MINUS&gt; | &lt;DOT&gt; )</TD>
+</TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+//	ASSERTIONS - PARAMETERS
+</PRE>
+  </TD>
+ </TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod10">ParamList</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod12">Type</A> &lt;COLON&gt; &lt;IDWN&gt; ( &lt;COMMA&gt; <A HREF="#prod12">Type</A> &lt;COLON&gt; &lt;IDWN&gt; )* )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">Type</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;INT&gt; | &lt;BOOL&gt; | &lt;STRING&gt; | &lt;IDWN&gt; | &lt;SET&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">Assertion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod13">LogicalExp</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod13">LogicalExp</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod14">BooleanExp</A> | &lt;OR&gt; &lt;LPAR&gt; <A HREF="#prod13">LogicalExp</A> &lt;COMMA&gt; <A HREF="#prod13">LogicalExp</A> &lt;RPAR&gt; | &lt;AND&gt; &lt;LPAR&gt; <A HREF="#prod13">LogicalExp</A> &lt;COMMA&gt; <A HREF="#prod13">LogicalExp</A> &lt;RPAR&gt; | &lt;NOT&gt; <A HREF="#prod13">LogicalExp</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">BooleanExp</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod15">ArithmeticExp</A> ( &lt;EQ&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;NEQ&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;LT&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;GT&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;LEQ&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;GEQ&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;VARASS&gt; <A HREF="#prod15">ArithmeticExp</A> | &lt;CONTAINS&gt; <A HREF="#prod15">ArithmeticExp</A> )* )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>|</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;EXISTS&gt; <A HREF="#prod16">AtomicExp</A> <A HREF="#prod16">AtomicExp</A> <A HREF="#prod13">LogicalExp</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>|</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;FORALL&gt; <A HREF="#prod16">AtomicExp</A> <A HREF="#prod16">AtomicExp</A> <A HREF="#prod13">LogicalExp</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">ArithmeticExp</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod17">UnaryExp</A> ( &lt;PLUS&gt; <A HREF="#prod17">UnaryExp</A> | &lt;MINUS&gt; <A HREF="#prod17">UnaryExp</A> | &lt;TIMES&gt; <A HREF="#prod17">UnaryExp</A> | &lt;DIV&gt; <A HREF="#prod17">UnaryExp</A> )*</TD>
+</TR>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+/*
+	Atomic and negation
+*/</PRE>
+  </TD>
+ </TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">UnaryExp</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod16">AtomicExp</A> | &lt;MINUS&gt; <A HREF="#prod17">UnaryExp</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">AtomicExp</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;NUMBER&gt; | &lt;QUOTE&gt; &lt;STRING_LITERAL&gt; &lt;QUOTE&gt; | &lt;SLPAR&gt; &lt;SRPAR&gt; | &lt;TRUE&gt; | &lt;FALSE&gt; | ( <A HREF="#prod12">Type</A> )? &lt;IDWN&gt; )</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

@@ -24,7 +24,7 @@ public class ASTForAll implements ASTNode {
 
 	@Override
 	public String toString() {
-		return " ∀ " + left.toString() + middle.toString() + right.toString();
+		return left.toString() + "in" + middle.toString() + "and" + right.toString();
 	}
 
 	@Override
