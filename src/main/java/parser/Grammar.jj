@@ -49,7 +49,7 @@ TOKEN :
 // Logical Operators :
 TOKEN :
 {
-  	< AND : "AND"  >
+  	< AND : "AND" | "&" >
   	| < NOT: "NOT" >
 	| < OR : "OR" >
 }
@@ -95,6 +95,7 @@ TOKEN :
 {
 	< UNDERSCORE : "_" >
  	| < COLON : ":" >
+ 	| < SEMICOLON : ";" >
  	| < COMMA: "," >
   	| < VAR : "var" >
   	| < VARASS : ":=" >
@@ -133,15 +134,28 @@ void DeployTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
  	Transition t;
  	Boolean eC = false;
  	ASTNode postC = null;
+ 	Set <ASTVar> vars = null;
 }
 {
   	iS = < UNDERSCORE > <LBRACKET> <RBRACKET>
   		p = Participant() eC = ExternalCall() t = DeployAction(auto)
   			<LBRACKET> (postC = Assertion())? <RBRACKET>
-  				eS = < IDWN > (isES = < PLUS >)?
+  				<LBRACKET> (vars = VariableDeclaration())? <RBRACKET>
+	  				eS = < IDWN > (isES = < PLUS >)?
 	{
-    	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, null, postC, p, true);
+    	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, null, postC, p, true, vars);
 	}
+}
+
+Set <ASTVar> VariableDeclaration():
+{
+  	Token t1, t2;
+  	Set <ASTVar> vars = new HashSet <ASTVar> ();
+	IType ty1, ty2 = null;
+}
+{
+	ty1 = Type() t1 = < IDWN > (<SEMICOLON> ty2 = Type() t2 = < IDWN > { vars.add(new ASTVar(t2.image, ty2)); })*
+	{ vars.add(new ASTVar(t1.image, ty1)); return vars; }
 }
 
 void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks) throws CustomException, TypingException:
@@ -158,7 +172,7 @@ void NormalTransition(Hashtable<String, Automaton> auto, ValidationChecks checks
 			<LBRACKET> (postC = Assertion())? <RBRACKET>
 				eS = < IDWN > (isES = < PLUS >)?
 	{
-	 	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, preC, postC, p, false);
+	 	GrammarLogic.addTransition(auto, checks, t, iS, eS, isES, eC, preC, postC, p, false, null);
 	}
 }
 
@@ -266,20 +280,29 @@ ASTNode Assertion():
 	ASTNode n;
 }
 {
-	n = LogicalExp()
+	n = Exp()
 	{ return n; }
 }
 
-ASTNode LogicalExp():
+ASTNode Exp():
 {
   	ASTNode n1, n2;
 }
 {
-  	( n1 = BooleanExp()
- 	| <OR> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { return new ASTOr(n1, n2); }
-  	| <AND> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { return new ASTAnd(n1, n2); }
-  	| <NOT> n1 = LogicalExp() { return new ASTNot(n1); }
+  	( n1 = BooleanExp() LogicalExp(n1)
+  	| <NOT> n1 = Exp() { return new ASTNot(n1); }
  	) { return n1; }
+}
+
+ASTNode LogicalExp(ASTNode n1):
+{
+  	ASTNode n2;
+}
+{
+  	(  	  <AND> n2 = Exp() { return new ASTAnd(n1, n2); }
+ 	| <OR> n2 = Exp() { return new ASTOr(n1, n2); }
+	)?
+	{ return n1; } 	
 }
 
 ASTNode BooleanExp():
@@ -297,8 +320,8 @@ ASTNode BooleanExp():
 	 	| <VARASS> n2 = ArithmeticExp() { return new ASTAssign(n1, n2); }
 		| <CONTAINS> n2 = ArithmeticExp() { return new ASTContains(n1, n2);})*
 	{ return n1; } )
-	| <EXISTS> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTExists(n1, n2, n3);}
-	| <FORALL> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTForAll(n1, n2, n3);}
+	| <EXISTS> n1 = AtomicExp() n2 = AtomicExp() n3 = Exp() { return new ASTExists(n1, n2, n3);}
+	| <FORALL> n1 = AtomicExp() n2 = AtomicExp() n3 = Exp() { return new ASTForAll(n1, n2, n3);}
 }
 
 ASTNode ArithmeticExp() :

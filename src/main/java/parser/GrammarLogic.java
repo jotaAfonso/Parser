@@ -2,10 +2,12 @@ package parser;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import ast.ASTId;
 import ast.ASTNode;
+import ast.ASTVar;
 import data.Automaton;
 import data.Transition;
 import exceptions.CustomException;
@@ -41,7 +43,7 @@ public class GrammarLogic {
 	 * @throws TypingException - typing exception
 	 */
 	public static void addTransition(Hashtable<String, Automaton> auto, ValidationChecks checks, Transition t, Token iS,
-			Token eS, Token isES, boolean eC, ASTNode preC, ASTNode postC, String p, boolean deployFlag)
+			Token eS, Token isES, boolean eC, ASTNode preC, ASTNode postC, String p, boolean deployFlag, Set <ASTVar> vars)
 			throws CustomException, TypingException {
 		// automaton
 		Automaton a = getAutomataById(auto, t);
@@ -59,11 +61,11 @@ public class GrammarLogic {
 		}
 		// asserion_pre
 		if (preC != null)
-			treatAssertion(a, t, preC, false);
+			treatAssertion(a, t, preC, false, null);
 
 		// asserion_post
 		if (postC != null)
-			treatAssertion(a, t, postC, deployFlag);
+			treatAssertion(a, t, postC, deployFlag, vars);
 		
 		List<Param> lparams = t.getParameters().stream().filter(x -> x.getType() instanceof ParticipantType).collect(Collectors.toList());
 		// participants in parameters
@@ -91,13 +93,14 @@ public class GrammarLogic {
 	 * @param t          - transition
 	 * @param condition  - assertion
 	 * @param deployFlag - deploy flag
+	 * @param vars 
 	 * @throws CustomException - custom exception
 	 * @throws TypingException - typing exception
 	 */
-	private static void treatAssertion(Automaton a, Transition t, ASTNode condition, boolean deployFlag)
+	private static void treatAssertion(Automaton a, Transition t, ASTNode condition, boolean deployFlag, Set<ASTVar> vars)
 			throws CustomException, TypingException {
-		if (deployFlag && condition.checkIfItHasVar())
-			a.addGlobalVars(condition.getVars(), t.getLocalVars());
+		if (deployFlag && !vars.isEmpty())
+			a.addGlobalVars(vars.stream().collect(Collectors.toList()), t.getLocalVars());
 		if(!deployFlag && condition.checkIfItHasVar())
 			throw new CustomException("Variables are only declared in the deploy/start method.");
 			

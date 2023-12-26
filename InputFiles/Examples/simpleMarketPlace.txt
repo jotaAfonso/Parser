@@ -1,6 +1,4 @@
-_ {} o:PO > deploy(c) {AND(OR(false,true),true)} S0
-S0 {} b:PB > c.bid() {} S1
+_ {} o:O > deploy(c) {a := 0} {int a; int b} S0
+S0 {} b:B > c.bid(int:value) {} S1 
 S1 {} b > c.withdraw() {} S0
-S0 {} o > c.end() {} S0
-S1 {} o > c.end() {} S1
-S1 {} b > c.win() {} S2+
+S1 {} o > c.end() {} S2+

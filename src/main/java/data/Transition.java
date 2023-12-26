@@ -38,11 +38,9 @@ public class Transition {
 	private String actionLabel;
 
 	/** The new parts. */
-	@JsonProperty(JSON_NEW_PART)
 	private Set<AssociationRP> newParts = new HashSet<AssociationRP>();
 
 	/** The existent parts. */
-	@JsonProperty(JSON_EXISTENT_PART)
 	private AssociationRP existentParts;
 
 	/** The input. */

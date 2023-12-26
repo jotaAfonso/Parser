@@ -1,10 +1,3 @@
-_ {} o:O > starts(c) { NOT AND(int x := 0, set y := [])} S0
-S0 {} b:B > c.makeOffer(int:value) {exists x y true} S1
-S0 {} o > c.h() {} S5+
-S1 {} o > c.r() {} S3
-S1 {} o < c.a() {} S2
-S2 {} b > c.h() {} S5
-S3 {} b > c-l() {} S5
-S3 {} o > c.h() {} S5
-S3 {} b > c-s() {} S4
-S4 {} b|b1:B > c.mo() {} S1
+_ {} o:O > deploy(c) { AND(int currentV := 0, bool ended := false) } S0
+S0 {AND( value > currentV, NOT ended)} b:B > c.bid(int:value) {currentV := value} S1 S1 {} b > c.withdraw() {currentV := 0} S0
+S1 {} o > c.end() {ended := true} S2+

@@ -72,29 +72,31 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int COLON = 33;
   /** RegularExpression Id. */
-  int COMMA = 34;
+  int SEMICOLON = 34;
   /** RegularExpression Id. */
-  int VAR = 35;
+  int COMMA = 35;
   /** RegularExpression Id. */
-  int VARASS = 36;
+  int VAR = 36;
   /** RegularExpression Id. */
-  int MOREPART = 37;
+  int VARASS = 37;
   /** RegularExpression Id. */
-  int DOT = 38;
+  int MOREPART = 38;
   /** RegularExpression Id. */
-  int EXISTS = 39;
+  int DOT = 39;
   /** RegularExpression Id. */
-  int FORALL = 40;
+  int EXISTS = 40;
   /** RegularExpression Id. */
-  int NUMBER = 41;
+  int FORALL = 41;
   /** RegularExpression Id. */
-  int CHAR = 42;
+  int NUMBER = 42;
   /** RegularExpression Id. */
-  int ID = 43;
+  int CHAR = 43;
   /** RegularExpression Id. */
-  int IDWN = 44;
+  int ID = 44;
   /** RegularExpression Id. */
-  int STRING_LITERAL = 45;
+  int IDWN = 45;
+  /** RegularExpression Id. */
+  int STRING_LITERAL = 46;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -113,7 +115,7 @@ public interface ParserConstants {
     "\"-\"",
     "\"*\"",
     "\"/\"",
-    "\"AND\"",
+    "<AND>",
     "\"NOT\"",
     "\"OR\"",
     "\"==\"",
@@ -135,6 +137,7 @@ public interface ParserConstants {
     "\"\\\"\"",
     "\"_\"",
     "\":\"",
+    "\";\"",
     "\",\"",
     "\"var\"",
     "\":=\"",
