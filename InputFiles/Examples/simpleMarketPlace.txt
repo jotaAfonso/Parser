@@ -1,4 +1,4 @@
-_ {} o:O > deploy(c) {true} {int a; int b} S0
-S0 {} b:B > c.bid(int:value) {} S1 
+_ {} o:O > deploy(c) {} {int a; int b} S0
+S0 {} b:B > c.bid(int value) {} S1 
 S1 {} b > c.withdraw() {} S0
 S1 {} o > c.end() {} S2+

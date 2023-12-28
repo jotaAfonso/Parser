@@ -1,26 +1,10 @@
 {
   "id" : "c",
   "initialState" : "S0",
+  "statesDeclaration" : "int b; int a",
   "states" : [ "S0", "S1", "S2" ],
   "finalStates" : [ "S2" ],
   "transitions" : [ {
-    "newParts" : [ {
-      "role" : "B",
-      "participants" : [ "b" ]
-    } ],
-    "existentParts" : {
-      "role" : "",
-      "participants" : [ ]
-    },
-    "from" : "S0",
-    "to" : "S1",
-    "actionLabel" : "bid",
-    "input" : "value:int",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
     "newParts" : [ ],
     "existentParts" : {
       "role" : "",
@@ -62,7 +46,24 @@
     "actionLabel" : "starts",
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "true",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "newParts" : [ {
+      "role" : "B",
+      "participants" : [ "b" ]
+    } ],
+    "existentParts" : {
+      "role" : "",
+      "participants" : [ ]
+    },
+    "from" : "S0",
+    "to" : "S1",
+    "actionLabel" : "bid",
+    "input" : "value:int",
+    "preCondition" : "",
+    "postCondition" : "",
     "internal" : false,
     "externalCall" : false
   } ],

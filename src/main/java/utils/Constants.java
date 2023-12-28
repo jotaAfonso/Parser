@@ -41,6 +41,7 @@ public class Constants {
 	//	JSON AUTOMATA ELEMENTS
 	public static final String JSON_ID = "id";
 	public static final String JSON_INITIAL_STATE = "initialState";
+	public static final String JSON_STATES_DECLARATION = "statesDeclaration";
 	public static final String JSON_STATES = "states";
 	public static final String JSON_END_STATES = "finalStates";
 	public static final String JSON_TRANSITIONS = "transitions";

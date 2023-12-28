@@ -111,7 +111,7 @@ TOKEN :
   	| < NUMBER : (["0"-"9"])+ >
  	| < #CHAR : ["A"-"Z","a"-"z"] >
 	| < #ID : (["A"-"Z","a"-"z"])+ >
-	| < IDWN : <CHAR> (<ID> | <NUMBER>)* >
+	| < IDWN : (<CHAR> | "_") (<ID> | <NUMBER>)* >
 }
 
 TOKEN :
@@ -248,8 +248,8 @@ List<Param> ParamList():
 }
 {
   	// t = Type or ID -> check if its a state if it is not gives error
-	[ t=TypeParam() <COLON> x=<IDWN> { l.add(new Param(x.image, t));}
-	( <COMMA> t=TypeParam() <COLON> x=<IDWN> {l.add(new Param(x.image, t));} )*]
+	[ t=TypeParam() x=<IDWN> { l.add(new Param(x.image, t));}
+	( <COMMA> t=TypeParam() x=<IDWN> {l.add(new Param(x.image, t));} )*]
 	{ return l; }
 }
 

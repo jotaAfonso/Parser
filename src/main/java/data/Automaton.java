@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,6 +30,10 @@ public class Automaton {
 	/** The initial State. */
 	@JsonProperty(JSON_INITIAL_STATE)
 	private String initialS;
+	
+	/** The variables of the contract. */
+	@JsonProperty(JSON_STATES_DECLARATION)
+	private String statesDeclaration = "";
 
 	/** All of the states. */
 	@JsonProperty(JSON_STATES)
@@ -313,5 +318,14 @@ public class Automaton {
 						v.getId());
 				throw new CustomException(msg);
 			}
+	}
+	
+	public void setStatesDeclaration(String var) {
+		this.statesDeclaration = var;
+	}
+	
+	public void setStatesDeclaration(Set<ASTVar> vars) {
+		String var = vars.stream().map(x -> x.toString()).collect(Collectors.joining("; "));
+		setStatesDeclaration(var);
 	}
 }

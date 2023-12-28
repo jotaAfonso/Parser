@@ -44,8 +44,8 @@ public class GrammarLogic {
 	 * @throws TypingException - typing exception
 	 */
 	public static void addTransition(Hashtable<String, Automaton> auto, ValidationChecks checks, Transition t, Token iS,
-			Token eS, Token isES, boolean eC, ASTNode preC, ASTNode postC, String p, boolean deployFlag, Set <ASTVar> vars)
-			throws CustomException, TypingException {
+			Token eS, Token isES, boolean eC, ASTNode preC, ASTNode postC, String p, boolean deployFlag,
+			Set<ASTVar> vars) throws CustomException, TypingException {
 		// automaton
 		Automaton a = getAutomataById(auto, t);
 		// transition
@@ -65,18 +65,19 @@ public class GrammarLogic {
 			treatAssertion(a, t, preC, false, null, true);
 
 		// asserion_post
-		if (postC != null)
+		if (postC != null || (vars != null && !vars.isEmpty()))
 			treatAssertion(a, t, postC, deployFlag, vars, false);
-		
-		List<Param> lparams = t.getParameters().stream().filter(x -> x.getType() instanceof ParticipantType).collect(Collectors.toList());
+
+		List<Param> lparams = t.getParameters().stream().filter(x -> x.getType() instanceof ParticipantType)
+				.collect(Collectors.toList());
 		// participants in parameters
-		if(lparams != null && !lparams.isEmpty()) {
-			for(Param pa : lparams) {
+		if (lparams != null && !lparams.isEmpty()) {
+			for (Param pa : lparams) {
 				ParticipantType type = (ParticipantType) pa.getType();
 				a.addAssociations(pa.getId(), type.getRole());
 			}
-		}			
-			
+		}
+
 		// automaton
 		addDataToAutomaton(a, t, iS.image, eS.image, (isES != null), p, deployFlag);
 
@@ -94,30 +95,33 @@ public class GrammarLogic {
 	 * @param t          - transition
 	 * @param condition  - assertion
 	 * @param deployFlag - deploy flag
-	 * @param vars 
+	 * @param vars
 	 * @throws CustomException - custom exception
 	 * @throws TypingException - typing exception
 	 */
-	private static void treatAssertion(Automaton a, Transition t, ASTNode condition, boolean deployFlag, Set<ASTVar> vars, boolean preCondition)
-			throws CustomException, TypingException {
-		if (deployFlag && !vars.isEmpty())
+	private static void treatAssertion(Automaton a, Transition t, ASTNode condition, boolean deployFlag,
+			Set<ASTVar> vars, boolean preCondition) throws CustomException, TypingException {
+		if (deployFlag && !vars.isEmpty()) {
 			a.addGlobalVars(vars.stream().collect(Collectors.toList()), t.getLocalVars());
-		
-		if(!deployFlag && condition.checkIfItHasVar())
-			throw new CustomException("Variables are only declared in the deploy/start method.");
-			
-		t.setPostCondition(condition.toString());
-		List<ASTId> idsV = condition.getIds();
-		if (idsV != null && !idsV.isEmpty())
-			CommonUtils.addTypeToIDs(idsV, a.getGlobalVars(), t.getLocalVars());
-		
+			a.setStatesDeclaration(vars);
+		}
 
-		if(preCondition) {
-			if (!condition.typeCheckPre().equals(BoolType.singleton))
-				throw new TypingException();
-		} else { 
-			if (!condition.typeCheckPost().equals(AssignType.singleton))
-				throw new TypingException("Post condition consists on conjunctions of assignments.");
+		if (condition != null) {
+			if (!deployFlag && condition.checkIfItHasVar())
+				throw new CustomException("Variables are only declared in the deploy/start method.");
+
+			t.setPostCondition(condition.toString());
+			List<ASTId> idsV = condition.getIds();
+			if (idsV != null && !idsV.isEmpty())
+				CommonUtils.addTypeToIDs(idsV, a.getGlobalVars(), t.getLocalVars());
+
+			if (preCondition) {
+				if (!condition.typeCheckPre().equals(BoolType.singleton))
+					throw new TypingException();
+			} else {
+				if (!condition.typeCheckPost().equals(AssignType.singleton))
+					throw new TypingException("Post condition consists on conjunctions of assignments.");
+			}
 		}
 	}
 
