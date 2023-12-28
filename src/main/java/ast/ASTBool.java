@@ -39,4 +39,14 @@ public class ASTBool implements ASTNode {
 	public List<ASTId> getIds() {
 		return new ArrayList<ASTId>();		
 	}
+
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 }

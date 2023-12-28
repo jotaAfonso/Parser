@@ -19,6 +19,16 @@ public class ASTNum implements ASTNode {
 	public String toString() {
 		return String.valueOf(val);
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

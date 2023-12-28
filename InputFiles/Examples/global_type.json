@@ -62,7 +62,7 @@
     "actionLabel" : "starts",
     "input" : "",
     "preCondition" : "",
-    "postCondition" : "a := 0",
+    "postCondition" : "true",
     "internal" : false,
     "externalCall" : false
   } ],

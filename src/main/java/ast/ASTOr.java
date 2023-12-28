@@ -18,7 +18,17 @@ public class ASTOr implements ASTNode {
 
 	@Override
 	public String toString() {
-		return "OR(" + left.toString() + ", " + right.toString() + ")" ;
+		return left.toString() + " || " + right.toString() ;
+	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
 	}
 
 	@Override

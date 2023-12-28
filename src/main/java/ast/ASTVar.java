@@ -29,6 +29,16 @@ public class ASTVar implements ASTNode {
 	public IType getType() {
 		return this.type;
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

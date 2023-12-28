@@ -6,8 +6,10 @@ import exceptions.TypingException;
 import types.IType;
 
 public interface ASTNode {
-	
+
 	IType typeCheck() throws TypingException;
+	IType typeCheckPost() throws TypingException;
+	IType typeCheckPre() throws TypingException;
 
 	List<ASTVar> getVars();
 	

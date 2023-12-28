@@ -18,7 +18,16 @@ public class ASTIf implements ASTNode {
 		this.e3 = e3;
 	}
 	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
 
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
+	
 	@Override
 	public IType typeCheck()
 			throws TypingException {

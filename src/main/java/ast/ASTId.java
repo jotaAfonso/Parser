@@ -22,6 +22,16 @@ public class ASTId implements ASTNode {
 	public void setType(IType type) {
 		this.type = type;
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

@@ -26,6 +26,16 @@ public class ASTForAll implements ASTNode {
 	public String toString() {
 		return left.toString() + "in" + middle.toString() + "and" + right.toString();
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

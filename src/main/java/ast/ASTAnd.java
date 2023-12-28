@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exceptions.TypingException;
+import types.AssignType;
 import types.BoolType;
 import types.IType;
 
@@ -18,7 +19,7 @@ public class ASTAnd implements ASTNode {
 
 	@Override
 	public String toString() {
-		return "AND(" + left.toString() + ", " + right.toString() + ")" ;
+		return left.toString() + " & " + right.toString();
 	}
 	
 	@Override
@@ -59,5 +60,21 @@ public class ASTAnd implements ASTNode {
 		result.addAll(rl);
 		
 		return result;
+	}
+
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		IType typeCheck = left.typeCheck();
+		IType typeCheck2 = right.typeCheck();
+		
+		if(typeCheck == typeCheck2 && typeCheck.equals(AssignType.singleton))
+			return typeCheck;
+		else
+			throw new TypingException();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
 	}
 }

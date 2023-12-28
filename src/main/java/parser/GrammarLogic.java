@@ -12,6 +12,7 @@ import data.Automaton;
 import data.Transition;
 import exceptions.CustomException;
 import exceptions.TypingException;
+import types.AssignType;
 import types.BoolType;
 import types.ParticipantType;
 import utils.CommonUtils;
@@ -61,11 +62,11 @@ public class GrammarLogic {
 		}
 		// asserion_pre
 		if (preC != null)
-			treatAssertion(a, t, preC, false, null);
+			treatAssertion(a, t, preC, false, null, true);
 
 		// asserion_post
 		if (postC != null)
-			treatAssertion(a, t, postC, deployFlag, vars);
+			treatAssertion(a, t, postC, deployFlag, vars, false);
 		
 		List<Param> lparams = t.getParameters().stream().filter(x -> x.getType() instanceof ParticipantType).collect(Collectors.toList());
 		// participants in parameters
@@ -97,10 +98,11 @@ public class GrammarLogic {
 	 * @throws CustomException - custom exception
 	 * @throws TypingException - typing exception
 	 */
-	private static void treatAssertion(Automaton a, Transition t, ASTNode condition, boolean deployFlag, Set<ASTVar> vars)
+	private static void treatAssertion(Automaton a, Transition t, ASTNode condition, boolean deployFlag, Set<ASTVar> vars, boolean preCondition)
 			throws CustomException, TypingException {
 		if (deployFlag && !vars.isEmpty())
 			a.addGlobalVars(vars.stream().collect(Collectors.toList()), t.getLocalVars());
+		
 		if(!deployFlag && condition.checkIfItHasVar())
 			throw new CustomException("Variables are only declared in the deploy/start method.");
 			
@@ -109,12 +111,14 @@ public class GrammarLogic {
 		if (idsV != null && !idsV.isEmpty())
 			CommonUtils.addTypeToIDs(idsV, a.getGlobalVars(), t.getLocalVars());
 		
-		/* 
-		 * assertions are either of type boolean outside of deploy
-		 * or of type assign when the method is deploy/start
-		*/
-		if (!condition.typeCheck().equals(BoolType.singleton))
-			throw new TypingException();
+
+		if(preCondition) {
+			if (!condition.typeCheckPre().equals(BoolType.singleton))
+				throw new TypingException();
+		} else { 
+			if (!condition.typeCheckPost().equals(AssignType.singleton))
+				throw new TypingException("Post condition consists on conjunctions of assignments.");
+		}
 	}
 
 	/**

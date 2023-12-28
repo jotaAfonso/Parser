@@ -16,6 +16,16 @@ public class ASTSet implements ASTNode {
 	public String toString() {
 		return "[]";
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

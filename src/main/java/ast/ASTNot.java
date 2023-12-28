@@ -18,6 +18,16 @@ public class ASTNot implements ASTNode {
 	public String toString() {
 		return "NOT" + node.toString();
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

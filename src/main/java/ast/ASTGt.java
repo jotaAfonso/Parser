@@ -21,6 +21,16 @@ public class ASTGt implements ASTNode {
 	public String toString() {
 		return left.toString() + " > " + right.toString();
 	}
+	
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return this.typeCheck();
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 
 	@Override
 	public IType typeCheck() throws TypingException {

@@ -64,4 +64,14 @@ public class ASTAssign implements ASTNode {
 		
 		return result;
 	}
+
+	@Override
+	public IType typeCheckPost() throws TypingException {
+		return null;
+	}
+
+	@Override
+	public IType typeCheckPre() throws TypingException {
+		return this.typeCheck();
+	}
 }
