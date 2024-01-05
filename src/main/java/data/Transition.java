@@ -39,6 +39,9 @@ public class Transition {
 
 	/** The new parts. */
 	private Set<AssociationRP> newParts = new HashSet<AssociationRP>();
+	
+	/** The new parts. */
+	private Map<String, Set<String>> caller = new HashMap<String, Set<String>>();
 
 	/** The existent parts. */
 	private AssociationRP existentParts;
@@ -239,6 +242,7 @@ public class Transition {
 	 *
 	 * @return the existent parts
 	 */
+	@JsonIgnore
 	public AssociationRP getExistentParts() {
 		return existentParts;
 	}
@@ -431,13 +435,19 @@ public class Transition {
 					throw new CustomException(msg);
 				} else
 					associationE.getParticipants().add(elements[0]);
-			} else
+			} else {
 				this.getNewParts().add(new AssociationRP(elements[1], elements[0]));
+				Set<String> set = new HashSet<>(Arrays.asList(elements[1]));
+				this.getCaller().put(elements[0], set);
+			}
 		} else {
-			if (this.getExistentParts() == null)
+			if (this.getExistentParts() == null) {
+				this.getCaller().put(p, Collections.<String>emptySet());
 				this.setExistentParts(new AssociationRP("", p));
-			else
+			} else {
 				this.getExistentParts().getParticipants().add(p);
+				this.getCaller().put(p, Collections.<String>emptySet());
+			}
 		}
 	}
 
@@ -456,5 +466,13 @@ public class Transition {
 				String msg = CommonUtils.replaceMsgOne(EXCEPTION_VARIABLE_ALREADY_EXISTS_WITH_THIS_ID, v.getId());
 				throw new CustomException(msg);
 			}
+	}
+
+	public Map<String, Set<String>> getCaller() {
+		return caller;
+	}
+
+	public void setCaller(Map<String, Set<String>> caller) {
+		this.caller = caller;
 	}
 }

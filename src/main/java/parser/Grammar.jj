@@ -76,7 +76,8 @@ TOKEN :
 TOKEN :
 {
 	< STARTLABEL : "starts" | "STARTS" | "deploy" | "DEPLOY" >
-	| < CONTAINS : "in" > 
+	| < CONTAINS : "in" >
+	| < ANY : "ANY" | "any" >
 }
 
 // Brackets
@@ -183,12 +184,18 @@ boolean ExternalCall():
 	| <LT> { return true; }	  
 }
 
+void AnyParticipant():
+{}
+{
+  <ANY>
+}
+
 String Participant():
 {
 	Token p1, p2 = null, p3 = null;
 }
 {
- 	p1 = < IDWN > (p2 = <COLON> p3 = <IDWN>)?
+ 	(AnyParticipant())? p1 = < IDWN > (p2 = <COLON> p3 = <IDWN>)?
  	{
 		if(p2 == null) { return p1.image; }
 		else { return p1.image.concat(p2.image).concat(p3.image); }

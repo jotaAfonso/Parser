@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exceptions.TypingException;
+import types.AssignType;
 import types.BoolType;
 import types.IType;
 
@@ -67,7 +68,13 @@ public class ASTAssign implements ASTNode {
 
 	@Override
 	public IType typeCheckPost() throws TypingException {
-		return null;
+		IType leftT = left.typeCheck();
+		IType rightT = right.typeCheck();
+		
+		if(leftT == rightT)
+			return AssignType.singleton;
+		else
+			throw new TypingException("Wrong types in assign");
 	}
 
 	@Override

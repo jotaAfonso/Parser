@@ -1,0 +1,74 @@
+{
+  "id" : "c",
+  "initialState" : "S0",
+  "statesDeclaration" : "int state; int offer",
+  "states" : [ "S0", "S1", "S2" ],
+  "finalStates" : [ "S2" ],
+  "transitions" : [ {
+    "newParts" : [ ],
+    "caller" : {
+      "o" : [ ]
+    },
+    "from" : "S1",
+    "to" : "S0",
+    "actionLabel" : "rejectOffer",
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "true",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "newParts" : [ ],
+    "caller" : {
+      "b" : [ ]
+    },
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "acceptOffer",
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "true",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "newParts" : [ {
+      "role" : "O",
+      "participants" : [ "o" ]
+    } ],
+    "caller" : {
+      "o" : [ "O" ]
+    },
+    "from" : "_",
+    "to" : "S0",
+    "actionLabel" : "starts",
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "newParts" : [ {
+      "role" : "B",
+      "participants" : [ "b" ]
+    } ],
+    "caller" : {
+      "b" : [ "B" ]
+    },
+    "from" : "S0",
+    "to" : "S1",
+    "actionLabel" : "makeOffer",
+    "input" : "_offer:int",
+    "preCondition" : "",
+    "postCondition" : "offer := _offer",
+    "internal" : false,
+    "externalCall" : false
+  } ],
+  "roles" : [ "B", "O" ],
+  "rPAssociation" : [ {
+    "role" : "O",
+    "participants" : [ "o" ]
+  }, {
+    "role" : "B",
+    "participants" : [ "b" ]
+  } ]
+}

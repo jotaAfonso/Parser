@@ -97,7 +97,8 @@ public class ValidationChecks {
 		Path outputP;
 		if (args.getOutputPath() == null) {
 			outputP = args.getInputPath().getParent();
-			outputP = outputP.resolve("global_type.json");
+			String name = args.getInputPath().getFileName().toString().split("\\.")[0];
+			outputP = outputP.resolve(name + "_global.json");
 		} else
 			outputP = args.getOutputPath();
 

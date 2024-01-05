@@ -1,3 +1,0 @@
-_ {} o:O > deploy(c) { AND(int currentV := 0, bool ended := false) } S0
-S0 {AND( value > currentV, NOT ended)} b:B > c.bid(int:value) {currentV := value} S1 S1 {} b > c.withdraw() {currentV := 0} S0
-S1 {} o > c.end() {ended := true} S2+

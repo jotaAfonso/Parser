@@ -54,49 +54,51 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int CONTAINS = 24;
   /** RegularExpression Id. */
-  int LBRACKET = 25;
+  int ANY = 25;
   /** RegularExpression Id. */
-  int RBRACKET = 26;
+  int LBRACKET = 26;
   /** RegularExpression Id. */
-  int LPAR = 27;
+  int RBRACKET = 27;
   /** RegularExpression Id. */
-  int RPAR = 28;
+  int LPAR = 28;
   /** RegularExpression Id. */
-  int SLPAR = 29;
+  int RPAR = 29;
   /** RegularExpression Id. */
-  int SRPAR = 30;
+  int SLPAR = 30;
   /** RegularExpression Id. */
-  int QUOTE = 31;
+  int SRPAR = 31;
   /** RegularExpression Id. */
-  int UNDERSCORE = 32;
+  int QUOTE = 32;
   /** RegularExpression Id. */
-  int COLON = 33;
+  int UNDERSCORE = 33;
   /** RegularExpression Id. */
-  int SEMICOLON = 34;
+  int COLON = 34;
   /** RegularExpression Id. */
-  int COMMA = 35;
+  int SEMICOLON = 35;
   /** RegularExpression Id. */
-  int VAR = 36;
+  int COMMA = 36;
   /** RegularExpression Id. */
-  int VARASS = 37;
+  int VAR = 37;
   /** RegularExpression Id. */
-  int MOREPART = 38;
+  int VARASS = 38;
   /** RegularExpression Id. */
-  int DOT = 39;
+  int MOREPART = 39;
   /** RegularExpression Id. */
-  int EXISTS = 40;
+  int DOT = 40;
   /** RegularExpression Id. */
-  int FORALL = 41;
+  int EXISTS = 41;
   /** RegularExpression Id. */
-  int NUMBER = 42;
+  int FORALL = 42;
   /** RegularExpression Id. */
-  int CHAR = 43;
+  int NUMBER = 43;
   /** RegularExpression Id. */
-  int ID = 44;
+  int CHAR = 44;
   /** RegularExpression Id. */
-  int IDWN = 45;
+  int ID = 45;
   /** RegularExpression Id. */
-  int STRING_LITERAL = 46;
+  int IDWN = 46;
+  /** RegularExpression Id. */
+  int STRING_LITERAL = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -128,6 +130,7 @@ public interface ParserConstants {
     "<FALSE>",
     "<STARTLABEL>",
     "\"in\"",
+    "<ANY>",
     "\"{\"",
     "\"}\"",
     "\"(\"",

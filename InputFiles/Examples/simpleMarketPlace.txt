@@ -1,4 +1,4 @@
-_ {} o:O > deploy(c) {} {int a; int b} S0
-S0 {} b:B > c.bid(int value) {} S1 
-S1 {} b > c.withdraw() {} S0
-S1 {} o > c.end() {} S2+
+_ {} o:O > deploy(c) {} {int state; int offer} S0
+S0 {_offer > 0} any b:B > c.makeOffer(int _offer) {offer := _offer} S1 
+S1 {true} b > c.acceptOffer() {} S2+
+S1 {true} o > c.rejectOffer() {} S0
