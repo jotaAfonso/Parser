@@ -5,61 +5,59 @@
   "states" : [ "S0", "S1", "S2" ],
   "finalStates" : [ "S2" ],
   "transitions" : [ {
-    "newParts" : [ ],
-    "caller" : {
-      "o" : [ ]
-    },
-    "from" : "S1",
-    "to" : "S0",
-    "actionLabel" : "rejectOffer",
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "true",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "newParts" : [ ],
-    "caller" : {
-      "b" : [ ]
-    },
-    "from" : "S1",
-    "to" : "S2",
-    "actionLabel" : "acceptOffer",
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "true",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "newParts" : [ {
-      "role" : "O",
-      "participants" : [ "o" ]
-    } ],
-    "caller" : {
-      "o" : [ "O" ]
-    },
-    "from" : "_",
-    "to" : "S0",
-    "actionLabel" : "starts",
-    "input" : "",
-    "preCondition" : "",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "newParts" : [ {
-      "role" : "B",
-      "participants" : [ "b" ]
-    } ],
     "caller" : {
       "b" : [ "B" ]
     },
     "from" : "S0",
     "to" : "S1",
     "actionLabel" : "makeOffer",
-    "input" : "_offer:int",
+    "newParticipants" : {
+      "b" : [ "B" ]
+    },
+    "input" : "int _offer",
     "preCondition" : "",
     "postCondition" : "offer := _offer",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "caller" : {
+      "b" : [ ]
+    },
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "acceptOffer",
+    "newParticipants" : { },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "true",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "caller" : {
+      "o" : [ "O" ]
+    },
+    "from" : "_",
+    "to" : "S0",
+    "actionLabel" : "starts",
+    "newParticipants" : {
+      "o" : [ "O" ]
+    },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "caller" : {
+      "o" : [ ]
+    },
+    "from" : "S1",
+    "to" : "S0",
+    "actionLabel" : "rejectOffer",
+    "newParticipants" : { },
+    "input" : "",
+    "preCondition" : "",
+    "postCondition" : "true",
     "internal" : false,
     "externalCall" : false
   } ],

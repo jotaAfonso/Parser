@@ -53,7 +53,7 @@ public class Constants {
 	public static final String JSON_FROM = "from";
 	public static final String JSON_TO = "to";
 	public static final String JSON_LABEL = "actionLabel";
-	public static final String JSON_NEW_PART = "newParts";
+	public static final String JSON_NEW_PART = "newParticipants";
 	public static final String JSON_EXISTENT_PART = "existantParts";
 	public static final String JSON_INPUT = "input";
 	public static final String JSON_PRE_COND = "preCondition";

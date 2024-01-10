@@ -228,11 +228,11 @@ public class ValidationChecks {
 		visited.add(start);
 		boolean result = true;
 		Transition starter = a.getTransitions().stream().filter(x -> x.getFromS().equals("_")).findAny().get();
-		for (AssociationRP nP : starter.getNewParts()) {
-			if (!nP.getParticipants().contains(part)) {
-				result = breadthFirstSearch(graph, visited, start, end, part, false, false, true);
-			}
-		}
+//		for (AssociationRP nP : starter.getNewParts()) {
+//			if (!nP.getParticipants().contains(part)) {
+//				result = breadthFirstSearch(graph, visited, start, end, part, false, false, true);
+//			}
+//		}
 		return result;
 	}
 

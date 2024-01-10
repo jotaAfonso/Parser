@@ -156,7 +156,7 @@ public class GrammarLogic {
 	 */
 	private static void treatExternalCall(Automaton a, ValidationChecks checks, String from, String to, String label,
 			Transition t, String p) {
-		Transition newt = new Transition(".", from, to, label, t.getNewParts(), t.getExistentParts(), t.getInput(),
+		Transition newt = new Transition(".", from, to, label, t.getNewParticipants(), t.getExistentParts(), t.getInput(),
 				t.getPreCondition(), t.getPostCondition(), false);
 		a.addTransition(newt);
 		checks.getGraph().addEdge(newt.getFromS(), newt.getToS(), p);

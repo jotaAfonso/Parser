@@ -38,7 +38,8 @@ public class Transition {
 	private String actionLabel;
 
 	/** The new parts. */
-	private Set<AssociationRP> newParts = new HashSet<AssociationRP>();
+	@JsonProperty(JSON_NEW_PART)
+	private Map<String, Set<String>> newParticipants  = new HashMap<String, Set<String>>();
 	
 	/** The new parts. */
 	private Map<String, Set<String>> caller = new HashMap<String, Set<String>>();
@@ -110,7 +111,7 @@ public class Transition {
 	 * @param postC - post condition
 	 * @param e     - external call
 	 */
-	public Transition(String type, String f, String t, String l, Set<AssociationRP> nP, AssociationRP eP, String i,
+	public Transition(String type, String f, String t, String l, Map<String, Set<String>> nP, AssociationRP eP, String i,
 			String preC, String postC, boolean e) {
 		this.type = type;
 
@@ -118,7 +119,7 @@ public class Transition {
 		this.toS = t;
 		this.actionLabel = l;
 
-		this.newParts = nP;
+		this.newParticipants  = nP;
 		this.existentParts = eP;
 
 		this.input = i;
@@ -224,8 +225,8 @@ public class Transition {
 	 *
 	 * @return the new participants
 	 */
-	public Set<AssociationRP> getNewParts() {
-		return newParts;
+	public Map<String, Set<String>> getNewParticipants() {
+		return newParticipants ;
 	}
 
 	/**
@@ -233,8 +234,8 @@ public class Transition {
 	 *
 	 * @param newParts - new participants
 	 */
-	public void setNewParts(Set<AssociationRP> newParts) {
-		this.newParts = newParts;
+	public void setNewParticipants(Map<String, Set<String>> newParticipants) {
+		this.newParticipants  = newParticipants;
 	}
 
 	/**
@@ -368,7 +369,6 @@ public class Transition {
 			for (Param p : parameters) {
 				String type = "";
 				input = input.concat(", ");
-				input = input.concat(p.getId()).concat(":");
 				IType ltype = p.getType();
 				if(ltype instanceof ParticipantType) {
 					ParticipantType pType = (ParticipantType) ltype;
@@ -376,7 +376,8 @@ public class Transition {
 				} else {
 					type = ltype.getType();
 				}
-				input = input.concat(type);	
+				input = input.concat(type).concat(" ");	
+				input = input.concat(p.getId());
 			}
 			if (!input.isEmpty())
 				input = input.substring(2);
@@ -427,17 +428,15 @@ public class Transition {
 	private void treatParticipant(String p) throws CustomException {
 		if (p.contains(COLON)) {
 			String[] elements = p.split("\\:", 0);
-			AssociationRP associationE = this.getNewParts().stream().filter(x -> x.getRole().equals(elements[1]))
-					.findAny().orElse(null);
-			if (associationE != null) {
-				if (associationE.getParticipants().contains(elements[0])) {
+			if (this.getNewParticipants().get(elements[0]) != null) {
+				if (this.getNewParticipants().get(elements[0]).contains(elements[1])) {
 					String msg = CommonUtils.replaceMsgTwo(EXCEPTION_TRANS_PART_REGIST, elements[0], elements[1]);
 					throw new CustomException(msg);
 				} else
-					associationE.getParticipants().add(elements[0]);
+					this.getNewParticipants().get(elements[0]).add(elements[1]);
 			} else {
-				this.getNewParts().add(new AssociationRP(elements[1], elements[0]));
 				Set<String> set = new HashSet<>(Arrays.asList(elements[1]));
+				this.getNewParticipants().put(elements[0], set);
 				this.getCaller().put(elements[0], set);
 			}
 		} else {
