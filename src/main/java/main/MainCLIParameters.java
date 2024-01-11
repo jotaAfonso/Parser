@@ -23,7 +23,6 @@ public class MainCLIParameters {
 	private Path inputFile;
 	
 	@Parameter(names = {"-o", "--outputFile"},
-			validateWith = FileParameterOptionalValidator.class,
 			converter = PathConverter.class,
 			description = "Path to the destination file. If not specified it will have the same path as the input file.")
 	private Path outputFile;
@@ -33,6 +32,20 @@ public class MainCLIParameters {
 	
 	@Parameter(names = {"-t", "--tests"}, description = "Runs tests.")
 	private boolean test;
+	
+	@Parameter(names = {"-generate"}, description = "Generates json.")
+	private boolean generate;
+	
+	@Parameter(names = {"-visualize"}, description = "Visualizes a json.")
+	private boolean visualize;
+	
+	public boolean isGenerate() {
+		return generate;
+	}
+	
+	public boolean isVisualize() {
+		return visualize;
+	}
 
 	public boolean isHelp() {
 		return help;

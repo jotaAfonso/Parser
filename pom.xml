@@ -43,6 +43,6 @@
 		  	<groupId>com.beust</groupId>
 		  	<artifactId>jcommander</artifactId>
 		  	<version>1.58</version>
-		</dependency>
+		</dependency>		
 	</dependencies>
 </project>

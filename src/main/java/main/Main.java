@@ -15,6 +15,7 @@ import data.Automaton;
 import exceptions.CustomException;
 import exceptions.TypingException;
 import validations.ValidationChecks;
+import visual.FSMGraphGenerator;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -29,7 +30,10 @@ public class Main {
 
 		try {
 			jCommander.parse(args);
-			argumentsGiven(mainArgs);
+			if(mainArgs.isVisualize())
+				FSMGraphGenerator.generateGraph(mainArgs.getInputPath().toString());
+			else
+				argumentsGiven(mainArgs);
 		} catch (ParameterException e) {
 			System.out.println(e.getMessage());
 			showUsage(jCommander);

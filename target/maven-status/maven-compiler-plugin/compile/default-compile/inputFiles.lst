@@ -3,6 +3,7 @@ C:\mano_pasta\Parser\src\main\java\ast\ASTOr.java
 C:\mano_pasta\Parser\src\main\java\main\MainCLIParameters.java
 C:\mano_pasta\Parser\src\main\java\ast\ASTGt.java
 C:\mano_pasta\Parser\src\main\java\ast\ASTSet.java
+C:\mano_pasta\Parser\src\main\java\types\AssignType.java
 C:\mano_pasta\Parser\src\main\java\exceptions\CustomException.java
 C:\mano_pasta\Parser\src\main\java\main\Main.java
 C:\mano_pasta\Parser\src\main\java\ast\ASTBool.java
