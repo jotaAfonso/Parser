@@ -12,7 +12,7 @@ public class ASTBool implements ASTNode {
 	String val;
 
 	public ASTBool(boolean n) {
-		val = String.valueOf(n);
+		val = String.valueOf(n).substring(0, 1).toUpperCase() + String.valueOf(n).substring(1);
 	}
 
 	@Override
