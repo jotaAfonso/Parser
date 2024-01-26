@@ -133,7 +133,7 @@ public class FSMGraphGenerator {
             String pre = "{".concat(transition.getString(JSON_PRE_COND)).concat("}");
             String post = "{".concat(transition.getString(JSON_POST_COND)).concat("}");
             
-            result = pre + " " + result + " " + post;
+            //result = pre + " " + result + " " + post;
             
             Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
            	//edge.setAttribute("layout.weight", 3); 
