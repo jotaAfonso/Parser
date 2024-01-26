@@ -28,8 +28,8 @@
     "actionLabel" : "rejectOffer",
     "newParticipants" : { },
     "input" : "",
-    "preCondition" : "",
-    "postCondition" : "true",
+    "preCondition" : "true",
+    "postCondition" : "",
     "internal" : false,
     "externalCall" : false
   }, {
@@ -43,7 +43,7 @@
       "b" : [ "B" ]
     },
     "input" : "int _offer",
-    "preCondition" : "",
+    "preCondition" : "_offer > 0",
     "postCondition" : "offer := _offer",
     "internal" : false,
     "externalCall" : false
@@ -56,8 +56,8 @@
     "actionLabel" : "acceptOffer",
     "newParticipants" : { },
     "input" : "",
-    "preCondition" : "",
-    "postCondition" : "true",
+    "preCondition" : "true",
+    "postCondition" : "",
     "internal" : false,
     "externalCall" : false
   } ],

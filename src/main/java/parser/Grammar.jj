@@ -1,6 +1,7 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
  */
+
 options
 {
  static = false;
@@ -68,8 +69,8 @@ TOKEN :
 // Boolean Values
 TOKEN :
 {
-  	< TRUE : "true" | "TRUE" >
-  	| < FALSE : "false" | "FALSE" > 
+  	< TRUE : "True" >
+  	| < FALSE : "False" > 
 }
 
 // Constants

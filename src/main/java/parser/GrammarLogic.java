@@ -110,7 +110,11 @@ public class GrammarLogic {
 			if (!deployFlag && condition.checkIfItHasVar())
 				throw new CustomException("Variables are only declared in the deploy/start method.");
 
-			t.setPostCondition(condition.toString());
+			if(preCondition)
+				t.setPreCondition(condition.toString());
+			else 
+				t.setPostCondition(condition.toString());
+			
 			List<ASTId> idsV = condition.getIds();
 			if (idsV != null && !idsV.isEmpty())
 				CommonUtils.addTypeToIDs(idsV, a.getGlobalVars(), t.getLocalVars());
