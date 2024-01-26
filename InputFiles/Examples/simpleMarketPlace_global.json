@@ -42,7 +42,7 @@
     "newParticipants" : {
       "o" : [ "O" ]
     },
-    "input" : "",
+    "input" : "int _test",
     "preCondition" : "true",
     "postCondition" : "",
     "internal" : false,
