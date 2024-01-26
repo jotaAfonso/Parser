@@ -1,4 +1,4 @@
-_ {} o:O > deploy(c) {} {int state; int offer} S0
+_ {True} o:O > deploy(c) {} {int state; int offer} S0
 S0 {_offer > 0} any b:B > c.makeOffer(int _offer) {offer := _offer} S1 
 S1 {True} b > c.acceptOffer() {} S2+
 S1 {True} o > c.rejectOffer() {} S0
