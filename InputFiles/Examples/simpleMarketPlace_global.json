@@ -6,15 +6,17 @@
   "finalStates" : [ "S2" ],
   "transitions" : [ {
     "caller" : {
-      "b" : [ ]
+      "b" : [ "B" ]
     },
-    "from" : "S1",
-    "to" : "S2",
-    "actionLabel" : "acceptOffer",
-    "newParticipants" : { },
-    "input" : "",
-    "preCondition" : "True",
-    "postCondition" : "",
+    "from" : "S0",
+    "to" : "S1",
+    "actionLabel" : "makeOffer",
+    "newParticipants" : {
+      "b" : [ "B" ]
+    },
+    "input" : "int _offer",
+    "preCondition" : "_offer > 0",
+    "postCondition" : "offer := _offer",
     "internal" : false,
     "externalCall" : false
   }, {
@@ -47,17 +49,15 @@
     "externalCall" : false
   }, {
     "caller" : {
-      "b" : [ "B" ]
+      "b" : [ ]
     },
-    "from" : "S0",
-    "to" : "S1",
-    "actionLabel" : "makeOffer",
-    "newParticipants" : {
-      "b" : [ "B" ]
-    },
-    "input" : "int _offer",
-    "preCondition" : "_offer > 0",
-    "postCondition" : "offer := _offer",
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "acceptOffer",
+    "newParticipants" : { },
+    "input" : "",
+    "preCondition" : "True",
+    "postCondition" : "",
     "internal" : false,
     "externalCall" : false
   } ],
