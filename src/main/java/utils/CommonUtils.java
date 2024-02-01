@@ -5,6 +5,7 @@ import static utils.Constants.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import ast.ASTId;
@@ -83,5 +84,11 @@ public class CommonUtils {
 				throw new CustomException(msg);
 			}
 		}			
+	}
+	
+	public static String generatingRandomString() {
+		UUID randomUUID = UUID.randomUUID();
+
+	    return randomUUID.toString().replaceAll("_", "");
 	}
 }

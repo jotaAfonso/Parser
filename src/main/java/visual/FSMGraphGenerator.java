@@ -21,6 +21,8 @@ import org.graphstream.ui.view.Viewer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import utils.CommonUtils;
+
 /**
  * The Class FSMGraphGenerator.
  */
@@ -123,27 +125,27 @@ public class FSMGraphGenerator {
             action = action.concat(transition.getString(JSON_LABEL));
             String result = cID;
             if(!transition.getString(JSON_LABEL).contains("start"))
-            	result = result.concat(action).concat("(").concat(input).concat(")");
+            	result = result.concat(action);
             else {
-            	result = action.replace(".", "").replace("-", "").concat("(").concat(cID);
-            	if(!input.isEmpty())
+            	result = action.replace(".", "").replace("-", "");
+            	/*if(!input.isEmpty())
             		result = result.concat(",");
-            	result = result.concat(input).concat(")");
+            	result = result.concat(input).concat(")");*/
             }
             String pre = "{".concat(transition.getString(JSON_PRE_COND)).concat("}");
             String post = "{".concat(transition.getString(JSON_POST_COND)).concat("}");
             
             //result = pre + " " + result + " " + post;
+            result = result.substring(result.indexOf(".") + 1);
+            String spriteId = result.concat(CommonUtils.generatingRandomString()).replace("-", "");
             
-            Edge edge = g.addEdge(from.concat(action).concat(to), from, to, true);
-           	//edge.setAttribute("layout.weight", 3); 
-            //edge.setAttribute("ui.style", "text-size: 15px; text-alignment: along; shape: line; text-offset: -100;");
-            
-            String spriteId = from.concat(action).concat(to).replace(".", "");
-            spriteId = spriteId.replace("-", "");
+            Edge edge = g.addEdge(spriteId, from, to, true);
+           	edge.setAttribute("layout.weight", 3); 
+            edge.setAttribute("ui.style", "text-size: 15px; text-alignment: along; shape: line; text-offset: -100;");
+            //spriteId = from.concat(action).concat(to).replace(".", "").replace("-", "");
             Sprite s = sm.addSprite(spriteId);
             s.setAttribute("ui.label", result);
-            s.attachToEdge(from.concat(action).concat(to));
+            s.attachToEdge(spriteId);
             s.setPosition(0.5);
         }
     }
