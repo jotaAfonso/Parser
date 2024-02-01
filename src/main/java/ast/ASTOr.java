@@ -18,7 +18,7 @@ public class ASTOr implements ASTNode {
 
 	@Override
 	public String toString() {
-		return left.toString() + " || " + right.toString() ;
+		return "OR(" + left.toString() + ", " + right.toString() + ")";
 	}
 	
 	@Override

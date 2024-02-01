@@ -288,29 +288,20 @@ ASTNode Assertion():
 	ASTNode n;
 }
 {
-	n = Exp()
+	n = LogicalExp()
 	{ return n; }
 }
 
-ASTNode Exp():
+ASTNode LogicalExp():
 {
   	ASTNode n1, n2;
 }
 {
-  	( n1 = BooleanExp() LogicalExp(n1)
-  	| <NOT> n1 = Exp() { return new ASTNot(n1); }
- 	) { return n1; }
-}
-
-ASTNode LogicalExp(ASTNode n1):
-{
-  	ASTNode n2;
-}
-{
-  	(  	  <AND> n2 = Exp() { return new ASTAnd(n1, n2); }
- 	| <OR> n2 = Exp() { return new ASTOr(n1, n2); }
-	)?
-	{ return n1; } 	
+  	( n1 = BooleanExp()
+	| <OR> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { n1 = new ASTOr(n1, n2); }
+  	| <AND> <LPAR> n1 = LogicalExp() <COMMA> n2 = LogicalExp() <RPAR> { n1 = new ASTAnd(n1, n2); }
+  	| <NOT> n1 = LogicalExp() { return new ASTNot(n1); }
+	) { return n1; }
 }
 
 ASTNode BooleanExp():
@@ -328,8 +319,8 @@ ASTNode BooleanExp():
 	 	| <VARASS> n2 = ArithmeticExp() { return new ASTAssign(n1, n2); }
 		| <CONTAINS> n2 = ArithmeticExp() { return new ASTContains(n1, n2);})*
 	{ return n1; } )
-	| <EXISTS> n1 = AtomicExp() n2 = AtomicExp() n3 = Exp() { return new ASTExists(n1, n2, n3);}
-	| <FORALL> n1 = AtomicExp() n2 = AtomicExp() n3 = Exp() { return new ASTForAll(n1, n2, n3);}
+	| <EXISTS> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTExists(n1, n2, n3);}
+	| <FORALL> n1 = AtomicExp() n2 = AtomicExp() n3 = LogicalExp() { return new ASTForAll(n1, n2, n3);}
 }
 
 ASTNode ArithmeticExp() :

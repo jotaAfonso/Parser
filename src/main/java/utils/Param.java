@@ -27,7 +27,4 @@ public class Param {
 	public void setType(IType type) {
 		this.type = type;
 	}
-	
-	
-
 }

@@ -28,7 +28,7 @@
     "actionLabel" : "acceptOffer",
     "newParticipants" : { },
     "input" : "",
-    "preCondition" : "true",
+    "preCondition" : "True",
     "postCondition" : "",
     "internal" : false,
     "externalCall" : false
@@ -43,7 +43,7 @@
       "o" : [ "O" ]
     },
     "input" : "int _test",
-    "preCondition" : "true",
+    "preCondition" : "AND(True, _test > 0)",
     "postCondition" : "",
     "internal" : false,
     "externalCall" : false
@@ -56,7 +56,7 @@
     "actionLabel" : "rejectOffer",
     "newParticipants" : { },
     "input" : "",
-    "preCondition" : "true",
+    "preCondition" : "True",
     "postCondition" : "",
     "internal" : false,
     "externalCall" : false
