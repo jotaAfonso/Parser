@@ -35,7 +35,9 @@ TOKEN :
   	< INT: "int" >
   	| < BOOL: "bool" >
  	| < STRING: "string">
- 	| < SET: "set">
+ 	| < PARTICIPANT: "participant" >
+ 	| < ARRAY: "array" >
+ 	//| < SET: "set">
  	// | < PTYPE: "PType">
 }
 
@@ -267,7 +269,8 @@ IType TypeParam():
   	Token role;
 }
 {	
-  	( role = <IDWN> { return new ParticipantType(role.image); }
+  	( <PARTICIPANT> role = <IDWN> { return new ParticipantType(role.image); }
+ 	| <ARRAY>  t = Type() { return new SetType(t); }
     | t = Type() { return t; })
 }
 
@@ -279,8 +282,7 @@ IType Type():
 {	
   	( <INT> { return IntType.singleton; }
     | <BOOL> { return BoolType.singleton; }
-	| <STRING> { return StringType.singleton; }
-    | <SET> { return SetType.singleton; })
+	| <STRING> { return StringType.singleton; })
 }
 
 ASTNode Assertion():

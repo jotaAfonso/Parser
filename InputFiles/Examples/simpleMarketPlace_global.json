@@ -42,7 +42,7 @@
     "newParticipants" : {
       "o" : [ "O" ]
     },
-    "input" : "int _test",
+    "input" : "int _test, C c, C b, array _arrayO",
     "preCondition" : "AND(True, _test > 0)",
     "postCondition" : "",
     "internal" : false,
@@ -63,6 +63,9 @@
   } ],
   "roles" : [ "B", "O" ],
   "rPAssociation" : [ {
+    "role" : "C",
+    "participants" : [ "b", "c" ]
+  }, {
     "role" : "O",
     "participants" : [ "o" ]
   }, {

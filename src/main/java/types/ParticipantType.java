@@ -4,7 +4,7 @@ public class ParticipantType implements IType {
 
 	public static final ParticipantType singleton = new ParticipantType();
 	
-	public static final String type = "pType";
+	public static final String type = "participant";
 	
 	public String role = "";
 	
