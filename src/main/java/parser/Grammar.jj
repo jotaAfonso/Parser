@@ -185,21 +185,24 @@ boolean ExternalCall():
 	| <LT> { return true; }	  
 }
 
-void AnyParticipant():
+String AnyParticipant():
 {}
 {
-  <ANY>
+  <ANY> { return "any "; }
 }
 
 String Participant():
 {
 	Token p1, p2 = null, p3 = null;
+	String a = "";
 }
 {
- 	(AnyParticipant())? p1 = < IDWN > (p2 = <COLON> p3 = <IDWN>)?
+ 	(a = AnyParticipant())? p1 = < IDWN > (p2 = <COLON> p3 = <IDWN>)?
  	{
 		if(p2 == null) { return p1.image; }
-		else { return p1.image.concat(p2.image).concat(p3.image); }
+		else {
+		  return a.concat(p1.image.concat(p2.image).concat(p3.image));
+		}
 	}
 }
 

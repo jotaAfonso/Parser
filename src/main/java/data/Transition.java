@@ -426,17 +426,27 @@ public class Transition {
 	 *                         the same transition it gives an exception.
 	 */
 	private void treatParticipant(String p) throws CustomException {
+		boolean anyFlag = false;
 		if (p.contains(COLON)) {
+			if(p.contains("any"))
+				anyFlag = true;
+			if(anyFlag)
+				p = p.replace("any", "").trim();	
 			String[] elements = p.split("\\:", 0);
-			if (this.getNewParticipants().get(elements[0]) != null) {
-				if (this.getNewParticipants().get(elements[0]).contains(elements[1])) {
-					String msg = CommonUtils.replaceMsgTwo(EXCEPTION_TRANS_PART_REGIST, elements[0], elements[1]);
-					throw new CustomException(msg);
-				} else
-					this.getNewParticipants().get(elements[0]).add(elements[1]);
+			if(!anyFlag) {
+				if (this.getNewParticipants().get(elements[0]) != null) {
+					if (this.getNewParticipants().get(elements[0]).contains(elements[1])) {
+						String msg = CommonUtils.replaceMsgTwo(EXCEPTION_TRANS_PART_REGIST, elements[0], elements[1]);
+						throw new CustomException(msg);
+					} else
+						this.getNewParticipants().get(elements[0]).add(elements[1]);
+				} else {
+					Set<String> set = new HashSet<>(Arrays.asList(elements[1]));
+					this.getNewParticipants().put(elements[0], set);
+					this.getCaller().put(elements[0], set);
+				}
 			} else {
 				Set<String> set = new HashSet<>(Arrays.asList(elements[1]));
-				this.getNewParticipants().put(elements[0], set);
 				this.getCaller().put(elements[0], set);
 			}
 		} else {
