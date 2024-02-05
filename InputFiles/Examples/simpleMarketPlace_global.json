@@ -1,38 +1,10 @@
 {
   "id" : "c",
   "initialState" : "S0",
-  "statesDeclaration" : "int state; int offer",
+  "statesDeclaration" : "int offer; int state",
   "states" : [ "S0", "S1", "S2" ],
   "finalStates" : [ "S2" ],
   "transitions" : [ {
-    "caller" : {
-      "b" : [ "B" ]
-    },
-    "from" : "S0",
-    "to" : "S1",
-    "actionLabel" : "makeOffer",
-    "newParticipants" : {
-      "b" : [ "B" ]
-    },
-    "input" : "int _offer",
-    "preCondition" : "_offer > 0",
-    "postCondition" : "offer := _offer",
-    "internal" : false,
-    "externalCall" : false
-  }, {
-    "caller" : {
-      "b" : [ ]
-    },
-    "from" : "S1",
-    "to" : "S2",
-    "actionLabel" : "acceptOffer",
-    "newParticipants" : { },
-    "input" : "",
-    "preCondition" : "True",
-    "postCondition" : "",
-    "internal" : false,
-    "externalCall" : false
-  }, {
     "caller" : {
       "o" : [ "O" ]
     },
@@ -60,6 +32,32 @@
     "postCondition" : "",
     "internal" : false,
     "externalCall" : false
+  }, {
+    "caller" : {
+      "b" : [ "B" ]
+    },
+    "from" : "S0",
+    "to" : "S1",
+    "actionLabel" : "makeOffer",
+    "newParticipants" : { },
+    "input" : "int _offer",
+    "preCondition" : "_offer > 0",
+    "postCondition" : "offer := _offer",
+    "internal" : false,
+    "externalCall" : false
+  }, {
+    "caller" : {
+      "b" : [ ]
+    },
+    "from" : "S1",
+    "to" : "S2",
+    "actionLabel" : "acceptOffer",
+    "newParticipants" : { },
+    "input" : "",
+    "preCondition" : "True",
+    "postCondition" : "",
+    "internal" : false,
+    "externalCall" : false
   } ],
   "roles" : [ "B", "O" ],
   "rPAssociation" : [ {
@@ -70,6 +68,6 @@
     "participants" : [ "o" ]
   }, {
     "role" : "B",
-    "participants" : [ "b" ]
+    "participants" : [ "any b" ]
   } ]
 }
